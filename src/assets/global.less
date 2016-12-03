@@ -1,0 +1,171 @@
+@font-face {
+  font-family: 'iconfont';  /* project id 189309 */
+  src: url('//at.alicdn.com/t/font_k236v94xy0wo2yb9.eot');
+  src: url('//at.alicdn.com/t/font_k236v94xy0wo2yb9.eot?#iefix') format('embedded-opentype'),
+  url('//at.alicdn.com/t/font_k236v94xy0wo2yb9.woff') format('woff'),
+  url('//at.alicdn.com/t/font_k236v94xy0wo2yb9.ttf') format('truetype'),
+  url('//at.alicdn.com/t/font_k236v94xy0wo2yb9.svg#iconfont') format('svg');
+}
+.iconfont {
+  font: normal 22px/1 'iconfont';
+}
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background-color: #ebebeb;
+}
+html{font-size: 37.5px;}
+body{font-size: 12px;}
+a{color: #007aff;}
+
+.l-hflex{
+  display:-webkit-flex;display:flex; -webkit-flex-flow:row;flex-flow:row; 
+  display:-webkit-box;display: box; -webkit-box-orient:horizontal;box-orient:horizontal;
+}
+.l-vflex{
+  display:-webkit-flex;display:flex;-webkit-flex-flow:column;flex-flow:column; 
+  display:-webkit-box;display: box; -webkit-box-orient:vertical;box-orient:vertical;
+}
+.l-bc{-webkit-align-self:flex-end; align-self:flex-end; }
+.l-hflex.l-bc{-webkit-box-align:end;box-align:end;}
+.l-vflex.l-bc{-webkit-box-pack:end;box-pack:end;}
+.l-vc{-webkit-align-self:center; align-self:center; }
+.l-hflex.l-vc{-webkit-box-align:center;box-align:center;}
+.l-vflex.l-vc{-webkit-box-pack:center;box-pack:center;}
+.l-hc{-webkit-box-pack:center;box-pack:center;-webkit-align-items:center; align-items:center; }
+.l-hflex.l-hc{-webkit-box-pack:center;box-pack:center;}
+.l-vflex.l-hc{-webkit-box-align:center;box-align:center;}
+.l-flex1{-webkit-box-flex: 1;box-flex:1;-webkit-flex: 1;flex: 1;}
+.l-text-truncate {word-wrap: normal; /* for IE */ text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
+.l-line-clamp2{text-overflow: -o-ellipsis-lastline;text-overflow: ellipsis;overflow: hidden;max-height: 1.1rem;word-break: break-all;display: -webkit-box;-webkit-line-clamp: 2;-webkit-box-orient: vertical;}
+
+
+.vux-tab .vux-tab-item{
+  font-weight: 500;
+}
+
+.weui-btn-area{
+  margin: 0.4rem;
+}
+
+.l-group [slot=icon] {
+  width: 0.8rem;
+  height: 0.8rem;
+  line-height: 0.8rem;
+  color: #fff;
+  display: block;
+  font-size: 18px;
+  text-align: center;
+  border-radius: 4px;
+  margin: 0 0.266667rem 0 0;
+}
+
+.l-group .weui_cells {
+  margin: 0.4rem 0;
+}
+
+.l-group .weui_cell {
+  // line-height: 1;
+}
+
+.l-group .weui_cell_bd > p {
+  font-weight: 400;
+}
+
+.l-group .has-desc {
+  line-height: 1;
+}
+
+.l-group .has-desc .vux-label-desc {
+  font-size: 12px;
+}
+
+
+/* v-r-transition, default is {forward: 'forward', back: 'back'}*/
+.forward-enter,
+.forward-leave {
+  transform: translate3d(-100%, 0, 0);
+}
+
+.back-enter,
+.back-leave {
+  transform: translate3d(100%, 0, 0);
+}
+
+/**
+* vue-router transition
+*/
+
+.vux-pop-out-transition,
+.vux-pop-in-transition {
+  width: 100%;
+  animation-duration: 0.5s;
+  animation-fill-mode: both;
+  backface-visibility: hidden;
+}
+
+.vux-pop-out-enter,
+.vux-pop-out-leave,
+.vux-pop-in-enter,
+.vux-pop-in-leave {
+  will-change: transform;
+  height: 100%;
+  position: absolute;
+  left: 0;
+}
+
+.vux-pop-out-enter {
+  animation-name: popInLeft;
+}
+
+.vux-pop-out-leave {
+  animation-name: popOutRight;
+}
+
+.vux-pop-in-enter {
+  perspective: 1000;
+  animation-name: popInRight;
+}
+
+.vux-pop-in-leave {
+  animation-name: popOutLeft;
+}
+
+@keyframes popInLeft {
+  from {
+    transform: translate3d(-100%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes popOutLeft {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-100%, 0, 0);
+  }
+}
+
+@keyframes popInRight {
+  from {
+    transform: translate3d(100%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes popOutRight {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(100%, 0, 0);
+  }
+}
