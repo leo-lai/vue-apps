@@ -1,7 +1,7 @@
 <template>
   <div>
     <group title="常见问题">
-      <cell v-for="item in faqList" :title="item.title" :is-link="true">
+      <cell v-for="item in faqList" :title="item.title" link="/user/faq/info">
         <span slot="icon">{{$index+1}}、</span>
       </cell>
     </group>
@@ -12,7 +12,7 @@
       </cell>
     </group>
     <div class="weui-btn-area">
-      <x-button type="primary">我要反馈</x-button>  
+      <x-button type="primary" v-link="{path:'/user/faq/add'}">我要反馈</x-button>  
     </div>
   </div>
 </template>

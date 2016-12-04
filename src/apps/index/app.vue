@@ -103,7 +103,7 @@ export default {
 <style>
 /*全局样式*/
 .l-header-box {
-  z-index: 100;
+  z-index: 1000;
   position: absolute;
   width: 100%;
   left: 0;

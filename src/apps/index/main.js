@@ -63,6 +63,14 @@ router.map({
   '/user/faq': {
     title: '意见反馈',
     component: (resolve) => require(['./user-faq'], resolve)
+  },
+  '/user/faq/add': {
+    title: '意见反馈',
+    component: (resolve) => require(['./user-faq-add'], resolve)
+  },
+  '/user/faq/info': {
+    title: '意见反馈',
+    component: (resolve) => require(['./user-faq-info'], resolve)
   }
 })
 
