@@ -11,7 +11,7 @@
         <span slot="after-title" class="reddot-demo vux-reddot"></span>
       </cell>
     </group>
-    <div class="weui-btn-area">
+    <div class="l-btn-area">
       <x-button type="primary" v-link="{path:'/user/faq/add'}">我要反馈</x-button>  
     </div>
   </div>

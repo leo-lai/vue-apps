@@ -54,11 +54,11 @@ module.exports = {
       },
       {
         test   : /\.css$/,
-        loader : 'style-loader!css-loader'
+        loader : 'style-loader!css-loader!autoprefixer-loader?browsers=last 2 versions'
       }, 
     	{
         test: /\.less$/, 
-        loader: 'style!css!less'
+        loader: 'style!css!autoprefixer-loader?browsers=last 2 versions!less'
       },
       {
         test: /\.html$/,

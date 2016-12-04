@@ -52,9 +52,21 @@ router.map({
     title: '个人信息',
     component: (resolve) => require(['./user-info'], resolve)
   },
-  '/user/coupon': {
+  '/user/appointment': {
+    title: '我的预约',
+    component: (resolve) => require(['./user-appointment'], resolve)
+  },
+  '/user/order': {
+    title: '我的订单',
+    component: (resolve) => require(['./user-order'], resolve)
+  },
+  '/user/coupon/': {
     title: '我的优惠券',
     component: (resolve) => require(['./user-coupon'], resolve)
+  },
+  '/user/coupon/info': {
+    title: '优惠券详情',
+    component: (resolve) => require(['./user-coupon-info'], resolve)
   },
   '/user/pwd': {
     title: '重置密码',
