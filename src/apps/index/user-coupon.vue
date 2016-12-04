@@ -9,7 +9,7 @@
     </sticky>
     <div class="l-coupon-list" v-if="tabIndex === 0" :transition="tabDirection">
       <div class="l-coupon-item l-flex-h" v-link="{path:'/user/coupon/info'}" v-for="item in notUsedList">
-        <div class="l-flex-vc l-coupon-item-val">
+        <div class="l-flex-vhc l-coupon-item-val">
           <h4>¥{{item.value}}</h4>
           <p>[限于门窗]</p>
         </div>
@@ -18,13 +18,13 @@
           <p>卷号：{{item.code}}</p>
           <p>有效期：{{item.startDate}}至{{item.endDate}}</p>
         </div>
-        <!-- <div class="l-flex-vc">
+        <!-- <div class="l-flex-vhc">
           <i class="iconfont icon-arrow">&#xe601;</i>
         </div> -->
       </div>
       <divider>即将过期</divider>
       <div class="l-coupon-item l-flex-h" v-link="{path:'/user/coupon/info'}">
-        <div class="l-flex-vc l-coupon-item-val">
+        <div class="l-flex-vhc l-coupon-item-val">
           <h4>¥1000</h4>
         </div>
         <div class="l-rest l-coupon-item-desc">
@@ -36,7 +36,7 @@
     </div>
     <div class="l-coupon-list" v-if="tabIndex === 1" :transition="tabDirection">
       <div class="l-coupon-item l-flex-h" v-link="{path:'/user/coupon/info'}" v-for="item in usedList">
-        <div class="l-flex-vc l-coupon-item-val">
+        <div class="l-flex-vhc l-coupon-item-val">
           <h4>¥{{item.value}}</h4>
         </div>
         <div class="l-rest l-coupon-item-desc">
@@ -48,7 +48,7 @@
     </div>
     <div class="l-coupon-list" v-if="tabIndex === 2" :transition="tabDirection">
       <div class="l-coupon-item l-flex-h" v-link="{path:'/user/coupon/info'}" v-for="item in expiredList">
-        <div class="l-flex-vc l-coupon-item-val">
+        <div class="l-flex-vhc l-coupon-item-val">
           <h4>¥{{item.value}}</h4>
         </div>
         <div class="l-rest l-coupon-item-desc">

@@ -39,63 +39,96 @@ a {
 // .vux-center .vux-center-h .vux-center-v
 .l-flex-h,
 .l-flex-hc,
+.l-flex-hvc,
 .l-flex-v,
-.l-flex-vc {
+.l-flex-vhc,
+.l-flex-wrap {
   // 应用于父元素 
   display: flex;
+  display: box;
 }
 
 // flex-flow: <' flex-direction '> || <' flex-wrap '>
 // flex-direction: row | row-reverse | column | column-reverse
 // flex-wrap: nowrap | wrap | wrap-reverse
 .l-flex-h,
-.l-flex-hc {
+.l-flex-hc,
+.l-flex-hvc {
   // 横向布局
   flex-flow: row nowrap;
+  box-orient: horizontal;
 }
 
 .l-flex-v,
-.l-flex-vc {
+.l-flex-vhc {
   // 纵向布局
   flex-flow: column nowrap;
+  box-orient:  vertical;
 }
 
-// align-content：flex-start | flex-end | center | space-between | space-around | stretch 用于换行的弹性盒模型容器
-// justify-content：flex-start | flex-end | center | space-between | space-around 用于不换行的弹性盒模型容器
-// align-items：flex-start | flex-end | center | baseline | stretch 用于不换行的弹性盒模型容器
+// justify-content: flex-start | flex-end | center | space-between | space-around 用于不换行的弹性盒模型容器
+// align-items: flex-start | flex-end | center | baseline | stretch 用于不换行的弹性盒模型容器
 .l-flex-h {
   // 同等高度
   align-items: strecth;
+  box-align: stretch;
 }
 
-.l-flex-hc {
-  // 垂直居中
-  align-items: center;
+.l-flex-hc,
+.l-flex-hvc {
+  // 水平排列的垂直居中
+  align-items: center; // 垂直居中
+  box-align: center; // 垂直居中
 }
 
-.l-flex-vc {
-  // 多行的垂直水平居中
-  justify-content: center; // 垂直
-  align-items: center; // 水平
+.l-flex-hvc {
+  // 水平排列的垂直水平居中
+  justify-content: center; // 水平居中
+  box-pack: center; // 水平居中
+}
+
+.l-flex-vhc {
+  // 垂直排列的垂直水平居中
+  box-align: center; // 水平居中
+  align-items: center; // 水平居中
+  box-pack: center; // 垂直居中
+  justify-content: center; // 垂直居中
+}
+
+// align-content: flex-start | flex-end | center | space-between | space-around | stretch 用于换行的弹性盒模型容器
+.l-flex-wrap {
+  // 水平排列换行布局
+  flex-flow: row wrap;
+  align-content: flex-start;
+  justify-content: space-between;
 }
 
 // 设置子项
-// flex：none | <' flex-grow '> <' flex-shrink >'? || <' flex-basis '>
+// flex: none | <' flex-grow '> <' flex-shrink >'? || <' flex-basis '>
 // flex-grow: <number> 剩余空间扩展比例
-// flex-shrink：<number>  不足空间收缩比例
+// flex-shrink: <number>  不足空间收缩比例
 // flex-basis: <length> | <percentage> | auto | content   // 基准值
-// align-self：auto | flex-start | flex-end | center | baseline | stretch
+// align-self: auto | flex-start | flex-end | center | baseline | stretch
 [class*='l-flex-'] > .l-rest {
   // 如果只有设置其中一个子项，其将霸占剩余部分
-  box-flex: 1;
   flex: 1;
+  box-flex: 1;
   align-self: auto; // 子项的排版设置
 }
 
 // 弹性布局===================end
+.l-fill-color {
+  white-space: nowrap;
+  background: linear-gradient(top, #eee, #aaa 50%, #333 51%, #000);
+  background-clip: text;
+  -webkit-fill-color: transparent;
+}
+
+.l-reflect{
+  white-space: nowrap;
+  -webkit-box-reflect:below 0 linear-gradient(transparent,transparent 50%,rgba(255,255,255,.3));
+}
 .l-text-truncate {
-  word-wrap: normal;
-  /* for IE */
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
@@ -104,8 +137,9 @@ a {
 .l-line-clamp2 {
   text-overflow: ellipsis;
   overflow: hidden;
-  max-height: 1.1rem;
+  max-height: 2em;
   word-break: break-all;
+  word-wrap: break-word;
   display: box;
   box-orient: vertical;
   line-clamp: 2;
