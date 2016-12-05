@@ -9,7 +9,7 @@
   </div>
 </template>
 <script>
-import { Panel, Group, Tab, TabItem } from 'vux'
+import { Panel, Group, Tab, TabItem } from 'vux-components'
 let tempImg = require('assets/imgs/temp-005.jpg')
 export default {
   components: {
@@ -20,7 +20,7 @@ export default {
       tabIndex: 0,
       type: '1',
       list: [{
-        src: tempImg,
+        src: 'http://placeholder.qiniudn.com/60x60/3cc51f/ffffff',
         title: '无锁孔门',
         desc: '适用于：入户门',
         url: '/product/details'
@@ -50,7 +50,5 @@ export default {
 }
 </script>
 <style>
-.l-product-list .weui_media_appmsg_thumb{
-  vertical-align: middle !important;
-}
+
 </style>

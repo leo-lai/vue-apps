@@ -4,7 +4,7 @@
   </div>
 </template>
 <script>
-import { Tab, TabItem, Divider, Sticky } from 'vux'
+import { Tab, TabItem, Divider, Sticky } from 'vux-components'
 
 export default {
   components: {

@@ -11,7 +11,7 @@
   </div>
 </template>
 <script>
-import { Masker } from 'vux'
+import { Masker } from 'vux-components'
 export default {
   components: {
     Masker

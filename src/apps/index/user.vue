@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="l-select-none">
     <blur class="l-user-avatar" :blur-amount="15" :url="images.avatar">
       <div class="avatar" :style="{'background-image': 'url('+images.avatar+')'}"></div>
     </blur>
@@ -29,7 +29,7 @@
   </div>
 </template>
 <script>
-import { Blur, Group, Cell } from 'vux'
+import { Blur, Group, Cell } from 'vux-components'
 
 let images = {
   'avatar': require('assets/imgs/kenan2.jpg')

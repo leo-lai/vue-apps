@@ -16,7 +16,7 @@
   </div>
 </template>
 <script>
-import { Search, Sticky } from 'vux'
+import { Search, Sticky } from 'vux-components'
 
 export default {
   components: {

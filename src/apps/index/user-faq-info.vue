@@ -1,8 +1,6 @@
 <template>
   <div>
-    <article class="weui-article">
-      <h1>安全无孔锁门忘带安装器怎么办？</h1>
-      <hr class="vux-1px-b" />
+    <l-article title="安全无孔锁门忘带安装器怎么办？" time="2016-12-12">
       <section>
         <h3>1.1 节标题</h3>
         <p>
@@ -22,68 +20,26 @@
           proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
         </p>
       </section>
-      <div class="l-btn-area">
+      <div slot="footer" class="l-btn-area">
         <x-button mini>已解决</x-button>
         &nbsp;&nbsp;
         <x-button mini>未解决</x-button>  
       </div>
-    </article>
+    </l-article>
   </div>
 </template>
 
 <script>
-import { Group, Cell, XButton, Divider } from 'vux'
+import { XButton } from 'vux-components'
+import LArticle from 'src/components/l-article'
 
 export default {
   components: {
-    Group, Cell, XButton, Divider
-  },
-  data () {
-    return {
-      showTip: false
-    }
-  },
-  methods: {
-    submit() {
-      this.showTip = true;
-    },
-    onHide() {
-      window.history.back();
-    }
+    LArticle, XButton
   }
 }
 </script>
 
-<style lang="less">
-.weui-article {
-  background-color: #fff;
-  padding: 20px 15px;
-  font-size: 15px;
-  section {
-    margin-bottom: 1.5em;
-  }
-  h1 {
-    font-size: 18px;
-    font-weight: 400;
-    margin-bottom: .9em;
-  }
-  h2 {
-    font-size: 16px;
-    font-weight: 400;
-    margin-bottom: .34em;
-  }
-  h3 {
-    font-weight: 400;
-    font-size: 15px;
-    margin-bottom: .34em;
-  }
-  * {
-    max-width: 100%;
-    box-sizing: border-box;
-    word-wrap: break-word;
-  }
-  p {
-    margin: 0 0 .8em;
-  }
-}
+<style scoped lang="less">
+
 </style>

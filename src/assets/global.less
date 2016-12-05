@@ -32,6 +32,14 @@ a {
   color: #007aff;
 }
 
+img{
+  max-width: 100%;
+  vertical-align: top;
+}
+img.l-center{
+  display: block;
+  margin:auto;
+}
 // http://www.css88.com/book/css/
 // 弹性布局===================
 // .l-flex-h  横向布局不换行，子项将会同等高度
@@ -45,7 +53,7 @@ a {
 .l-flex-wrap {
   // 应用于父元素 
   display: flex;
-  display: box;
+  // display: box;
 }
 
 // flex-flow: <' flex-direction '> || <' flex-wrap '>
@@ -55,43 +63,44 @@ a {
 .l-flex-hc,
 .l-flex-hvc {
   // 横向布局
+  // box-orient: horizontal;
   flex-flow: row nowrap;
-  box-orient: horizontal;
 }
 
 .l-flex-v,
 .l-flex-vhc {
   // 纵向布局
+  // box-orient:  vertical;
   flex-flow: column nowrap;
-  box-orient:  vertical;
 }
 
 // justify-content: flex-start | flex-end | center | space-between | space-around 用于不换行的弹性盒模型容器
 // align-items: flex-start | flex-end | center | baseline | stretch 用于不换行的弹性盒模型容器
 .l-flex-h {
   // 同等高度
+  // box-align: stretch;
   align-items: strecth;
-  box-align: stretch;
 }
 
 .l-flex-hc,
 .l-flex-hvc {
   // 水平排列的垂直居中
+  // box-align: center; // 垂直居中
   align-items: center; // 垂直居中
-  box-align: center; // 垂直居中
 }
 
 .l-flex-hvc {
   // 水平排列的垂直水平居中
+  // box-pack: center; // 水平居中
   justify-content: center; // 水平居中
-  box-pack: center; // 水平居中
+  
 }
 
 .l-flex-vhc {
   // 垂直排列的垂直水平居中
-  box-align: center; // 水平居中
+  // box-align: center; // 水平居中
   align-items: center; // 水平居中
-  box-pack: center; // 垂直居中
+  // box-pack: center; // 垂直居中
   justify-content: center; // 垂直居中
 }
 
@@ -99,8 +108,8 @@ a {
 .l-flex-wrap {
   // 水平排列换行布局
   flex-flow: row wrap;
-  align-content: flex-start;
-  justify-content: space-between;
+  // align-content: flex-start;
+  // justify-content: space-between;
 }
 
 // 设置子项
@@ -161,8 +170,13 @@ a {
   color: #999;
 }
 
+.l-fr{float: right;}
 .l-hr {
   // 1px横线
+}
+.l-margin-tb{
+  margin-top: 0.4rem;
+  margin-bottom: 0.4rem;
 }
 
 .l-btn-area {
@@ -184,6 +198,9 @@ hr.vux-1px-b {
   font-size: 12px;
 }
 
+.weui_media_box.weui_media_appmsg .weui_media_appmsg_thumb{
+  height: 100%;
+}
 .l-group [slot=icon] {
   width: 0.8rem;
   height: 0.8rem;
@@ -216,6 +233,9 @@ hr.vux-1px-b {
   font-size: 12px;
 }
 
+.l-select-none{
+  user-select: none;
+}
 .vux-tab .vux-tab-item {
   font-weight: 500;
 }
@@ -241,7 +261,6 @@ hr.vux-1px-b {
 /**
 * vue-router transition
 */
-
 .vux-pop-out-transition,
 .vux-pop-in-transition {
   width: 100%;
@@ -249,7 +268,6 @@ hr.vux-1px-b {
   animation-fill-mode: both;
   backface-visibility: hidden;
 }
-
 .vux-pop-out-enter,
 .vux-pop-out-leave,
 .vux-pop-in-enter,
@@ -259,24 +277,19 @@ hr.vux-1px-b {
   position: absolute;
   left: 0;
 }
-
 .vux-pop-out-enter {
   animation-name: popInLeft;
 }
-
 .vux-pop-out-leave {
   animation-name: popOutRight;
 }
-
 .vux-pop-in-enter {
   perspective: 1000;
   animation-name: popInRight;
 }
-
 .vux-pop-in-leave {
   animation-name: popOutLeft;
 }
-
 @keyframes popInLeft {
   from {
     transform: translate3d(-100%, 0, 0);
@@ -285,7 +298,6 @@ hr.vux-1px-b {
     transform: translate3d(0, 0, 0);
   }
 }
-
 @keyframes popOutLeft {
   from {
     transform: translate3d(0, 0, 0);
@@ -294,7 +306,6 @@ hr.vux-1px-b {
     transform: translate3d(-100%, 0, 0);
   }
 }
-
 @keyframes popInRight {
   from {
     transform: translate3d(100%, 0, 0);
@@ -303,7 +314,6 @@ hr.vux-1px-b {
     transform: translate3d(0, 0, 0);
   }
 }
-
 @keyframes popOutRight {
   from {
     transform: translate3d(0, 0, 0);

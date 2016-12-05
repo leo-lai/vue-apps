@@ -1,6 +1,5 @@
-// import 'vux/src/styles/index.less'
-// import 'vux/src/styles/weui/base/reset.less'
-import 'vux/dist/vux.css'
+// import 'vux/dist/vux.css'
+import 'vux/src/styles/index.less'
 import 'assets/global.less'
 import config from 'assets/config'
 import FastClick from 'fastclick'

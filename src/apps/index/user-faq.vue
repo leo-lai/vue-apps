@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { Group, Cell, XButton } from 'vux'
+import { Group, Cell, XButton } from 'vux-components'
 
 export default {
   components: {

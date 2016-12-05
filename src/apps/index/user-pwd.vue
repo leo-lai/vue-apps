@@ -8,13 +8,13 @@
       <x-input placeholder="请输入新密码" @on-change="change" type="password" :value.sync="password" :required="true"></x-input>
       <x-input placeholder="请确认新密码" @on-change="change" type="password" :equal-with="password"></x-input>
     </group>
-    <div class="weui-btn-area">
+    <div class="l-btn-area">
       <x-button type="primary">保存</x-button>  
     </div>
   </div>
 </template>
 <script>
-import { Group, XInput, XButton } from 'vux'
+import { Group, XInput, XButton } from 'vux-components'
 
 
 export default {

@@ -188,23 +188,23 @@
     <div class="loader-section section-right"></div>
   </div>
   <script>
-  var autoScale = function() {
-    var ratio = 375 / 667, //视觉稿宽高比
-      winW = window.screen.width,
-      winH = window.screen.height,
-      ratio2 = winW / winH,
-      scale;
-    console.info(winW , winH,ratio2)
-    // if (ratio < ratio2) {
-    //   scale = (winH / 375).toString().substring(0, 6);
-    // } else {
-    //   scale = (winW / 667).toString().substring(0, 6);
-    // }
-    scale = ratio / ratio2;
-    var cssText = '-webkit-transform: scale(' + scale + '); -webkit-transform-origin:0 0;';
-    // document.getElementById('app').setAttribute('style', cssText);
-    document.body.setAttribute('style', cssText);
-  };
+  (function(doc, win) {
+    var docEl = doc.documentElement,
+      resizeEvt = 'onorientationchange' in window ? 'onorientationchange' : 'resize',
+      recalc = function() {
+        var clientWidth = docEl.clientWidth;
+        if (!clientWidth) return;
+        if (clientWidth >= 750) {
+          docEl.style.fontSize = '100px';
+        } else {
+          docEl.style.fontSize = 100 * (clientWidth / 750) + 'px';
+        }
+      };
+
+    if (!doc.addEventListener) return;
+    // win.addEventListener(resizeEvt, recalc, false);
+    // doc.addEventListener('DOMContentLoaded', recalc, false);
+  })(document, window);
   </script>
   <!-- built files will be auto injected -->
 </body>

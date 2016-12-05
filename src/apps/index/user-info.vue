@@ -18,7 +18,7 @@
   </div>
 </template>
 <script>
-import { Group, Cell, Address, AddressChinaData, XButton} from 'vux'
+import { Group, Cell, Address, AddressChinaData, XButton} from 'vux-components'
 
 let images = {
   'avatar': require('assets/imgs/kenan2.jpg')

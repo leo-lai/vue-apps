@@ -1,7 +1,7 @@
 <template>
   <div style="height:100%;">
     <loading :show="isLoading" position="absolute"></loading>
-    <view-box v-ref:view-box class="l-body" :class="{'l-no-header': $device.isWechat, 'l-no-footer': !route.mainPage}">
+    <view-box v-ref:view-box class="l-body l-no-header" :class="{'l-no-header': $device.isWechat, 'l-no-footer': !route.mainPage}">
       <!--header slot-->
       <div class="l-header-box" slot="header">
         <x-header :left-options="leftOptions" :transition="headerTransition" :title="route.title" @on-click-title="scrollTop"></x-header>
@@ -35,7 +35,7 @@
 <script>
 import { $ } from 'assets/lib'
 import store from './vuex/store'
-import { Tabbar, TabbarItem, Loading, ViewBox, XHeader, } from 'vux'
+import { Tabbar, TabbarItem, Loading, ViewBox, XHeader, } from 'vux-components'
 
 export default {
   components: {

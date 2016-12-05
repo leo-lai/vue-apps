@@ -17,6 +17,7 @@
     "array-find": "^1.0.0",
     "array-map": "^0.0.0",
     "fastclick": "^1.0.6",
+    "lib-flexible": "^0.3.2",
     "sprint-js": "^0.1.0",
     "vue": "^1.0.26",
     "vue-router": "^0.7.5",

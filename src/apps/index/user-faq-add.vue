@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import { Group, Cell, XButton, XTextarea, XInput, Toast } from 'vux'
+import { Group, Cell, XButton, XTextarea, XInput, Toast } from 'vux-components'
 
 export default {
   components: {

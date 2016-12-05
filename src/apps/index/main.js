@@ -25,10 +25,18 @@ router.map({
     mainPage: true,
     component: (resolve) => require(['./home'], resolve)
 	},
+  '/booking': {
+    title: '在线预约',
+    component: (resolve) => require(['./booking'], resolve)
+  },
   '/activity': {
     title: '活动中心',
     mainPage: true,
     component: (resolve) => require(['./activity'], resolve)
+  },
+  '/activity/info': {
+    title: '活动详情',
+    component: (resolve) => require(['./activity-info'], resolve)
   },
   '/product': {
     title: '产品中心',
@@ -103,18 +111,20 @@ let routerHistory = {  count: 0 }
 router.beforeEach(({ to, from, next }) => {
   let toIndex = routerHistory[to.path]
   let fromIndex = routerHistory[from.path]
-  if(!from.mainPage && to.mainPage && !toIndex){
+  // 判断是否返回上一页 /user/info -> /user
+  // from.path.startsWith(to.path) 安卓微信报错
+  let isBack = from.path && from.path.indexOf(to.path) === 0
+
+  if(!toIndex && (isBack || (!from.mainPage && to.mainPage))){
     toIndex = fromIndex
     fromIndex = ++routerHistory.count
     routerHistory[to.path] = toIndex
     routerHistory[from.path] = fromIndex
-    sessionStorage.setItem('routerHistory', routerHistory)
   }
   
   if(!toIndex){
     store.dispatch('UPDATE_LOADING', true)
     routerHistory[to.path] = ++routerHistory.count
-    sessionStorage.setItem('routerHistory', routerHistory)
     if(!to.mainPage && fromIndex){
       // 如果不是主界面并且不是首次进入
       store.dispatch('UPDATE_DIRECTION', 'in')
@@ -135,6 +145,7 @@ router.beforeEach(({ to, from, next }) => {
 router.afterEach(({ to }) => {
   LUtils.setTitle(to.title)
   store.dispatch('UPDATE_LOADING', false)
+  sessionStorage.setItem('routerHistory', routerHistory)
 })
 
 
