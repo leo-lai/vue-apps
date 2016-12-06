@@ -7,7 +7,7 @@ var ExtractTextPlugin = require('extract-text-webpack-plugin')
 var config = require('./config')
 var cssLoaders = require('./css-loaders')
 
-var entries = getEntry('./src/apps/*/*.js') // 获得入口js文件
+var entries = getEntry('./src/apps/*/main.js') // 获得入口js文件
 var chunks = Object.keys(entries)
 
 module.exports = {
@@ -24,6 +24,7 @@ module.exports = {
     fallback: [path.join(__dirname, '../node_modules')],
     alias: {
       'src': path.resolve(__dirname, '../src'),
+      'apps': path.resolve(__dirname, '../src/apps'),
       'assets': path.resolve(__dirname, '../src/assets'),
       'components': path.resolve(__dirname, '../src/components'),
       'vux-components': 'vux/src/components'
