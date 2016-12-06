@@ -20,6 +20,7 @@
     "lib-flexible": "^0.3.2",
     "sprint-js": "^0.1.0",
     "vue": "^1.0.26",
+    "vue-resource": "^1.0.3",
     "vue-router": "^0.7.5",
     "vuex": "^0.8.2",
     "vuex-router-sync": "^2.1.1",

@@ -5,17 +5,27 @@ Vue.use(Vuex)
 
 // 应用状态
 const state = {
-  isLoading: false,
-  direction: ''  // in or out
+  app_confirm: {
+    show: false,
+    title: '确认提示框',
+    desc: '提示内容',
+    onConfirm(){},
+    onCancel(){}
+  },
+  app_loading: false,
+  app_direction: ''  // in or out
 }
 
 // 变更函数
 const mutations = {
-  UPDATE_LOADING (state, status) {
-    state.isLoading = status
+  APP_LOADING (state, status) {
+    state.app_loading = status
   },
-  UPDATE_DIRECTION (state, direction) {
-    state.direction = direction
+  APP_DIRECTION (state, inOrout) {
+    state.app_direction = inOrout
+  },
+  APP_CONFIRM (state, config) {
+    Object.assign(state.app_confirm, config)
   }
 }
 

@@ -49,24 +49,22 @@
         <p>720展厅</p>
       </div>
     </div>
-    <panel class="l-margin-tb" header="<h3 style='color:#333;'>艾臣资讯</h3>" :footer="footer" :list="newsList" type="1"></panel>
+    <panel class="l-margin-tb" header="<h3 style='color:#333;'>艾臣资讯</h3>" :footer="news.footer" :list="news.data" type="1"></panel>
   </div>
 </template>
 <script>
+import config from './config'
 import { Swiper, Masker, Flexbox, FlexboxItem, Divider, Panel } from 'vux-components'
 let images = {
   tempImg: require('assets/imgs/temp-002.jpg')
 }
+
 export default {
   components: {
     Swiper, Masker, Flexbox, FlexboxItem, Divider, Panel
   },
-  route: {
-    activate: function(transition) {
-      console.info('hook-example activated!')
-      transition.next()
-    }
-  },
+  route: config.routerHook,
+  events: config.vueHook,
   data() {
     return {
       images: images,
@@ -83,20 +81,22 @@ export default {
         img: require('assets/imgs/temp-001.jpg'),
         title: ''
       }],
-      newsList: [{
-        src: 'http://placeholder.qiniudn.com/60x60/3cc51f/ffffff',
-        title: '标题一',
-        desc: '由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。',
-        url: ''
-      }, {
-        src: 'http://placeholder.qiniudn.com/60x60/3cc51f/ffffff',
-        title: '标题二',
-        desc: '由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。',
-        url: ''
-      }],
-      footer: {
-        title: '查看更多',
-        url: ''
+      news: {
+        data: [{
+          src: 'http://placeholder.qiniudn.com/60x60/3cc51f/ffffff',
+          title: '标题一',
+          desc: '由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。',
+          url: ''
+        }, {
+          src: 'http://placeholder.qiniudn.com/60x60/3cc51f/ffffff',
+          title: '标题二',
+          desc: '由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。',
+          url: ''
+        }],
+        footer: {
+          title: '查看更多',
+          url: ''
+        }
       }
     }
   }

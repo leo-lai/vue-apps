@@ -10,7 +10,7 @@
       <group class="l-booking-form">
         <x-input name="username" placeholder="请输入姓名" is-type="china-name"></x-input>
         <x-input name="mobile" placeholder="请输入手机号码" keyboard="number" is-type="china-mobile"></x-input>
-        <address :value.sync="address.value" raw-value :list="address.data" placeholder="请选择地区"></address>
+        <address title="" :value.sync="address.value" raw-value :list="address.data" placeholder="请选择地区"></address>
       </group>
     </div>
     <div class="l-btn-area">

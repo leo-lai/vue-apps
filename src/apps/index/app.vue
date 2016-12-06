@@ -1,7 +1,7 @@
 <template>
   <div style="height:100%;">
-    <loading :show="isLoading" position="absolute"></loading>
-    <view-box v-ref:view-box class="l-body l-no-header" :class="{'l-no-header': $device.isWechat, 'l-no-footer': !route.mainPage}">
+    <loading :show="loading" position="absolute"></loading>
+    <view-box v-ref:view-box class="l-body" :class="{'l-no-header': $device.isWechat, 'l-no-footer': !route.mainPage}">
       <!--header slot-->
       <div class="l-header-box" slot="header">
         <x-header :left-options="leftOptions" :transition="headerTransition" :title="route.title" @on-click-title="scrollTop"></x-header>
@@ -30,53 +30,47 @@
         </tabbar>
       </div>
     </view-box>
+    <confirm 
+      cancel-text="取消" 
+      confirm-text="确定" 
+      :show.sync="confirm.show" 
+      :title="confirm.title" 
+      @on-confirm="confirm.onConfirm" 
+      @on-cancel="confirm.onCancel">
+      <div v-html="confirm.desc"></div>
+    </confirm>
   </div>
 </template>
 <script>
-import { $ } from 'assets/lib'
-import store from './vuex/store'
-import { Tabbar, TabbarItem, Loading, ViewBox, XHeader, } from 'vux-components'
+import $ from 'sprint-js'
+import { store, getters, actions } from './vuex'
+import { Tabbar, TabbarItem, Loading, ViewBox, XHeader, Confirm } from 'vux-components'
 
 export default {
   components: {
-    Tabbar, TabbarItem, Loading, ViewBox, XHeader 
+    Tabbar, TabbarItem, Loading, ViewBox, XHeader, Confirm
   },
   events: {
-    'hook:created': function() {
-      console.log('created!')
+    'hook:created': function() { 
+      console.log('app components created!')
     },
     'hook:ready': function() {
-      console.log('ready!')
-      let $appLoader = $('#app-loader')
-      // setTimeout(()=> $appLoader.addClass('app-loaded'), 3000)
+      console.log('app components ready!')
+      // setTimeout(()=> $('#app-loader').addClass('app-loaded'), 3000)
       setTimeout(() => {
-        $appLoader.remove()
+        $('#app-loader').remove()
         $('#app-loader-css').remove()
       }, 5000)
     }
   },
   store,
   vuex: {
-    getters: {
-      route: (state) => state.route,
-      isLoading: (state) => state.isLoading,
-      direction: (state) => state.direction
-    },
-    actions: {
-      updateLoading({
-        dispatch,
-        state
-      }) {
-        dispatch('UPDATE_LOADING', true)
-      }
-    }
+    getters, actions
   },
   data() {
+    console.log(this)
     return {
-      routerTransition: {
-        forward: 'slideRL',
-        back: 'slideLR'
-      }
+      
     }
   },
   methods: {
@@ -97,13 +91,10 @@ export default {
   }
 }
 </script>
-<style scoped>
-/*局部样式*/
-</style>
 <style>
 /*全局样式*/
 .l-header-box {
-  z-index: 1000;
+  z-index: 999;
   position: absolute;
   width: 100%;
   left: 0;
@@ -129,8 +120,8 @@ export default {
 }
 
 .l-body .weui_tab_bd {
-  padding-top: 1.226667rem;
-  padding-bottom: 1.333333rem;
+  padding-top: 46px;
+  padding-bottom: 50px;
 }
 
 .l-no-header .l-header-box {

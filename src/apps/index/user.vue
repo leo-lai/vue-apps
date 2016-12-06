@@ -1,12 +1,12 @@
 <template>
   <div class="l-select-none">
-    <blur class="l-user-avatar" :blur-amount="15" :url="images.avatar">
-      <div class="avatar" :style="{'background-image': 'url('+images.avatar+')'}"></div>
+    <blur class="l-user-avatar l-flex-vhc" :blur-amount="15" :height="150" :url="images.avatar">
+      <div v-link="'/user/info'" class="avatar" :style="{'background-image': 'url('+images.avatar+')'}"></div>
     </blur>
     <group class="l-group">
-      <cell title="个人信息" link="/user/info">
+      <!-- <cell title="个人信息" link="/user/info">
         <i slot="icon" class="iconfont" style="background-color:#1ab9cf;">&#xe6b7;</i>
-      </cell>
+      </cell> -->
       <cell title="我的预约" link="/user/appointment">
         <i slot="icon" class="iconfont" style="background-color:#2ea748;">&#xe6d0;</i>
       </cell>
@@ -25,10 +25,14 @@
       <cell title="400-816-2882" value="09:00-24:00" :is-link="true" @click="callPhone('400-816-2882')">
         <i slot="icon" class="iconfont" style="background-color:#fe486e;">&#xe652;</i>
       </cell>
+      <cell title="退出登录" :is-link="true" @click="logout">
+        <i slot="icon" class="iconfont" style="background-color:#999999;">&#xe7c7;</i>
+      </cell>
     </group>
   </div>
 </template>
 <script>
+import { store, actions } from './vuex'
 import { Blur, Group, Cell } from 'vux-components'
 
 let images = {
@@ -36,13 +40,11 @@ let images = {
 }
 export default {
   components: {
-    Blur, Group, Cell 
+    Blur, Group, Cell
   },
-  route: {
-    activate: function(transition) {
-      console.info('hook-example activated!')
-      transition.next()
-    }
+  store,
+  vuex: {
+    actions
   },
   data() {
     return {
@@ -52,6 +54,20 @@ export default {
   methods: {
     callPhone(phone) {
       window.location.href = 'tel://' + phone;
+    },
+    logout() {
+      let self = this
+      self.acConfirm({
+        title: '确定退出登录？',
+        onConfirm() {
+          self.$router.replace('/login')
+          // self.$router.replace('/login?redirect=' + self.$route.path)
+          // self.$router.go({
+          //   path: 'login?redirect=' + self.$route.path,
+          //   replace: true
+          // })
+        }
+      })
     }
   }
 }
@@ -63,12 +79,11 @@ export default {
 }
 
 .l-user-avatar .avatar {
-  width: 2.666667rem;
-  height: 2.666667rem;
+  width: 2.133333rem;
+  height: 2.133333rem;
   border-radius: 50%;
   border: 2px solid #ececec;
   background: no-repeat 50% 50%;
   background-size: cover;
-  margin: 1.28rem auto;
 }
 </style>

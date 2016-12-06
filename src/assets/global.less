@@ -1,11 +1,12 @@
 // 字体图标 http://www.iconfont.cn/
 @font-face {
-  font-family: 'iconfont';
-  /* project id 189309 */
-  src: url('//at.alicdn.com/t/font_k236v94xy0wo2yb9.eot');
-  src: url('//at.alicdn.com/t/font_k236v94xy0wo2yb9.eot?#iefix') format('embedded-opentype'), url('//at.alicdn.com/t/font_k236v94xy0wo2yb9.woff') format('woff'), url('//at.alicdn.com/t/font_k236v94xy0wo2yb9.ttf') format('truetype'), url('//at.alicdn.com/t/font_k236v94xy0wo2yb9.svg#iconfont') format('svg');
+  font-family: 'iconfont';  /* project id 189309 */
+  src: url('//at.alicdn.com/t/font_kq9osznpjmunmi.eot');
+  src: url('//at.alicdn.com/t/font_kq9osznpjmunmi.eot?#iefix') format('embedded-opentype'),
+  url('//at.alicdn.com/t/font_kq9osznpjmunmi.woff') format('woff'),
+  url('//at.alicdn.com/t/font_kq9osznpjmunmi.ttf') format('truetype'),
+  url('//at.alicdn.com/t/font_kq9osznpjmunmi.svg#iconfont') format('svg');
 }
-
 .iconfont {
   font: normal 22px/1 'iconfont';
   vertical-align: middle;
@@ -18,6 +19,7 @@ body {
   width: 100%;
   overflow: hidden;
   background-color: #ebebeb;
+  color: #333;
 }
 
 html {
@@ -158,12 +160,20 @@ img.l-center{
   filter: blur(10px);
 }
 
-.l-size-12 {
+.l-fsize-sm {
   font-size: 12px;
 }
 
-.l-size-14 {
+.l-fsize-s {
   font-size: 14px;
+}
+
+.l-fsize {
+  font-size: 17px;
+}
+
+.l-fsize-l {
+  font-size: 20px;
 }
 
 .l-gray {
@@ -180,7 +190,7 @@ img.l-center{
 }
 
 .l-btn-area {
-  margin: 0.4rem;
+  margin: 0.8rem 0.4rem;
   text-align: center;
 }
 
@@ -243,20 +253,6 @@ hr.vux-1px-b {
 .vux-header .vux-header-left .vux-header-back {
   height: 0.533333rem;
 }
-
-
-/* v-r-transition, default is {forward: 'forward', back: 'back'}*/
-
-.forward-enter,
-.forward-leave {
-  transform: translate3d(-100%, 0, 0);
-}
-
-.back-enter,
-.back-leave {
-  transform: translate3d(100%, 0, 0);
-}
-
 
 /**
 * vue-router transition
