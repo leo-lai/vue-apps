@@ -115,7 +115,7 @@ for (var pathname in entries) {
   }
 
   // 配置生成的html文件，定义路径等
-  if(pathname === 'index'){
+  if(pathname === 'default'){
     conf.filename = 'index.html'
   }else{
     conf.filename = pathname + '/index.html'
