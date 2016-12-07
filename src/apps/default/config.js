@@ -1,5 +1,9 @@
-// 全局配置
+// 应用配置
+const _HOST = window.location.origin
+const _PATH = '/'
 var Exports = {
+  getHost: () => _HOST,
+  getPath: () => _PATH,
   // 组件生命周期 http://vuejs.org.cn/guide/instance.html#生命周期图示
   vueHook: {
   	'hook:created': function() { 
@@ -41,79 +45,83 @@ var Exports = {
   routerMap: {
   	'/login': {
       title: '登录',
-      component: (resolve) => require(['./login'], resolve)
+      component: (resolve) => require(['./page/login'], resolve)
+    },
+    '/register': {
+      title: '注册',
+      component: (resolve) => require(['./page/register'], resolve)
     },
     '/home': {
       title: '首页',
       mainPage: true,
-      component: (resolve) => require(['./home'], resolve)
+      component: (resolve) => require(['./page/home'], resolve)
     },
     '/booking': {
       title: '在线预约',
-      component: (resolve) => require(['./booking'], resolve)
+      component: (resolve) => require(['./page/booking'], resolve)
     },
     '/activity': {
       title: '活动中心',
       mainPage: true,
-      component: (resolve) => require(['./activity'], resolve)
+      component: (resolve) => require(['./page/activity'], resolve)
     },
     '/activity/info': {
       title: '活动详情',
-      component: (resolve) => require(['./activity-info'], resolve)
+      component: (resolve) => require(['./page/activity-info'], resolve)
     },
     '/product': {
       title: '产品中心',
       mainPage: true,
-      component: (resolve) => require(['./product'], resolve)
+      component: (resolve) => require(['./page/product'], resolve)
     },
     '/product/list': {
       title: '产品列表',
-      component: (resolve) => require(['./product-list'], resolve)
+      component: (resolve) => require(['./page/product-list'], resolve)
     },
     '/product/details': {
       title: '产品详情',
-      component: (resolve) => require(['./product-details'], resolve)
+      component: (resolve) => require(['./page/product-details'], resolve)
     },
     '/user': {
       title: '个人中心',
       mainPage: true,
-      component: (resolve) => require(['./user'], resolve)
+      component: (resolve) => require(['./page/user'], resolve)
     },
     '/user/info': {
       title: '个人信息',
-      component: (resolve) => require(['./user-info'], resolve)
+      component: (resolve) => require(['./page/user-info'], resolve)
     },
     '/user/appointment': {
       title: '我的预约',
-      component: (resolve) => require(['./user-appointment'], resolve)
+      component: (resolve) => require(['./page/user-appointment'], resolve)
     },
     '/user/order': {
       title: '我的订单',
-      component: (resolve) => require(['./user-order'], resolve)
+      component: (resolve) => require(['./page/user-order'], resolve)
     },
     '/user/coupon/': {
       title: '我的优惠券',
-      component: (resolve) => require(['./user-coupon'], resolve)
+      component: (resolve) => require(['./page/user-coupon'], resolve)
     },
     '/user/coupon/info': {
       title: '优惠券详情',
-      component: (resolve) => require(['./user-coupon-info'], resolve)
+      component: (resolve) => require(['./page/user-coupon-info'], resolve)
     },
     '/user/pwd': {
       title: '重置密码',
-      component: (resolve) => require(['./user-pwd'], resolve)
+      component: (resolve) => require(['./page/user-pwd'], resolve)
     },
     '/user/faq': {
       title: '意见反馈',
-      component: (resolve) => require(['./user-faq'], resolve)
+      component: (resolve) => require(['./page/user-faq'], resolve)
     },
     '/user/faq/add': {
       title: '意见反馈',
-      component: (resolve) => require(['./user-faq-add'], resolve)
+      component: (resolve) => require(['./page/user-faq-add'], resolve)
     },
     '/user/faq/info': {
       title: '意见反馈',
-      component: (resolve) => require(['./user-faq-info'], resolve)
+      component: (resolve) => require(['./page/user-faq-info'], resolve)
     }
   }
 }

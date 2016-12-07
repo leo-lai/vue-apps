@@ -156,31 +156,15 @@ img.l-center{
   line-clamp: 2;
 }
 
-.l-blur {
-  filter: blur(10px);
-}
-
-.l-fsize-sm {
-  font-size: 12px;
-}
-
-.l-fsize-s {
-  font-size: 14px;
-}
-
-.l-fsize {
-  font-size: 17px;
-}
-
-.l-fsize-l {
-  font-size: 20px;
-}
-
-.l-gray {
-  color: #999;
-}
-
+.l-blur {filter: blur(10px);}
+.l-fsize-sm {font-size: 12px;}
+.l-fsize-s {font-size: 14px;}
+.l-fsize {font-size: 17px;}
+.l-fsize-l {font-size: 20px;}
+.l-fgray {color: #999;}
+.l-fl{float: left;}
 .l-fr{float: right;}
+
 .l-hr {
   // 1px横线
 }
@@ -198,7 +182,32 @@ img.l-center{
   color: #C8C8CD;
 }
 
-// 覆盖/扩展样式===========================
+// 覆盖/扩展vux,weui样式
+.weui-vcode-btn {
+  width: 110px;
+  background-color: transparent;
+  border-top: 0;
+  border-right: 0;
+  border-bottom: 0;
+  outline: 0;
+  display: inline-block;
+  height: 44px;
+  margin-left: 5px;
+  padding: 0 0.6em 0 0.7em;
+  border-left: 1px solid #E5E5E5;
+  line-height: 44px;
+  vertical-align: middle;
+  font-size: 17px;
+  color: #3CC51F;
+}
+.weui-vcode-btn:active {
+  color: #52a341;
+}
+.weui-vcode-btn:disabled{
+  color: #999;
+  text-shadow: 1px 1px #eee;
+}
+
 hr.vux-1px-b {
   height: 1px;
   margin: 0.266667rem 0;

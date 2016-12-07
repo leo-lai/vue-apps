@@ -1,6 +1,5 @@
 <template>
   <div style="height:100%;">
-    <loading :show="loading" position="absolute"></loading>
     <view-box v-ref:view-box class="l-body" :class="{'l-no-header': $device.isWechat, 'l-no-footer': !route.mainPage}">
       <!--header slot-->
       <div class="l-header-box" slot="header">
@@ -30,6 +29,7 @@
         </tabbar>
       </div>
     </view-box>
+    <loading :show="loading.show" :text="loading.text"></loading>
     <confirm 
       cancel-text="取消" 
       confirm-text="确定" 
@@ -39,16 +39,18 @@
       @on-cancel="confirm.onCancel">
       <div v-html="confirm.desc"></div>
     </confirm>
+    <toptips :show="toptips.show" :msg="toptips.msg" :type="toptips.type"></toptips>
   </div>
 </template>
 <script>
 import $ from 'sprint-js'
-import { store, getters, actions } from './vuex'
 import { Tabbar, TabbarItem, Loading, ViewBox, XHeader, Confirm } from 'vux-components'
+import Toptips from 'components/l-toptips'
+import { store, getters, actions } from './vuex'
 
 export default {
   components: {
-    Tabbar, TabbarItem, Loading, ViewBox, XHeader, Confirm
+    Tabbar, TabbarItem, Loading, ViewBox, XHeader, Confirm, Toptips
   },
   events: {
     'hook:created': function() { 
@@ -57,10 +59,10 @@ export default {
     'hook:ready': function() {
       console.log('app components ready!')
       // setTimeout(()=> $('#app-loader').addClass('app-loaded'), 3000)
-      setTimeout(() => {
-        $('#app-loader').remove()
-        $('#app-loader-css').remove()
-      }, 5000)
+      // setTimeout(() => {
+      //   $('#app-loader').remove()
+      //   $('#app-loader-css').remove()
+      // }, 5000)
     }
   },
   store,

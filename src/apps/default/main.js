@@ -1,23 +1,21 @@
-import {Vue, Router, Resource, utils } from 'assets/lib'
-import config from './config'
-import store from './vuex/store'
+import { Vue, Router, utils, storage } from 'assets/lib'
 import { sync } from 'vuex-router-sync'
+import store from './vuex/store'
+import config from './config'
 import App from './app'
 
-Vue.config.devtools = true
+// https://github.com/vuejs/vue-router/tree/1.0/docs/zh-cn
 Vue.use(Router)
-Vue.use(Resource)
-
 const router = new Router({
 	history: true,
+  root: config.getPath(),
   saveScrollPosition: true,
-  // root: '/yz-wx',
   transitionOnLoad: false
 })
 
 // 设置路由
 router.map(config.routerMap)
-// 默认跳转Home页面，且没有历史记录
+// 默认跳转home页面
 router.redirect({
   '/': '/home'
 })
@@ -43,7 +41,7 @@ router.beforeEach(({ to, from, next }) => {
   // 记录当前地址和上一页地址
   _history.prevPath = from.path
   _history.currPath = to.path
-  utils.session.set('_history', _history)
+  storage.session.set('_history', _history)
 
   let toIndex = _history[to.path]
   let fromIndex = _history[from.path]
@@ -62,16 +60,15 @@ router.beforeEach(({ to, from, next }) => {
     store.dispatch('APP_LOADING', true)
     _history[to.path] = ++_history.count
     if(!to.mainPage && fromIndex){
-      // 如果不是主界面并且不是首次进入
       store.dispatch('APP_DIRECTION', 'in')
     }else{
       store.dispatch('APP_DIRECTION', '')
     }
   }else if(!to.mainPage || !from.mainPage){
-    if(fromIndex > toIndex){
-      store.dispatch('APP_DIRECTION', 'out')
-    }else{
+    if(fromIndex < toIndex){
       store.dispatch('APP_DIRECTION', 'in')
+    }else{
+      store.dispatch('APP_DIRECTION', 'out')
     }  
   }else{
     store.dispatch('APP_DIRECTION', '')
@@ -83,7 +80,7 @@ router.afterEach(({ to , from }) => {
   console.log('%s router afterEach!', to.path)
   store.dispatch('APP_LOADING', false)
   utils.setTitle(to.title)
-  utils.session.set('_history', _history)
+  storage.session.set('_history', _history)
 })
 
 router.start(App, '#app')

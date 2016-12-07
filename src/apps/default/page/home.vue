@@ -53,7 +53,7 @@
   </div>
 </template>
 <script>
-import config from './config'
+import config from '../config'
 import { Swiper, Masker, Flexbox, FlexboxItem, Divider, Panel } from 'vux-components'
 let images = {
   tempImg: require('assets/imgs/temp-002.jpg')

@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import LArticle from 'src/components/l-article'
+import LArticle from 'components/l-article'
 
 export default {
   components: {

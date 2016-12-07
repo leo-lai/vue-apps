@@ -32,8 +32,8 @@
   </div>
 </template>
 <script>
-import { store, actions } from './vuex'
 import { Blur, Group, Cell } from 'vux-components'
+import { store, actions } from '../vuex'
 
 let images = {
   'avatar': require('assets/imgs/kenan2.jpg')

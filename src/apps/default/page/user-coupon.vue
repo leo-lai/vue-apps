@@ -65,12 +65,6 @@ import {Tab, TabItem, Divider, XButton, Sticky } from 'vux-components'
 
 export default {
   components: {Tab, TabItem, Divider, Sticky, XButton },
-  route: {
-    activate: function(transition) {
-      console.info('hook-example activated!')
-      transition.next()
-    }
-  },
   data() {
     return {
       tabDirection: 'vux-pop-in',

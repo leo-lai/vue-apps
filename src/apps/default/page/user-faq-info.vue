@@ -31,7 +31,7 @@
 
 <script>
 import { XButton } from 'vux-components'
-import LArticle from 'src/components/l-article'
+import LArticle from 'components/l-article'
 
 export default {
   components: {
