@@ -4,8 +4,8 @@
       使用账号和密码登录
     </div>
     <group class="weui_cells_form">
-      <x-input title="账号" placeholder="手机号码" keyboard="number" is-type="china-mobile" :value.sync="fromData.accountName" ></x-input>
-      <x-input type="password" title="密码" placeholder="请填写密码" :value.sync="fromData.pwd"  :required="true"></x-input>
+      <x-input title="账号" placeholder="手机号码" keyboard="number" is-type="china-mobile" :value.sync="formData.accountName" ></x-input>
+      <x-input type="password" title="密码" placeholder="请填写密码" :value.sync="formData.pwd"  :required="true"></x-input>
     </group>
     <div class="l-btn-area">
       <x-button type="primary" @click="submit">登录</x-button> 
@@ -19,6 +19,8 @@ import { utils, storage } from 'assets/lib'
 import { Group, XInput, XButton } from 'vux-components'
 import { store, actions } from '../vuex'
 import config from '../config'
+import server from '../server'
+
 // 上一页
 let prevPath = storage.session.get('_history').prevPath
 export default {
@@ -31,42 +33,48 @@ export default {
   },
   data() {
     return {
-      fromData: {
-        accountName: '',
-        pwd: ''
+      formData: {
+        accountName: '18602029524',
+        pwd: '123456'
       }
     }
   },
   methods: {
     submit() {
       let self = this
-      if(!self.fromData.accountName){
-        self.acToptips('账号不能为空')
+      if(!self.formData.accountName){
+        self.$vux.toptips.show('账号不能为空')
         return  
       }
-      if(!self.fromData.pwd){
-        self.acToptips('密码不能为空')
+      if(!self.formData.pwd){
+        self.$vux.toptips.show('密码不能为空')
         return  
       }
 
-      self.acLoading(true, '登录中')
-      self.$http.post('owner/visitor/login', self.fromData)
+      self.$vux.loading.show('登录中')
+      self.$http.post('owner/visitor/login', self.formData)
         .then((response) => {
-          self.acLoading(false)
+          self.$vux.loading.hide()
           if(response.body.success){
-            self.$router.replace( prevPath ||  '/')  
+            storage.local.set('userinfo', response.body.data)
+            self.acUpdateUserInfo()
+            self.$router.replace( prevPath ? prevPath.indexOf('/register') === 0 ? '/' : prevPath : '/' )
           }else{
-            self.acToptips(response.body.message || '登录失败')
+            self.$vux.toptips.show(response.body.message || '登录失败')
           }
         }, (error) => {
-          self.acLoading(false)
-          self.acToptips('服务器繁忙，请稍后重试！')
+          self.$vux.loading.hide()
+          self.$vux.toptips.show('服务器繁忙，请稍后重试！')
         })
     },
     wxlogin() {
-      let url = utils.getGrantUrl(utils.url.join(config.getHost(), config.getPath(), '/register'))
-      console.log(url)
-      // utils.url.replace(url)
+      let absUrl = utils.url.join(config.getHost(), config.getPath(), '/register')
+      // absUrl = server.getGrantUrl(absUrl, {direction: 'in'})
+      if(utils.device.isWechat){
+        utils.url.replace(absUrl)
+      }else{
+        utils.url.assign(absUrl)
+      }
     }
   }
 }

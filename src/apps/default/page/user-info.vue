@@ -2,49 +2,84 @@
   <div>
     <group class="l-group l-user-info">
       <cell title="头像" :is-link="true">
-        <img class="avatar" slot="value" width="50" height="50" :src="images.avatar">
+        <img class="avatar" slot="value" width="50" height="50" :src="formData.photo || defaultVal.avatar">
       </cell>
-      <cell title="手机号码" value="18602029524" :is-link="true"></cell>
-      <cell title="真实姓名" value="赖国聪" :is-link="true"></cell>
-      <cell title="电子邮箱" value="657448678@qq.com" :is-link="true"></cell>
-      <cell title="QQ号码" value="657448678" :is-link="true"></cell>
+      <cell title="手机号码" :value="userinfo.mobilePhone"></cell>
+      <x-input class="l-input-arrow" title="真实姓名" :value.sync="formData.realName" placeholder="请填写" :show-clear="false" text-align="right"></x-input>
+      <x-input class="l-input-arrow" title="电子邮箱" :value.sync="formData.email" placeholder="请填写" :show-clear="false" text-align="right"></x-input>
+      <x-input class="l-input-arrow" title="QQ号码" :value.sync="formData.qq" placeholder="请填写" keyboard="number" :show-clear="false" text-align="right"></x-input>
     </group>
     <group class="l-group l-user-info">
-      <cell title="单位名称" value="艾臣科技有限公司" :is-link="true"></cell>
-      <address :title="address.title" :value.sync="address.value" raw-value :list="address.data" placeholder="请选择地址"></address>
-      <cell title="详细地址" value="科韵路方圆E时光2703" :is-link="true"></cell>
+      <x-input class="l-input-arrow" title="单位名称" :value.sync="formData.companyName" placeholder="请填写" :show-clear="false" text-align="right"></x-input>
+      <address title="所在地区" :value.sync="address.value" raw-value :list="address.data" placeholder="请选择地区"></address>
+      <x-input class="l-input-arrow" title="详细地址" :value.sync="formData.address" placeholder="请填写" :show-clear="false" text-align="right"></x-input>
       <!-- <x-textarea placeholder="详细地址" value="天河区科韵路方圆E时光2703"></x-textarea> -->
     </group>
+    <div class="l-btn-area">
+      <x-button type="primary" @click="submit">保存</x-button>
+    </div>
   </div>
 </template>
 <script>
-import { Group, Cell, Address, AddressChinaData, XButton} from 'vux-components'
+import { utils, storage } from 'assets/utils'
+import { Group, XInput, Cell, XButton, Address, AddressChinaData } from 'vux-components'
+import { store, getters, actions } from '../vuex'
+import config from '../config'
 
-let images = {
-  'avatar': require('assets/imgs/kenan2.jpg')
-}
 export default {
   components: {
-    Group, Cell, Address, AddressChinaData, XButton
+    Group, XInput, Cell, XButton, Address, AddressChinaData
   },
-  route: {
-    activate: function(transition) {
-      console.info('hook-example activated!')
-      transition.next()
-    }
-  },
+  store,
+  vuex: { getters, actions },
   data() {
     return {
-      images: images,
+      defaultVal: config.defaultVal,
+      formData: {
+        photo: this.userinfo.photo,
+        realName: this.userinfo.realName,
+        email: this.userinfo.email,
+        qq: this.userinfo.qq,
+        companyName: this.userinfo.companyName,
+        address: this.userinfo.address
+      },
       address: {
         data: AddressChinaData,
-        title: '所在地区',
-        value: ['广东省', '广州市', '天河区']
+        value: []
       }
     }
   },
   methods: {
+    submit() {
+      let self = this
+      self.formData.id = self.userinfo.id
+      if(self.address.value){
+        self.formData.provinceId = self.address.value[0] || ''
+        self.formData.cityId = self.address.value[1] || ''
+        self.formData.areaId = self.address.value[2] || ''
+      }
 
+      self.$vux.loading.show('保存中')
+      self.$http.post('owner/modifyMemPersonalInfo', self.formData)
+        .then((response) => {
+          self.$vux.loading.hide()
+          if(response.body.success){
+            storage.local.set('userinfo', Object.assign(self.userinfo, self.formData))
+            self.acUpdateUserInfo()
+            self.$vux.toast.show({
+              text: '保存成功',
+              onHide(){
+                self.$router.go('/user')
+              }
+            })
+          }else{
+            self.$vux.toptips.show(response.body.message || '保存失败')
+          }
+        }, (error) => {
+          self.$vux.loading.hide()
+          self.$vux.toptips.show('服务器繁忙，请稍后重试！')
+        })
+    }
   }
 }
 </script>
@@ -57,6 +92,26 @@ export default {
   vertical-align: middle;
   border-radius: 2px;
   border:1px solid #ebebeb;
+}
+
+.l-input-arrow:after{
+  content: " ";
+  display: inline-block;
+  transform: rotate(45deg);
+  height: 6px;
+  width: 6px;
+  border-width: 2px 2px 0 0;
+  border-color: #C8C8CD;
+  border-style: solid;
+  position: relative;
+  top: -1px;
+  margin-left: .6em;
+}
+.weui_cell_ft .vux-popup-picker-value+span{
+  color: #aaa;
+}
+.vux-popup-picker-value{
+  color: #333;
 }
 
 </style>

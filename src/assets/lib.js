@@ -1,30 +1,34 @@
 // import 'vux/dist/vux.css'
 import 'vux/src/styles/index.less'
 import 'assets/global.less'
-import FastClick from 'fastclick'
 import Vue from 'vue'
-import Router from 'vue-router'
 import Resource from 'vue-resource'
+import { utils, storage } from 'assets/utils'
 
-// https://github.com/ftlabs/fastclick/
-FastClick.attach(document.body)
+const strategies = Vue.config.optionMergeStrategies
+strategies.route = strategies.methods
 
-Vue.config.devtools = true
-// 检测设备
-const ua = navigator.userAgent
-const isAndroid = /(Android);?[\s\/]+([\d.]+)?/.test(ua)
-const isIpad = /(iPad).*OS\s([\d_]+)/.test(ua)
-const isIpod = /(iPod)(.*OS\s([\d_]+))?/.test(ua)
-const isIphone = !isIpad && /(iPhone\sOS)\s([\d_]+)/.test(ua)
-const isWechat = /micromessenger/i.test(ua)
-Vue.mixin({
+// 配置是否允许 vue-devtools 检查代码
+// Vue.config.devtools = true
+Vue.mixin({ // 设备检测
   created: function () {
-    this.$device = {
-      isAndroid,
-      isIpad,
-      isIpod,
-      isIphone,
-      isWechat
+    this.$device = utils.device
+    this.$image = {
+	    thumb(src, width, height) {
+	      width = width || 320
+
+	      if(!src){ 
+	      	return `http://placeholder.qiniudn.com/${width}/3cc51f/ffffff` 
+	      }
+	      
+	      // return src += '?imageMogr2/gravity/Center/crop/'+width+'x'+height;
+	      src += `?imageMogr2/format/jpg/interlace/1/quality/60/gravity/Center/thumbnail/${width}x`
+	      if(height){
+	        src += `/crop/x${height}`
+	      }
+
+	      return src
+	    }
     }
   }
 })
@@ -37,247 +41,5 @@ Vue.http.options.root = 'http://test.aylsonclub.com/owner'
 // Vue.http.headers.common['Authorization'] = 'Basic YXBpOnBhc3N3b3Jk'
 // Vue.http.options.emulateHTTP = true
 
-/*========本地存储===========*/
-const STORE_PREFIX = '_yz_'
-let storage = {
-  getPrefix: () => STORE_PREFIX,
-  cookies: {
-    get(sKey) {
-      if (!sKey) return null
-      sKey = STORE_PREFIX + sKey
-      return decodeURIComponent(document.cookie.replace(new RegExp('(?:(?:^|.*;)\\s*' + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, '\\$&') + '\\s*\\=\\s*([^;]*).*$)|^.*$'), '$1')) || null
-    },
-    set(sKey, sValue, vEnd = 1800, sPath = '/', sDomain = '', bSecure = false) {
-      if (!sKey || /^(?:expires|max\-age|path|domain|secure)$/i.test(sKey))  return false
-
-      sKey = STORE_PREFIX + sKey
-      let sExpires = ''
-      if (vEnd) {
-        switch (vEnd.constructor) {
-          case Number: // 单位秒
-            sExpires = vEnd === Infinity ? '; expires=Fri, 31 Dec 9999 23:59:59 GMT' : '; max-age=' + vEnd
-            break
-          case String:
-            sExpires = '; expires=' + vEnd
-            break
-          case Date:
-            sExpires = '; expires=' + vEnd.toUTCString()
-            break
-        }
-      }
-      document.cookie = encodeURIComponent(sKey) + '=' + encodeURIComponent(sValue) + sExpires + (sDomain ? '; domain=' + sDomain : '') + (sPath ? '; path=' + sPath : '') + (bSecure ? '; secure' : '')
-      return true
-    },
-    remove(sKey, sPath = '/', sDomain = '') {
-      if (!this.has(sKey)) return false 
-
-      sKey = STORE_PREFIX + sKey
-      document.cookie = encodeURIComponent(sKey) + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT' + (sDomain ? '; domain=' + sDomain : '') + (sPath ? '; path=' + sPath : '')
-      return true
-    },
-    has(sKey) {
-      if (!sKey) return false
-      return (new RegExp('(?:^|;\\s*)' + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, '\\$&') + '\\s*\\=')).test(document.cookie)
-    },
-    keys() {
-      let aKeys = document.cookie.replace(/((?:^|\s*;)[^\=]+)(?=;|$)|^\s*|\s*(?:\=[^;]*)?(?:\1|$)/g, '').split(/\s*(?:\=[^;]*)?;\s*/)
-      for (let nLen = aKeys.length, nIdx = 0; nIdx < nLen; nIdx++) { aKeys[nIdx] = decodeURIComponent(aKeys[nIdx]) }
-      return aKeys
-    }
-  },
-  session: {
-    set(key, value) {
-      if(!key) return false
-      window.sessionStorage.setItem(STORE_PREFIX + name, JSON.stringify(value || {}))
-    },
-    get(key) {
-      if(!key) return null
-      return JSON.parse(window.sessionStorage.getItem(STORE_PREFIX + name))
-    } 
-  },
-  local: {
-    set(key, value, seconds = 3600*24*365) {
-      if(!key) return false
-      
-      key = STORE_PREFIX + key
-      let newValue = {
-        value: value,
-        expires: seconds,
-        time: new Date().getTime()
-      }
-      window.localStorage.setItem(key, JSON.stringify(newValue))
-    },
-    get(key) {
-      if(!key) return null
-      key = STORE_PREFIX + key
-      
-      let value = window.localStorage.getItem(key)
-      if (value && (new Date().getTime() - value.time < value.expires)) {
-        value = value.value;
-      }
-      return value
-    } 
-  }
-}
-/*========utils小工具===========*/
-const WXAPPID = 'wxc8123454324da8b0'
-let utils = {
-  regexp: {
-    mobile: /^\s*1\d{10}\s*$/
-  },
-  noop(){},
-  isPlainObject(value){
-    return typeof value === 'object'
-  },
-  isFunction(value){
-    return typeof value === 'function'
-  },
-  isString(value){
-    return typeof value === 'string'
-  },
-	setTitle(title) {
-		document.title = title
-    // 判断是否为ios设备的微信浏览器，加载iframe来刷新title
-    if (isWechat && isIphone) {
-    	let iframe = document.createElement('iframe')
-		  iframe.setAttribute('src', '/favicon.ico')
-		  iframe.addEventListener('load', function() {
-		    setTimeout(() => {
-	      	iframe.removeEventListener('load')
-	        document.body.removeChild(iframe)
-	      }, 50)
-		  })
-		  document.body.appendChild(iframe)
-    }
-	},
-  alert(msg) {
-    window.alert(msg)
-  },
-  url: {
-    getArgs(url) {
-      if(typeof url !== 'string') url = window.location.href
-      url = decodeURIComponent(url)
-      let pos = url.indexOf('?'),
-        pos2 = url.lastIndexOf('#'),
-        qs = pos > -1 ? url.substring(pos+1, pos2 <= pos ? url.length : pos2) : '',
-        items = qs.split('&')
-      let args = {},
-        arg = null, 
-        name = null,
-        value = null
-      for(let i=0, splitPos = 0, item=null; i<items.length; i++){
-        item = items[i]
-        splitPos = item.indexOf('=')
-        name  = item.substring(0, splitPos)
-        value  = item.substring(splitPos+1)
-        args[name] = value
-      }
-      return args
-    },
-    setArgs(url, name, value) {
-      if(typeof url !== 'string') return ''
-      let urlArgs = utils.url.getArgs(url),
-        params = []
-
-      if(utils.isPlainObject(name)){
-        Object.assign(urlArgs, name)
-      }else if(utils.isString(name)){
-        urlArgs[name] = value
-      }
-
-      let hash = ''
-      for(let key of Object.keys(urlArgs)){
-        let val = urlArgs[key]
-        if(val != undefined && val !== ''){
-          if(key === '_hash'){
-            hash = val;
-          }else{
-            params.push(encodeURIComponent(key) +'=' + encodeURIComponent(val)) 
-          }
-        }
-      }
-      params.length > 0 && (url = url.split('?')[0] + '?' + params.join('&'))
-      hash && (url += '#'+hash)
-      
-      return url
-    },
-    replace(url) {
-      window.location.replace(url)
-    },
-    join(...paths) {
-      paths.filter((item) => utils.isString(item) && item )
-      // 做各种处理...
-      // ...
-      return paths.join('')
-    }
-  },
-  // 获取微信授权路径 url为绝对路径
-  getGrantUrl(url, params) {
-    if(!url) return false
-
-    url = utils.url.setArgs(url, params)
-    isWechat && (url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${WXAPPID}&redirect_uri=${url}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`)
-    return url
-  },
-  // 获取微信信息
-  getWxByCode(code, callback) {
-    if(!code) return
-
-    callback = utils.isFunction(callback) ? callback : utils.noop
-    Vue.http.get('owner/frame/getByCode', {
-      params: { code }
-    }).then((response)=>{
-      if(response.body.success){
-        storage.local.set('wxinfo', response.body.data)
-        callback(response.body.data)
-      }else{
-        utils.alert(response.body.message)
-      }
-    }, (error)=>{
-      utils.alert('服务器繁忙，请稍后重试！')
-    })
-  },
-  // 发送手机验证码
-  sendMobiCode(phone, btn) {
-    if(utils.regexp.mobile.test(phone)){
-      
-      btn.setAttribute('disabled', true)
-      let time = 30
-      let oldtext = btn.textContent
-      let timeid = setInterval(()=>{
-        if(--time >= 0){
-          btn.textContent = `${time}s`
-        }else{
-          clearInterval(timeid)
-          btn.removeAttribute('disabled')
-          btn.textContent = oldtext
-        }
-      }, 1000)
-      // common/beforeSendValidCode
-      Vue.http.get('common/getPhoneVerifyCode', {
-          params: {
-            phone: phone 
-          }
-        }).then((response) => {
-          if(!response.body.success){
-            clearInterval(timeid)
-            btn.removeAttribute('disabled')
-            btn.textContent = oldtext
-            utils.alert(response.body.message)
-          }else{
-            utils.alert('手机验证码已发送成功')
-          }
-        }, (error) => {
-          clearInterval(timeid)
-          btn.removeAttribute('disabled')
-          btn.textContent = oldtext
-          utils.alert('服务器繁忙，请稍后重试！')
-        })
-    }else{
-      utils.alert('请输入正确手机号码')
-    }
-  }
-}
-
-module.exports = { Vue, Router, Resource, utils, storage }
+module.exports = { Vue, utils, storage }
 

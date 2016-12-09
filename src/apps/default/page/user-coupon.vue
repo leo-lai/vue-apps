@@ -7,7 +7,7 @@
         <tab-item :selected="tabIndex === 2" @click="tabClick(2)">已过期</tab-item>
       </tab>
     </sticky>
-    <div class="l-coupon-list" v-if="tabIndex === 0" :transition="tabDirection">
+    <div class="l-coupon-list" v-show="tabIndex === 0" :transition="tabDirection">
       <div class="l-flex-h l-coupon-item-{{item}}" v-for="item in 4">
         <div class="l-rest par">
           <p>折扣券</p>
@@ -24,7 +24,7 @@
         <i></i>
       </div>
     </div>
-    <div class="l-coupon-list" v-if="tabIndex === 1" :transition="tabDirection">
+    <div class="l-coupon-list" v-show="tabIndex === 1" :transition="tabDirection">
       <div class="l-flex-h l-coupon-item-used" v-for="item in 2">
         <div class="l-rest par">
           <p>折扣券</p>
@@ -41,7 +41,7 @@
         <i></i>
       </div>
     </div>
-    <div class="l-coupon-list" v-if="tabIndex === 2" :transition="tabDirection">
+    <div class="l-coupon-list" v-show="tabIndex === 2" :transition="tabDirection">
       <div class="l-flex-h l-coupon-item-used" v-for="item in 1">
         <div class="l-rest par">
           <p>折扣券</p>

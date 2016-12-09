@@ -1,8 +1,7 @@
 <template>
   <div>
     <div v-if="show" transition="l-show" class="l-toptips l-{{type}}">
-      {{msg}}
-      <slot></slot>
+      <div class="l-toptips-cont">{{text}}<slot></slot></div>
     </div>
   </div>
 </template>
@@ -10,11 +9,26 @@
 <script>
 export default {
   props: {
-    msg: String,
+    text: String,
     show: Boolean,
+    time: {
+      type: Number,
+      default: 2000
+    },
     type: {
       type: String,
       default: 'error' // warn error
+    }
+  },
+  watch: {
+    show (val) {
+      if (val) {
+        clearTimeout(this.timeout)
+        this.timeout = setTimeout(() => {
+          this.show = false
+          this.$emit('on-hide')
+        }, this.time)
+      }
     }
   }
 }

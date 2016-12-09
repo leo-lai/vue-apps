@@ -20,23 +20,23 @@ export default {
     return {
       list: [{
         title: '产品展示',
-        img: require('assets/imgs/temp-002.jpg'),
+        img: require('assets/imgs/temp-010.jpg'),
         url: '/product/list'
       }, {
         title: '实景Show',
-        img: require('assets/imgs/temp-003.jpg'),
+        img: require('assets/imgs/temp-012.jpg'),
         url: '/product/list'
       }, {
         title: '智慧生活',
-        img: require('assets/imgs/temp-004.jpg'),
+        img: require('assets/imgs/temp-013.jpg'),
         url: '/product/list'
       }, {
         title: '澳式风情',
-        img: require('assets/imgs/temp-004.jpg'),
+        img: require('assets/imgs/temp-014.jpg'),
         url: '/product/list'
       }, {
         title: '720展厅',
-        img: require('assets/imgs/temp-004.jpg'),
+        img: require('assets/imgs/temp-015.jpg'),
         url: '/product/list'
       }]
     }

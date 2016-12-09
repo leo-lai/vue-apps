@@ -9,7 +9,7 @@
 }
 .iconfont {
   font: normal 22px/1 'iconfont';
-  vertical-align: middle;
+  vertical-align: 0;
 }
 
 // reset
@@ -126,7 +126,11 @@ img.l-center{
   box-flex: 1;
   align-self: auto; // 子项的排版设置
 }
-
+.l-flex-v .l-rest{
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
 // 弹性布局===================end
 .l-fill-color {
   white-space: nowrap;
@@ -148,12 +152,13 @@ img.l-center{
 .l-line-clamp2 {
   text-overflow: ellipsis;
   overflow: hidden;
-  max-height: 2em;
+  max-height: 2.4em;
+  line-height: 1.2;
   word-break: break-all;
   word-wrap: break-word;
-  display: box;
-  box-orient: vertical;
-  line-clamp: 2;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .l-blur {filter: blur(10px);}
@@ -180,9 +185,16 @@ img.l-center{
 
 .icon-arrow {
   color: #C8C8CD;
+  font-size: 18px;
 }
 
 // 覆盖/扩展vux,weui样式
+.vux-tab .vux-tab-item{
+  font-weight: 500;
+}
+.weui_cell_ft  .weui_icon{
+  margin-left: 5px
+}
 .weui-vcode-btn {
   width: 110px;
   background-color: transparent;

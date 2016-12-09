@@ -29,28 +29,16 @@
         </tabbar>
       </div>
     </view-box>
-    <loading :show="loading.show" :text="loading.text"></loading>
-    <confirm 
-      cancel-text="取消" 
-      confirm-text="确定" 
-      :show.sync="confirm.show" 
-      :title="confirm.title" 
-      @on-confirm="confirm.onConfirm" 
-      @on-cancel="confirm.onCancel">
-      <div v-html="confirm.desc"></div>
-    </confirm>
-    <toptips :show="toptips.show" :msg="toptips.msg" :type="toptips.type"></toptips>
   </div>
 </template>
 <script>
 import $ from 'sprint-js'
-import { Tabbar, TabbarItem, Loading, ViewBox, XHeader, Confirm } from 'vux-components'
-import Toptips from 'components/l-toptips'
+import { Tabbar, TabbarItem, ViewBox, XHeader } from 'vux-components'
 import { store, getters, actions } from './vuex'
 
 export default {
   components: {
-    Tabbar, TabbarItem, Loading, ViewBox, XHeader, Confirm, Toptips
+    Tabbar, TabbarItem, ViewBox, XHeader
   },
   events: {
     'hook:created': function() { 
@@ -70,7 +58,6 @@ export default {
     getters, actions
   },
   data() {
-    console.log(this)
     return {
       
     }

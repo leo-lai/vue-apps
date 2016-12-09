@@ -1,48 +1,25 @@
 // import { INCREMENT, DECREMENT } from './mutation-types'
+import { utils, storage } from 'assets/utils'
 // getters与actions命名不能相同
 const getters = {
 	route: (state) => state.route,
-  confirm: (state) => state.app_confirm,
-  toptips: (state) => state.app_toptips,
-  loading: (state) => state.app_loading,
+	userinfo: (state) => {
+		if(state.app_userinfo && state.app_userinfo.mobilePhone){
+			return state.app_userinfo
+		}else{
+			return storage.local.get('userinfo') || {}
+		}
+	},
   direction: (state) => state.app_direction
 }
 
 const actions = {
-	acConfirm: ({ dispatch }, config) => {
-		let defaultConfig = Object.assign({
-			show: true,
-			title: '',
-			desc: '',
-			onConfirm() {},
-			onCancel() {}
-		}, config)
-
-		dispatch('APP_CONFIRM', defaultConfig)
+	acUpdateUserInfo: ({ dispatch }) => {
+		dispatch('APP_USERINFO', storage.local.get('userinfo') || {})
 	},
-	acToptips: ({ dispatch }, msg, type) => {
-		let defaultConfig = Object.assign({
-			show: true,
-	    msg: '',
-	    type: 'error'
-		}, { msg, type })
-
-		dispatch('APP_TOPTIPS', defaultConfig)
-
-		clearTimeout(actions.acToptips.timeid)
-		actions.acToptips.timeid = setTimeout(()=>{
-			defaultConfig.show = false
-			dispatch('APP_TOPTIPS', defaultConfig)
-		}, 3000)
-	},
-	acLoading: ({ dispatch }, show, text) => {
-
-		let defaultConfig = Object.assign({
-			show: true,
-	    text: '加载中'
-		}, { show, text })
-
-		dispatch('APP_LOADING', defaultConfig)
+	acClearUserInfo({ dispatch }) {
+		storage.local.set('userinfo', null, 0)
+		dispatch('APP_USERINFO', {})
 	}
 }
 module.exports = { getters, actions }

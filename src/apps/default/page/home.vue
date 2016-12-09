@@ -63,7 +63,7 @@ export default {
   components: {
     Swiper, Masker, Flexbox, FlexboxItem, Divider, Panel
   },
-  route: config.routerHook,
+  route: config.routeHook,
   events: config.vueHook,
   data() {
     return {

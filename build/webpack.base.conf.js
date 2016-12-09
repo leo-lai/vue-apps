@@ -27,7 +27,10 @@ module.exports = {
       'apps': path.resolve(__dirname, '../src/apps'),
       'assets': path.resolve(__dirname, '../src/assets'),
       'components': path.resolve(__dirname, '../src/components'),
-      'vux-components': 'vux/src/components'
+      'plugins': path.resolve(__dirname, '../src/plugins'),
+      'vux-components': 'vux/src/components',
+      'vux-plugins': 'vux/src/plugins',
+      'vux-styles': 'vux/src/styles'
     }
   },
   resolveLoader: {

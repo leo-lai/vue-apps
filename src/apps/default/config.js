@@ -1,9 +1,15 @@
 // 应用配置
 const _HOST = window.location.origin
 const _PATH = '/'
-var Exports = {
+const avatar = require('assets/imgs/avatar.png')
+const avatarBg = require('assets/imgs/avatar-bg.jpg')
+export default {
   getHost: () => _HOST,
   getPath: () => _PATH,
+  defaultVal: {
+    avatarBg, 
+    avatar
+  },
   // 组件生命周期 http://vuejs.org.cn/guide/instance.html#生命周期图示
   vueHook: {
   	'hook:created': function() { 
@@ -14,7 +20,7 @@ var Exports = {
     }
   },
   // 路由生命周期 https://github.com/vuejs/vue-router/blob/1.0/docs/zh-cn/pipeline/hooks.md
-  routerHook: { 
+  routeHook: { 
     // waitForData: true,
     data(transition) {
       // 每次路由变动时都会被调用
@@ -89,18 +95,22 @@ var Exports = {
     },
     '/user/info': {
       title: '个人信息',
+      auth: true,
       component: (resolve) => require(['./page/user-info'], resolve)
     },
     '/user/appointment': {
       title: '我的预约',
+      auth: true,
       component: (resolve) => require(['./page/user-appointment'], resolve)
     },
     '/user/order': {
       title: '我的订单',
+      auth: true,
       component: (resolve) => require(['./page/user-order'], resolve)
     },
     '/user/coupon/': {
       title: '我的优惠券',
+      auth: true,
       component: (resolve) => require(['./page/user-coupon'], resolve)
     },
     '/user/coupon/info': {
@@ -109,14 +119,15 @@ var Exports = {
     },
     '/user/pwd': {
       title: '重置密码',
+      auth: true,
       component: (resolve) => require(['./page/user-pwd'], resolve)
     },
     '/user/faq': {
-      title: '意见反馈',
+      title: '常见问题',
       component: (resolve) => require(['./page/user-faq'], resolve)
     },
     '/user/faq/add': {
-      title: '意见反馈',
+      title: '我要反馈',
       component: (resolve) => require(['./page/user-faq-add'], resolve)
     },
     '/user/faq/info': {
@@ -126,4 +137,3 @@ var Exports = {
   }
 }
 
-module.exports = Exports

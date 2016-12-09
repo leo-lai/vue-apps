@@ -1,7 +1,15 @@
 <template>
   <div class="l-select-none">
-    <blur class="l-user-avatar l-flex-vhc" :blur-amount="15" :height="150" :url="images.avatar">
-      <div v-link="'/user/info'" class="avatar" :style="{'background-image': 'url('+images.avatar+')'}"></div>
+    <blur class="l-user-avatar l-flex-hc" :blur-amount="15" :height="120" :url="defaultVal.avatarBg" v-link="'/user/info'">
+      <div class="avatar" :style="{'background-image': 'url('+ (userinfo.photo || defaultVal.avatar) +')'}"></div>
+      <div v-if="userinfo.mobilePhone" class="l-rest">
+        <h3 v-text="userinfo.realName || '未设置姓名'"></h3>
+        <p v-text="userinfo.mobilePhone">13800138000</p>
+      </div>
+      <div v-else class="l-rest">
+        <p>登录/注册</p>
+      </div>
+      <div style="width:40px;text-align:center;"><i class="iconfont icon-arrow">&#xe601;</i></div>
     </blur>
     <group class="l-group">
       <!-- <cell title="个人信息" link="/user/info">
@@ -25,30 +33,30 @@
       <cell title="400-816-2882" value="09:00-24:00" :is-link="true" @click="callPhone('400-816-2882')">
         <i slot="icon" class="iconfont" style="background-color:#fe486e;">&#xe652;</i>
       </cell>
-      <cell title="退出登录" :is-link="true" @click="logout">
+      <cell v-if="userinfo.mobilePhone" title="退出登录" :is-link="true" @click="logout">
         <i slot="icon" class="iconfont" style="background-color:#999999;">&#xe7c7;</i>
       </cell>
     </group>
   </div>
 </template>
 <script>
+import { utils, storage } from 'assets/lib'
 import { Blur, Group, Cell } from 'vux-components'
-import { store, actions } from '../vuex'
+import { store, getters, actions } from '../vuex'
+import config from '../config'
 
-let images = {
-  'avatar': require('assets/imgs/kenan2.jpg')
-}
 export default {
   components: {
     Blur, Group, Cell
   },
   store,
   vuex: {
+    getters,
     actions
   },
   data() {
     return {
-      images: images
+      defaultVal: config.defaultVal
     }
   },
   methods: {
@@ -57,9 +65,10 @@ export default {
     },
     logout() {
       let self = this
-      self.acConfirm({
+      self.$vux.confirm.show({
         title: '确定退出登录？',
         onConfirm() {
+          self.acClearUserInfo()
           self.$router.replace('/login')
           // self.$router.replace('/login?redirect=' + self.$route.path)
           // self.$router.go({
@@ -72,15 +81,20 @@ export default {
   }
 }
 </script>
-<style>
+<style lang="less">
 .l-user-avatar {
   z-index: 0;
   background-color: #35495e;
+  color: #fff;
+  h3{
+    font-weight: 400;
+  }
 }
 
 .l-user-avatar .avatar {
-  width: 2.133333rem;
-  height: 2.133333rem;
+  width: 1.6rem;
+  height: 1.6rem;
+  margin:0 0.4rem;
   border-radius: 50%;
   border: 2px solid #ececec;
   background: no-repeat 50% 50%;

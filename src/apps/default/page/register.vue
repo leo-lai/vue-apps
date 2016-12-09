@@ -4,16 +4,16 @@
       填写注册信息
     </div>
     <group class="weui_cells_form">
-      <x-input placeholder="请输入手机号码" :value.sync="fromData.mobilePhone" class="weui_vcode" keyboard="number" is-type="china-mobile">
+      <x-input placeholder="请输入手机号码" :value.sync="formData.mobilePhone" class="weui_vcode" keyboard="number" is-type="china-mobile">
         <button v-el:send-btn slot="right" class="weui-vcode-btn" @click="sendCode">发送验证码</button>
       </x-input>
-      <x-input placeholder="请输入手机验证码" :value.sync="fromData.validCode" :max="6" keyboard="number"></x-input>
-      <x-input placeholder="请输入密码" type="password" :value.sync="fromData.pwd" :required="true"></x-input>
-      <x-input placeholder="请再次输入密码" type="password" :equal-with="fromData.confirmPwd"></x-input>
+      <x-input placeholder="请输入手机验证码" :value.sync="formData.validCode" :max="6" keyboard="number"></x-input>
+      <x-input placeholder="请输入密码" type="password" :value.sync="formData.pwd" :required="true"></x-input>
+      <x-input placeholder="请再次输入密码" type="password" :value.sync="formData.confirmPwd"></x-input>
     </group>
     <div class="l-btn-area">
       <x-button type="primary" @click="submit">快速注册</x-button> 
-      <!-- <x-button><i class="iconfont" style="vertical-align:0; color:#04be02; margin-right:5px;">&#xe60a;</i>微信授权登录</x-button> -->
+      <x-button @click="$router.replace('/login?direction=out')">返回登录</x-button>
     </div>
   </div>
 </template>
@@ -21,6 +21,7 @@
 import { utils } from 'assets/lib'
 import { Group, XInput, XButton } from 'vux-components'
 import { store, actions } from '../vuex'
+import server from '../server'
 
 export default {
   components: {
@@ -30,9 +31,26 @@ export default {
   vuex: {
     actions
   },
+  route: {
+    canActivate(transition){
+      let code = transition.to.query.code
+      if(code){ // 如果页面已授权
+        // 获取微信信息及判断是否已注册
+        server.getWxByCode(code).then((response)=>{
+          if(response.body.success && response.body.data && response.body.data.mobilePhone){
+            transition.redirect('/user')
+          }else{
+            transition.next()    
+          }
+        })
+      }else{
+        transition.next()
+      }
+    }
+  },
   data() {
     return {
-      fromData: {
+      formData: {
         mobilePhone: '',
         validCode: '',
         pwd: '',
@@ -41,40 +59,40 @@ export default {
     }
   },
   methods: {
-    sendCode(){
-      utils.sendMobiCode(this.fromData.mobilePhone, this.$els.sendBtn)
+    sendCode() {
+      server.sendMobiCode(this.formData.mobilePhone, this.$els.sendBtn)
     },
     submit() {
       let self = this
-      if(!utils.regexp.mobile.test(self.fromData.mobilePhone)){
-        self.acToptips('请输入正确手机号码')
+      if(!utils.regexp.mobile.test(self.formData.mobilePhone)){
+        self.$vux.toptips.show('请输入正确手机号码')
         return  
       }
-      if(!self.fromData.validCode){
-        self.acToptips('请输入手机验证码')
+      if(!self.formData.validCode){
+        self.$vux.toptips.show('请输入手机验证码')
         return  
       }
-      if(!self.fromData.pwd){
-        self.acToptips('密码不能为空')
-        return  
+      if(!self.formData.pwd){
+        self.$vux.toptips.show('密码不能为空')
+        return 
       }
-      if(self.fromData.pwd !== self.fromData.confirmPwd){
-        self.acToptips('两次密码不一致')
-        return  
+      if(self.formData.pwd !== self.formData.confirmPwd){
+        self.$vux.toptips.show('两次密码不一致')
+        return
       }
 
-      self.acLoading(true, '注册中')
-      self.$http.post('owner/visitor/register', self.fromData)
+      self.$vux.loading.show('注册中')
+      self.$http.post('owner/visitor/register', self.formData)
         .then((response) => {
-          self.acLoading(false)
+          self.$vux.loading.hide()
           if(response.body.success){
             self.$router.replace('/user')  
           }else{
-            self.acToptips(response.body.message || '注册失败')
+            self.$vux.toptips.show(response.body.message || '注册失败')
           }
         }, (error) => {
-          self.acLoading(false)
-          self.acToptips('服务器繁忙，请稍后重试！')
+          self.$vux.loading.hide()
+          self.$vux.toptips.show('服务器繁忙，请稍后重试！')
         })
     }
   }
