@@ -41,6 +41,7 @@ export default {
         $vm.show = true
       },
       hide () {
+        $vm.text = '加载中'
         $vm.show = false
       }
     }

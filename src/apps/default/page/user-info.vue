@@ -51,7 +51,7 @@ export default {
   },
   methods: {
     submit() {
-      let self = this
+      const self = this
       self.formData.id = self.userinfo.id
       if(self.address.value){
         self.formData.provinceId = self.address.value[0] || ''

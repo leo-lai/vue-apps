@@ -1,51 +1,51 @@
 <template>
   <div>
-    <swiper :list="swiperList" loop auto></swiper>
+    <swiper :list="banner" loop auto></swiper>
     <div class="l-margin-tb l-flex-hc" style="background-color:#fff;padding:0.4rem;">
       <div class="l-rest">
         <masker class="l-masker-item" :opacity="0.5" v-link="{path:'/booking'}">
-          <div class="l-img" :style="{backgroundImage: 'url(' + images.tempImg + ')'}"></div>
+          <div class="l-img" :style="{backgroundImage: 'url(' + images.img1 + ')'}"></div>
           <div class="l-title" slot="content">在线预约</div>
         </masker>  
       </div>
       <div class="l-rest" style="margin-left:0.4rem;">
         <masker class="l-masker-item" :opacity="0.5" v-link="{path:'/booking'}">
-          <div class="l-img" :style="{backgroundImage: 'url(' + images.tempImg + ')'}"></div>
-          <div class="l-title" slot="content">领福利</div>
+          <div class="l-img" :style="{backgroundImage: 'url(' + images.img2 + ')'}"></div>
+          <div class="l-title" slot="content">新人领福利</div>
         </masker>
       </div>
     </div>
     <div class="l-flex-wrap l-grid">
       <div class="l-flex-vhc l-grid-item">
-        <img src="~assets/imgs/icon-tabbar.png">
+        <img src="~assets/imgs/icon-001.jpg">
         <p>企业简介</p>
       </div>
       <div class="l-flex-vhc l-grid-item">
-        <img src="~assets/imgs/icon-tabbar.png">
+        <img src="~assets/imgs/icon-002.jpg">
         <p>企业荣誉</p>
       </div>
       <div class="l-flex-vhc l-grid-item">
-        <img src="~assets/imgs/icon-tabbar.png">
+        <img src="~assets/imgs/icon-003.jpg">
         <p>门店展示</p>
       </div>
       <div class="l-flex-vhc l-grid-item">
-        <img src="~assets/imgs/icon-tabbar.png">
+        <img src="~assets/imgs/icon-004.jpg">
         <p>案列分享</p>
       </div>
       <div class="l-flex-vhc l-grid-item">
-        <img src="~assets/imgs/icon-tabbar.png">
+        <img src="~assets/imgs/icon-005.jpg">
         <p>产品展示</p>
       </div>
       <div class="l-flex-vhc l-grid-item">
-        <img src="~assets/imgs/icon-tabbar.png">
+        <img src="~assets/imgs/icon-006.jpg">
         <p>智慧生活</p>
       </div>
       <div class="l-flex-vhc l-grid-item">
-        <img src="~assets/imgs/icon-tabbar.png">
+        <img src="~assets/imgs/icon-007.jpg">
         <p>澳式风情</p>
       </div>
       <div class="l-flex-vhc l-grid-item">
-        <img src="~assets/imgs/icon-tabbar.png">
+        <img src="~assets/imgs/icon-008.jpg">
         <p>720展厅</p>
       </div>
     </div>
@@ -55,9 +55,6 @@
 <script>
 import config from '../config'
 import { Swiper, Masker, Flexbox, FlexboxItem, Divider, Panel } from 'vux-components'
-let images = {
-  tempImg: require('assets/imgs/temp-002.jpg')
-}
 
 export default {
   components: {
@@ -67,14 +64,13 @@ export default {
   events: config.vueHook,
   data() {
     return {
-      images: images,
-      swiperList: [{
+      images: {
+        img1: require('assets/imgs/temp-017.jpg'),
+        img2: require('assets/imgs/temp-018.jpg')
+      },
+      banner: [{
         url: 'javascript:;',
-        img: require('assets/imgs/temp-001.jpg'),
-        title: ''
-      }, {
-        url: 'javascript:;',
-        img: require('assets/imgs/temp-001.jpg'),
+        img: require('assets/imgs/temp-016.jpg'),
         title: ''
       }, {
         url: 'javascript:;',

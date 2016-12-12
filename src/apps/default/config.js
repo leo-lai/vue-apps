@@ -103,6 +103,11 @@ export default {
       auth: true,
       component: (resolve) => require(['./page/user-appointment'], resolve)
     },
+    '/user/appointment/info': {
+      title: '预约详情',
+      auth: true,
+      component: (resolve) => require(['./page/user-appointment-info'], resolve)
+    },
     '/user/order': {
       title: '我的订单',
       auth: true,

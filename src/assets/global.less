@@ -1,11 +1,11 @@
 // 字体图标 http://www.iconfont.cn/
 @font-face {
   font-family: 'iconfont';  /* project id 189309 */
-  src: url('//at.alicdn.com/t/font_kq9osznpjmunmi.eot');
-  src: url('//at.alicdn.com/t/font_kq9osznpjmunmi.eot?#iefix') format('embedded-opentype'),
-  url('//at.alicdn.com/t/font_kq9osznpjmunmi.woff') format('woff'),
-  url('//at.alicdn.com/t/font_kq9osznpjmunmi.ttf') format('truetype'),
-  url('//at.alicdn.com/t/font_kq9osznpjmunmi.svg#iconfont') format('svg');
+  src: url('//at.alicdn.com/t/font_ml0c04xe3p5bfbt9.eot');
+  src: url('//at.alicdn.com/t/font_ml0c04xe3p5bfbt9.eot?#iefix') format('embedded-opentype'),
+  url('//at.alicdn.com/t/font_ml0c04xe3p5bfbt9.woff') format('woff'),
+  url('//at.alicdn.com/t/font_ml0c04xe3p5bfbt9.ttf') format('truetype'),
+  url('//at.alicdn.com/t/font_ml0c04xe3p5bfbt9.svg#iconfont') format('svg');
 }
 .iconfont {
   font: normal 22px/1 'iconfont';
@@ -41,6 +41,38 @@ img{
 img.l-center{
   display: block;
   margin:auto;
+}
+
+table{
+  width: 100%;
+  border:1px solid #ebebeb;
+  border-collapse: collapse;
+  border-spacing:0;
+}
+
+th, td{
+  font-weight: 400;
+  border:1px solid #ebebeb;
+  padding: 0.133333rem;
+  text-align: center;
+}
+
+th{
+  background-color: #eee;
+}
+td.l-tr{
+  text-align: right;
+}
+ins{
+  visibility: hidden;
+  width: 2em;
+  display: inline-block;
+}
+ins.ins2-1{
+  width: 1em;
+}
+ins.ins4-1{
+  width: 0.5em;
 }
 // http://www.css88.com/book/css/
 // 弹性布局===================
@@ -178,6 +210,13 @@ img.l-center{
   margin-bottom: 0.4rem;
 }
 
+.l-btn-square{
+  border-radius: 0 !important;
+}
+.l-btn-square:after{
+  visibility: hidden;
+}
+
 .l-btn-area {
   margin: 0.8rem 0.4rem;
   text-align: center;
@@ -189,6 +228,16 @@ img.l-center{
 }
 
 // 覆盖/扩展vux,weui样式
+.vux-slider{
+  background-color: #fff;
+}
+.weui_toast_content{
+  font-size: 14px;
+  padding: 0 15px;
+}
+.weui_icon_toast{
+  margin-bottom: 10px !important;
+}
 .vux-tab .vux-tab-item{
   font-weight: 500;
 }

@@ -40,7 +40,7 @@ export default {
       server.sendMobiCode(this.formData.mobilePhone, this.$els.sendBtn)
     },
     submit() {
-      let self = this
+      const self = this
       if(!utils.regexp.mobile.test(self.formData.mobilePhone)){
         self.$vux.toptips.show('请输入正确手机号码')
         return  

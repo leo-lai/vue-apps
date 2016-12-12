@@ -8,39 +8,81 @@
     <div class="l-margin-tb" style="background-color:#fff;padding:0.8rem 0;">
       <img class="l-center" style="width:80%;" src="~assets/imgs/temp-009.jpg">
       <group class="l-booking-form">
-        <x-input name="username" placeholder="请输入姓名" is-type="china-name"></x-input>
-        <x-input name="mobile" placeholder="请输入手机号码" keyboard="number" is-type="china-mobile"></x-input>
+        <x-input name="username" placeholder="请输入姓名" :value.sync="formData.name" is-type="china-name"></x-input>
+        <x-input name="mobile" placeholder="请输入手机号码" :value.sync="formData.mobilePhone" keyboard="number" is-type="china-mobile"></x-input>
         <address title="" :value.sync="address.value" raw-value :list="address.data" placeholder="请选择地区"></address>
       </group>
     </div>
     <div class="l-btn-area">
-      <x-button type="primary">马上预约</x-button>
+      <x-button type="primary" @click="submit">马上预约</x-button>
     </div>
   </div>
 </template>
 <script>
 import { XButton, Group, XInput, Cell, Address, AddressChinaData } from 'vux-components'
-let images = {
-  tempImg: require('assets/imgs/temp-006.jpg')
-}
+import value2name from 'vux/src/filters/value2name'
 export default {
   components: {
     XButton, Group, XInput, Cell, Address, AddressChinaData
   },
-  route: {
-    activate: function(transition) {
-      console.info('hook-example activated!')
-      transition.next()
-    }
-  },
   data() {
     return {
-      images: images,
+      formData: {
+        name: '',
+        mobilePhone: ''
+      },
       address: {
         data: AddressChinaData,
-        title: '所在地区',
         value: []
       }
+    }
+  },
+  methods: {
+    submit() {
+      const self = this
+      if(!self.formData.name){
+        self.$vux.toptips.show('请输入您的姓名')
+        return  
+      }
+      if(!self.$regexp.mobile.test(self.formData.mobilePhone)){
+        self.$vux.toptips.show('请输入正确手机号码')
+        return  
+      }
+      if(self.address.value.length === 0){
+        self.$vux.toptips.show('请选择所在地区')
+        return
+      }
+      self.formData.provinceId = self.address.value[0] || ''
+      self.formData.cityId = self.address.value[1] || ''
+      self.formData.areaId = self.address.value[2] || ''
+      let addressNames = value2name(self.address.value, AddressChinaData)
+      addressNames = addressNames && addressNames.split(' ')
+      if(addressNames.length > 0){
+        self.formData.province = addressNames[0]
+        self.formData.city = addressNames[1]
+        self.formData.area = addressNames[2]       
+      }
+
+      self.$vux.loading.show('预约中')
+      self.$http.post('owner/visitor/addAppoint', self.formData)
+        .then((response) => {
+          self.$vux.loading.hide()
+          if(response.body.success){
+            self.$vux.toast.show({
+              time: 3000,
+              text: '预约成功！您可以在[个人中心-我的预约]查看预约进度',
+              width: '80%',
+              onHide(){
+                self.$router.go(`/user/appointment?phone=${self.formData.mobilePhone}`)
+              }
+            })
+          }else{
+            self.$vux.toptips.show(response.body.message || '预约失败')
+          }
+        }, (error) => {
+          self.$vux.loading.hide()
+          self.$vux.toptips.show('服务器繁忙，请稍后重试！')
+        })
     }
   }
 }
@@ -54,6 +96,7 @@ export default {
   }
   .vux-popup-picker-value{
     float: left;
+    color: #333
   }
   .vux-popup-picker-value+span{
     float: left;

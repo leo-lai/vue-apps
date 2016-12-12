@@ -13,6 +13,7 @@ strategies.route = strategies.methods
 Vue.mixin({ // 设备检测
   created: function () {
     this.$device = utils.device
+    this.$regexp = utils.regexp
     this.$image = {
 	    thumb(src, width, height) {
 	      width = width || 320
