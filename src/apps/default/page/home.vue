@@ -16,7 +16,7 @@
       </div>
     </div>
     <div class="l-flex-wrap l-grid">
-      <div class="l-flex-vhc l-grid-item">
+      <div class="l-flex-vhc l-grid-item" v-link="{path: '/company'}">
         <img src="~assets/imgs/icon-001.jpg">
         <p>企业简介</p>
       </div>
@@ -24,7 +24,7 @@
         <img src="~assets/imgs/icon-002.jpg">
         <p>企业荣誉</p>
       </div>
-      <div class="l-flex-vhc l-grid-item">
+      <div class="l-flex-vhc l-grid-item" v-link="{path: '/store/list'}">
         <img src="~assets/imgs/icon-003.jpg">
         <p>门店展示</p>
       </div>

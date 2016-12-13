@@ -62,6 +62,18 @@ export default {
       mainPage: true,
       component: (resolve) => require(['./page/home'], resolve)
     },
+    '/company': {
+      title: '企业简介',
+      component: (resolve) => require(['./page/company'], resolve)
+    },
+    '/store/list': {
+      title: '门店展示',
+      component: (resolve) => require(['./page/store-list'], resolve)
+    },
+    '/store/list/info': {
+      title: '门店详情',
+      component: (resolve) => require(['./page/store-info'], resolve)
+    },
     '/booking': {
       title: '在线预约',
       component: (resolve) => require(['./page/booking'], resolve)
@@ -120,6 +132,7 @@ export default {
     },
     '/user/coupon/info': {
       title: '优惠券详情',
+      auth: true,
       component: (resolve) => require(['./page/user-coupon-info'], resolve)
     },
     '/user/pwd': {
@@ -129,15 +142,23 @@ export default {
     },
     '/user/faq': {
       title: '常见问题',
+      auth: true,
       component: (resolve) => require(['./page/user-faq'], resolve)
+    },
+    '/user/faq/info': {
+      title: '常见问题',
+      auth: true,
+      component: (resolve) => require(['./page/user-faq-info'], resolve)
     },
     '/user/faq/add': {
       title: '我要反馈',
+      auth: true,
       component: (resolve) => require(['./page/user-faq-add'], resolve)
     },
-    '/user/faq/info': {
-      title: '意见反馈',
-      component: (resolve) => require(['./page/user-faq-info'], resolve)
+    '/user/faq/feedback': {
+      title: '常见问题',
+      auth: true,
+      component: (resolve) => require(['./page/user-faq-feedback'], resolve)
     }
   }
 }

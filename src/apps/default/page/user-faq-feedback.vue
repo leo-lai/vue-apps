@@ -22,9 +22,9 @@ export default {
   route: {
     data(transition) {
       const self = this
-      const promise = self.$http.get('owner/visitor/getHelpDetail', {
+      const promise = self.$http.get('owner/getMyFeedBackDetail', {
         params: {
-          helpId: transition.to.query.id
+          feedBackId: transition.to.query.id
         }
       })
       promise.then((response)=>{

@@ -18,9 +18,9 @@
       <cell title="我的预约" link="/user/appointment">
         <i slot="icon" class="iconfont" style="background-color:#2ea748;">&#xe6d0;</i>
       </cell>
-      <!-- <cell title="我的订单" link="/user/order">
+      <cell title="我的订单" link="/user/order">
         <i slot="icon" class="iconfont" style="background-color:#535fe0;">&#xe653;</i>
-      </cell> -->
+      </cell>
       <cell title="我的优惠劵" link="/user/coupon">
         <i slot="icon" class="iconfont" style="background-color:#f19824;">&#xe625;</i>
       </cell>

@@ -2,25 +2,29 @@
   <div>
     <div class="l-appointment-item">
       <p>预约单号：<span v-text="info.billCode"></span></p>
-      <p>预约进度：<span style="color:#007aff;" v-text="getStatus(info.state)"></span></p>
+      <p>预约进度：<span style="color:#4083c7;" v-text="getStatus(info.state)"></span></p>
       <p>预约时间：<span v-text="info.appointDate"></span></p>
-      <p>专属客服：<span v-text="info.designer"></span><span>(<a href="tel:{{info.designerPhone}}" v-text="info.designerPhone"></a>)</span></p>
+      <p v-if="info.designer">专属客服：<span v-text="info.designer"></span><span>(<a href="tel:{{info.designerPhone}}" v-text="info.designerPhone"></a>)</span></p>
+      <p v-else>专属客服：<span>正在安排</span></p>
       <p>姓<ins></ins>名：<span v-text="info.name"></span></p>
       <p>手机号码：<span v-text="info.mobilePhone"></span></p>
-      <p>楼盘地址：<span v-text="info.province+info.city+info.area+info.address"></span></p>
+      <p>楼盘地址：<span v-text="info.province+info.city+info.area+(info.address||'')"></span></p>
     </div>
     <divider>大样图</divider>
     <div style="background-color:#fff;margin: 0.133333rem 0 0.533333rem;">
-      <swiper :aspect-ratio="300/800">
+      <swiper :aspect-ratio="300/800" v-if="designImgs.length > 0">
         <swiper-item v-for="(index, item) in designImgs"  @click="$refs.previewer.show(index)">
           <img class="previewer-img" width="100%" :src="item.src">
         </swiper-item>
       </swiper>
+      <div v-else class="vux-center" style="height:4.266667rem;color:#999; font-size:14px;">
+        大样图正在设计中
+      </div>
     </div>
     
     <divider>产品信息</divider>
     <div class="l-appointment-item">
-      <table class="l-fsize-s">
+      <table class="l-fsize-sm">
         <thead>
           <tr>
             <th>产品名称</th>
@@ -50,14 +54,14 @@
       </table>
     </div>
     <div class="l-btn-area">
-      <x-button type="primary" @click="submit">确认报价信息，去下单</x-button>
-      <x-button @click="dialog.show=true">不满意，重新设计报价</x-button>
+      <x-button type="primary" @click="confirmInfo">确定报价信息</x-button>
+      <x-button @click="resetDesign">不满意，重新报价</x-button>
     </div>
 
     <dialog :show.sync="dialog.show" :scroll="dialog.scroll" @click="dialog.show=false">
       <div class="l-dissatisfied-reason" @click.stop>
-        <x-textarea :max="500" placeholder="请详细描述您不满意的原因"></x-textarea>
-        <x-button class="l-btn-square">提交</x-button>
+        <x-textarea :max="500" placeholder="请详细描述您不满意的原因" :value.sync="formData.remark"></x-textarea>
+        <x-button class="l-btn-square" @click="submit(false)">提交</x-button>
       </div>
     </dialog>
     <previewer :list="designImgs" v-ref:previewer :options="options"></previewer>
@@ -65,10 +69,10 @@
 </template>
 <script>
 import { store, getters, actions } from '../vuex'
-import { Search, Sticky, Divider, Swiper, SwiperItem, Previewer, XTextarea, XButton, Dialog, Group } from 'vux-components'
+import { Divider, Swiper, SwiperItem, Previewer, XTextarea, XButton, Dialog, Group } from 'vux-components'
 export default {
   components: {
-    Search, Sticky, Divider, Swiper, SwiperItem, Previewer, XTextarea, XButton, Dialog, Group
+    Divider, Swiper, SwiperItem, Previewer, XTextarea, XButton, Dialog, Group
   },
   route: {
     data(transition) {
@@ -81,6 +85,7 @@ export default {
       promise.then((response)=>{
         if(response.body.success){
           self.info = response.body.data
+          self.info._state = Number(String(self.info.state).substr(0,1))
         }
       })
     }
@@ -92,6 +97,11 @@ export default {
   data() {
     return {
       info: {},
+      formData: {
+        appointId: '',
+        isSatisfy: false,
+        remark: ''
+      },
       dialog: {
         show: false,
         scroll: false
@@ -173,23 +183,86 @@ export default {
         case 71:
           return '正在报价中'
         case 8:
-        case 9:
-        case 91:
           return '客户确认中'
+        case 9:
+          return '已确认报价'
+        case 91:
+          return '待重新报价'
       }
     },
-    submit() {
+    resetDesign() {
       const self = this
+      if(self.info._state < 8 || self.info._state == 91){
+        self.$vux.toast.show({
+          text: '无法操作，大样图和报价未确定。',
+          type: 'warn',
+          width: '65%'
+        })
+        return
+      }
+      self.dialog.show = true
+    },
+    confirmInfo() {
+      const self = this
+      if(self.info._state < 8 || self.info._state == 9){
+        self.$vux.toast.show({
+          text: '无法操作，大样图和报价未确定。',
+          type: 'warn',
+          width: '65%'
+        })
+        return
+      }
       self.$vux.confirm.show({
-        title: '确定下单？',
-        content: '<p>下单预收50%的定金，交货日期将是收款后30个工作日，请及时付款。</p>',
+        title: '是否确定报价信息？',
         onConfirm() {
-
-        },
-        onCancel() {
-
+          self.submit(true)
         }
       })
+    },
+    submit(sure) {
+      const self = this
+      self.formData.appointId = self.info.id
+      self.formData.isSatisfy = !!sure
+
+      if(!sure){
+        if(!self.formData.remark){
+          self.$vux.toptips.show('请详细描述您不满意的原因')
+          return  
+        }else{
+          self.dialog.show = false  
+        }
+      }
+
+      self.$vux.loading.show('提交中')
+      self.$http.post('owner/visitor/confirmAllQuotation', self.formData)
+        .then((response) => {
+          self.$vux.loading.hide()
+          if(response.body.success){
+            if(!sure){
+              self.$vux.toast.show({
+                text: '感谢您的反馈，我们工作人员将尽快与你联系沟通。',
+                width: '65%',
+                onHide(){
+                  self.$router.go('/user/appointment')
+                }
+              })
+            }else{
+              self.$vux.toast.show({
+                text: '确认成功，请等待工作人员联系',
+                width: '65%',
+                onHide(){
+                  self.$router.replace('/user/order')
+                }
+              })
+            }
+            
+          }else{
+            self.$vux.toptips.show(response.body.message || '提交失败')
+          }
+        }, (error) => {
+          self.$vux.loading.hide()
+          self.$vux.toptips.show('服务器繁忙，请稍后重试！')
+        })
     }
   }
 }

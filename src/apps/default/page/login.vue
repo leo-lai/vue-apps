@@ -35,7 +35,7 @@ export default {
     return {
       formData: {
         accountName: '18602029524',
-        pwd: '123456'
+        pwd: '111111'
       }
     }
   },
