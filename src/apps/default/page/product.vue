@@ -23,21 +23,17 @@ export default {
         img: require('assets/imgs/temp-010.jpg'),
         url: '/product/list'
       }, {
-        title: '实景Show',
-        img: require('assets/imgs/temp-012.jpg'),
-        url: '/product/list'
-      }, {
         title: '智慧生活',
         img: require('assets/imgs/temp-013.jpg'),
-        url: '/product/list'
+        url: ''
       }, {
         title: '澳式风情',
         img: require('assets/imgs/temp-014.jpg'),
-        url: '/product/list'
+        url: '/australia'
       }, {
         title: '720展厅',
         img: require('assets/imgs/temp-015.jpg'),
-        url: '/product/list'
+        url: 'http://www.hzzx3d.com/news/aylson/index.html'
       }]
     }
   }

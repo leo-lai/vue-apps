@@ -7,53 +7,51 @@
         <tab-item :selected="tabIndex === 2" @click="tabClick(2)">已过期</tab-item>
       </tab>
     </sticky>
-    <div class="l-coupon-list" v-show="tabIndex === 0" :transition="tabDirection">
-      <div class="l-flex-h l-coupon-item-{{item}}" v-for="item in 4">
+    <div class="l-coupon-list" v-show="tabIndex === 0" >
+      <div class="l-flex-h l-coupon-item-0" v-for="item in tabData[tabIndex]">
         <div class="l-rest par">
-          <p>折扣券</p>
-          <sub class="sign">￥</sub><span>50.00</span>
-          <p>订单满100.00元</p>
+          <p v-text="item.couponName"></p>
+          <sub class="sign">￥</sub><span v-text="item.couponValue"></span>
+          <p class="l-fsize-sm" v-text="item.ruleDesc"></p>
         </div>
         <div class="copy l-flex-vhc">
           <p>有效日期</p>
           <div class="time">
-            2015-08-13<br>2016-08-13
+            {{getDate(item.startTime)}}<br>{{getDate(item.endTime)}}
           </div>
-          <x-button mini>立即使用</x-button>
+          <x-button mini v-link="'/booking?direction=in&id=' + item.id">立即使用</x-button>
         </div>
         <i></i>
       </div>
     </div>
-    <div class="l-coupon-list" v-show="tabIndex === 1" :transition="tabDirection">
-      <div class="l-flex-h l-coupon-item-used" v-for="item in 2">
+    <div class="l-coupon-list" v-show="tabIndex === 1">
+      <div class="l-flex-h l-coupon-item-used" v-for="item in tabData[tabIndex]">
         <div class="l-rest par">
-          <p>折扣券</p>
-          <sub class="sign">￥</sub><span>50.00</span>
-          <p>订单满100.00元</p>
+          <p v-text="item.couponName"></p>
+          <sub class="sign">￥</sub><span v-text="item.couponValue"></span>
+          <p class="l-fsize-sm" v-text="item.ruleDesc"></p>
         </div>
         <div class="copy l-flex-vhc">
           <p>有效日期</p>
           <div class="time">
-            2015-08-13<br>2016-08-13
+            {{getDate(item.startTime)}}<br>{{getDate(item.endTime)}}
           </div>
-          <x-button mini>立即使用</x-button>
         </div>
         <i></i>
       </div>
     </div>
-    <div class="l-coupon-list" v-show="tabIndex === 2" :transition="tabDirection">
-      <div class="l-flex-h l-coupon-item-used" v-for="item in 1">
+    <div class="l-coupon-list" v-show="tabIndex === 2">
+      <div class="l-flex-h l-coupon-item-used" v-for="item in tabData[tabIndex]">
         <div class="l-rest par">
-          <p>折扣券</p>
-          <sub class="sign">￥</sub><span>50.00</span>
-          <p>订单满100.00元</p>
+          <p v-text="item.couponName"></p>
+          <sub class="sign">￥</sub><span v-text="item.couponValue"></span>
+          <p class="l-fsize-sm" v-text="item.ruleDesc"></p>
         </div>
         <div class="copy l-flex-vhc">
           <p>有效日期</p>
           <div class="time">
-            2015-08-13<br>2016-08-13
+            {{getDate(item.startTime)}}<br>{{getDate(item.endTime)}}
           </div>
-          <x-button mini>立即使用</x-button>
         </div>
         <i></i>
       </div>
@@ -61,27 +59,47 @@
   </div>
 </template>
 <script>
+import {store, getters } from '../vuex'
+import server from '../server'
 import {Tab, TabItem, Divider, XButton, Sticky } from 'vux-components'
 
 export default {
   components: {Tab, TabItem, Divider, Sticky, XButton },
+  route: {
+    data() {
+      this.tabClick(0)
+    }
+  },
+  store,
+  vuex: {
+    getters
+  },
   data() {
     return {
       tabDirection: 'vux-pop-in',
-      tabIndex: 0,
-      notUsedList: [],
-      usedList: [],
-      expiredList: []
+      tabIndex: -1,
+      tabData: [[],[],[]]
     }
   },
   methods: {
     tabClick(index) {
-      if (index < this.tabIndex) {
-        this.tabDirection = 'vux-pop-out';
-      } else {
-        this.tabDirection = 'vux-pop-in';
+      const self = this
+      if(self.tabIndex === index) return
+      self.tabDirection =  index < self.tabIndex ? 'vux-pop-out' : 'vux-pop-in'
+      self.tabIndex = index
+
+      if(self.tabData[index].length === 0){
+        server.coupon.getList(self.userinfo.mobilePhone, index)
+        .then((response)=>{
+          if(response.body.success && response.body.data ){
+            self.tabData.$set(index, response.body.data)
+          }
+        })
       }
-      this.tabIndex = index;
+    },
+    getDate(datetime) {
+      if(!datetime) return ''
+      return datetime.split(' ')[0]
     }
   }
 }
@@ -94,6 +112,8 @@ export default {
 
 [class*=l-coupon-item] button{
   border-radius: 2px;
+  position: relative;
+  z-index: 2;
 }
 [class*=l-coupon-item] button:after{
   display: none;

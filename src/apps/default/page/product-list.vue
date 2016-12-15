@@ -6,15 +6,14 @@
         :selected="tab.index === $index" 
         @click="tabClick($index)">{{item.dicName}}</tab-item>
     </tab>
-    <scroller class="l-rest" v-ref:scroller height="100%"
+    <!-- <scroller class="l-rest" v-ref:scroller height="100%"
       lock-x scrollbar-y use-pullup :use-pulldown="false"
-      :pullup-config="scroller.config" @pullup:loading="scrollerLoad">
-      <div class="l-scroller-body">
+      :pullup-config="scroller.config" @pullup:loading="scrollerLoad"> -->
+      <div class="l-scrolling l-rest">
         <div class="l-product-list"
           v-for="(index, category) in tab.data | limitBy 5"
-          v-show="tab.index === index"
-          :transition="tab.direction">
-          <div class="l-flex-hc l-product-item vux-1px-t" v-for="item in tab.list[index]">
+          v-show="tab.index === index">
+          <div class="l-flex-hc l-product-item l-border-b" v-for="item in tab.list[index]" @click="view(item.id)">
             <div class="l-thumb">
               <img :src="$image.thumb(item.thumbnail, 60, 60)">
             </div>
@@ -28,12 +27,12 @@
           </div>
         </div>  
       </div>
-    </scroller>
-    
+    <!-- </scroller> -->
   </div>
 </template>
 <script>
 import { Panel, Group, Tab, TabItem, Sticky, Scroller } from 'vux-components'
+import server from '../server'
 export default {
   components: {
     Panel, Group, Tab, TabItem, Sticky, Scroller
@@ -41,20 +40,19 @@ export default {
   route: {
     data(transition) {
       const self = this
-      self.$http.get('owner/visitor/getProductCategory')
-        .then((response)=>{
-          if(response.body.success){
-            self.tab.data = response.body.data
-            self.tabClick(0)
-          }
-        })
+      server.product.getCategory().then(({ body })=>{
+        if(body.success){
+          self.tab.data = body.data
+          self.tabClick(0)
+        }
+      })
     }
   },
   data() {
     return {
       tab: {
         direction: 'vux-pop-in',
-        index: 0,
+        index: -1,
         data: [],
         list: [[],[],[],[],[]]
       },
@@ -71,25 +69,24 @@ export default {
   methods: {
     tabClick(index) {
       const self = this
-      if (index < self.tab.index) {
-        self.tab.direction = 'vux-pop-out';
-      } else {
-        self.tab.direction = 'vux-pop-in';
-      }
+      if(self.tab.index === index) return
+      self.tab.direction =  index < self.tab.index ? 'vux-pop-out' : 'vux-pop-in'
+      self.tab.index = index
 
-      self.$http.get('owner/visitor/getProductList', {
-        params: {
-          category: self.tab.data[index].id
-        }
-      }).then((response)=>{
-          if(response.body.success){
-            self.tab.index = index
-            self.tab.list.$set(index, response.body.data.rowsObject)
+      if(self.tab.list[index].length === 0){
+        server.product.getList(self.tab.data[index].id)
+        .then(({ body })=>{
+          if(body.success){
+            self.tab.list.$set(index, body.data.rowsObject)
             self.$nextTick(() => {
-              setTimeout(self.$refs.scroller.reset, 500)
+              // setTimeout(self.$refs.scroller.reset, 500)
             })
           }
         })
+      }
+    },
+    view(id) {
+      this.$router.go(`/product/list/info?id=${id}`)
     },
     scrollerLoad(uuid) {
       const self = this
@@ -101,7 +98,7 @@ export default {
 </script>
 <style scoped lang="less">
 .l-product-list{
-  // padding: 0.4rem 0;
+  // margin: 0.4rem 0;
 }
 .l-product-item{
   background-color: #fff;
@@ -119,6 +116,7 @@ export default {
     h4{
       font-weight: 400;
       font-size: 17px;
+      margin-bottom: 5px;
     }
     p{
       color: #999;
@@ -132,5 +130,4 @@ export default {
 .l-product-item:active{
   background-color: #ebebeb;
 }
-
 </style>

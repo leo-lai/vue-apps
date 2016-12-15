@@ -18,6 +18,7 @@
     "array-map": "^0.0.0",
     "fastclick": "^1.0.6",
     "iswiper": "^1.4.1",
+    "jweixin": "^1.0.0",
     "lib-flexible": "^0.3.2",
     "sprint-js": "^0.1.0",
     "vue": "^1.0.26",

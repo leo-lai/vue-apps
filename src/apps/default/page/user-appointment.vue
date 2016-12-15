@@ -24,7 +24,8 @@ export default {
       const self = this
       const promise = self.$http.get('owner/visitor/getAppointList', {
         params: {
-          // mobilePhone: transition.to.query.phone || self.userinfo.mobilePhone
+          mobilePhone: transition.to.query.phone || self.userinfo.mobilePhone,
+          rows: 50
         }
       })
       promise.then((response)=>{
@@ -66,6 +67,8 @@ export default {
           return '已确认报价'
         case 91:
           return '待重新报价'
+        case 10:
+          return '已生成订单'
       }
     },
     view(id) {
@@ -80,7 +83,7 @@ export default {
 .l-appointment-item{
   color: #999;
   padding: 0.4rem;
-  margin:0.4rem 0;
+  margin:0 0 0.4rem 0;
   background-color: #fff;
   font-size: 14px;
   strong {

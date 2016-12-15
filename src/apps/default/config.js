@@ -57,10 +57,26 @@ export default {
       title: '注册',
       component: (resolve) => require(['./page/register'], resolve)
     },
+    '/news/list': {
+      title: '艾臣资讯',
+      component: (resolve) => require(['./page/news-list'], resolve)
+    },
+    '/news/list/info': {
+      title: '艾臣资讯详情',
+      component: (resolve) => require(['./page/news-info'], resolve)
+    },
     '/home': {
       title: '首页',
       mainPage: true,
       component: (resolve) => require(['./page/home'], resolve)
+    },
+    '/welfare': {
+      title: '新人福利',
+      component: (resolve) => require(['./page/welfare'], resolve)
+    },
+    '/australia': {
+      title: '澳式风情',
+      component: (resolve) => require(['./page/australia'], resolve)
     },
     '/company': {
       title: '企业简介',
@@ -96,9 +112,9 @@ export default {
       title: '产品列表',
       component: (resolve) => require(['./page/product-list'], resolve)
     },
-    '/product/details': {
+    '/product/list/info': {
       title: '产品详情',
-      component: (resolve) => require(['./page/product-details'], resolve)
+      component: (resolve) => require(['./page/product-info'], resolve)
     },
     '/user': {
       title: '个人中心',
@@ -124,6 +140,11 @@ export default {
       title: '我的订单',
       auth: true,
       component: (resolve) => require(['./page/user-order'], resolve)
+    },
+    '/user/order/info': {
+      title: '订单详情',
+      auth: true,
+      component: (resolve) => require(['./page/user-order-info'], resolve)
     },
     '/user/coupon/': {
       title: '我的优惠券',
@@ -156,7 +177,7 @@ export default {
       component: (resolve) => require(['./page/user-faq-add'], resolve)
     },
     '/user/faq/feedback': {
-      title: '常见问题',
+      title: '反馈详情',
       auth: true,
       component: (resolve) => require(['./page/user-faq-feedback'], resolve)
     }

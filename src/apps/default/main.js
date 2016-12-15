@@ -27,6 +27,7 @@ const router = new Router({
 	history: true,
   root: config.getPath(),
   saveScrollPosition: true,
+  // suppressTransitionError: true,
   transitionOnLoad: false
 })
 
@@ -34,7 +35,8 @@ const router = new Router({
 router.map(config.routerMap)
 // 默认跳转home页面
 router.redirect({
-  '/': '/home'
+  '/': '/home',
+  '/index.html': '/home'
 })
 // 设置路径别名
 // router.alias({
@@ -46,6 +48,18 @@ router.redirect({
 // store.state.route.params 
 // store.state.route.query
 sync(store, router)
+
+// 跳转站外链接
+router.beforeEach(({to, next, abort}) => {
+
+  let url = to.path.substring(config.getPath().length)
+  if(/^http(s?)/i.test(url)){
+    window.location.assign(url)
+    abort()
+  }else{
+    setTimeout(next, 50)  
+  }
+})
 
 // 验证登陆
 router.beforeEach((transition) => {
@@ -74,7 +88,7 @@ router.beforeEach(({ to, from, next }) => {
   let toIndex = _history[to.path]
   let fromIndex = _history[from.path]
   
-  if(fromIndex && to.query.direction){
+  if(fromIndex && to.query && to.query.direction){
     store.dispatch('APP_DIRECTION', to.query.direction)
     return true
   }
@@ -111,7 +125,7 @@ router.beforeEach(({ to, from, next }) => {
 })
 
 // 此钩子函数一个类型为切换对象的参数，但是你只能访问此参数的 to 和 from 属性, 这两个属性都是路由对象。在这个后置钩子函数里不能调用任何切换函数。
-router.afterEach(({ to , from }) => {  
+router.afterEach(({ to , from }) => {
   console.log('%s router afterEach!', to.path)
   Vue.$vux.loading.hide()
   utils.setTitle(to.title)

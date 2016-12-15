@@ -69,7 +69,7 @@ export default {
     },
     wxlogin() {
       let absUrl = utils.url.join(config.getHost(), config.getPath(), '/register')
-      // absUrl = server.getGrantUrl(absUrl, {direction: 'in'})
+      absUrl = server.getGrantUrl(absUrl)
       if(utils.device.isWechat){
         utils.url.replace(absUrl)
       }else{

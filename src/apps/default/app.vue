@@ -14,7 +14,7 @@
             <i slot="icon" class="iconfont">&#xe774;</i>
             <span slot="label">品牌中心</span>
           </tabbar-item>
-          <tabbar-item v-link="{path:'/activity', exact: true, replace: true}" :selected="route.path === '/activity'" badge="2">
+          <tabbar-item v-link="{path:'/activity', exact: true, replace: true}" :selected="route.path === '/activity'">
             <i slot="icon" class="iconfont">&#xe6d3;</i>
             <span slot="label">活动中心</span>
           </tabbar-item>
@@ -22,7 +22,7 @@
             <i slot="icon" class="iconfont">&#xe61c;</i>
             <span slot="label">产品中心</span>
           </tabbar-item>
-          <tabbar-item v-link="{path:'/user', exact: true, replace: true}" :selected="route.path === '/user'" show-dot>
+          <tabbar-item v-link="{path:'/user', exact: true, replace: true}" :selected="route.path === '/user'">
             <i slot="icon" class="iconfont">&#xe6b7;</i>
             <span slot="label">个人中心</span>
           </tabbar-item>

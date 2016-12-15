@@ -1,45 +1,82 @@
 <template>
   <div>
-    <sticky>
-      <search :auto-fixed="false"></search>
-    </sticky>
-    <div class="l-flex-hc l-appointment-item" v-for="item in 10">
+    <div class="l-flex-hc l-order-item" v-for="item in list">
       <div class="l-rest">
-        <p><i class="iconfont">&#xe653;</i>&nbsp;&nbsp;<strong>赖国聪</strong>&nbsp;&nbsp;&nbsp;&nbsp;15013256333</p>
-        <p>2016-11-11&nbsp;&nbsp;&nbsp;&nbsp;<b>正在进行中</b></p>
-        <p>广州市天河区科韵路12-1号方圆E时光</p>
+        <p>订单类型：{{getType(item.designType)}}</p>
+        <p>下单日期：{{item.createTime}}</p>
+        <p>订单状态：<b>{{getStatus(item.state)}}</b></p>
       </div>
-      <div>
+      <!-- <div>
         <i class="iconfont icon-arrow">&#xe601;</i>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
 <script>
 import { Search, Sticky } from 'vux-components'
-
+import { store, getters, actions } from '../vuex'
+import server from '../server'
 export default {
   components: {
     Search, Sticky
   },
+  route: {
+    data(transition) {
+      const self = this
+      server.order.getList(self.userinfo.mobilePhone).then((response)=>{
+        if(response.body.success){
+          self.list = response.body.data.rowsObject
+        }
+      })
+    }
+  },
+  store,
+  vuex: {
+    getters
+  },
   data() {
     return {
-      list: [
-        
-      ]
+      list: []
     }
   },
   methods: {
+    getStatus(code) { 
+      switch(code){
+        case 1:
+          return '确认订单'
+        case 2:
+          return '生产完成'
+        case 3:
+          return '产品入库中'
+        case 4:
+          return '产品出库'
+        case 5:
+          return '已经发货'
+      }
+    },
+    getType(type) {
+      switch(type){
+        case 2:
+          return '安全窗'
+        case 3:
+          return '贵族阳光房'
+        default:
+          return '安全门'
+      }
+    },
+    view(id) {
+      this.$router.go(`/user/order/info?id=${id}`)
+    }
   }
 }
 </script>
 
 
 <style scoped lang="less">
-.l-appointment-item{
+.l-order-item{
   color: #999;
   padding: 0.4rem;
-  margin:0.4rem 0;
+  margin:0 0 0.4rem 0;
   background-color: #fff;
   font-size: 14px;
   strong {
@@ -47,14 +84,11 @@ export default {
     color: #333;
   }
   b{
-    font-size: 16px;
-    color: #0BB20C;
+    font-weight: 400;
+    color: #4083c7;
   }
 }
-.l-appointment-item .iconfont{
-  vertical-align: -1px;
-}
-.l-appointment-item .icon-arrow{
+.l-order-item .icon-arrow{
   margin-right: -0.266667rem
 }
 </style>

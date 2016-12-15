@@ -33,7 +33,7 @@ export default {
   },
   route: {
     canActivate(transition){
-      let code = transition.to.query.code
+      const code = transition.to.query.code
       if(code){ // 如果页面已授权
         // 获取微信信息及判断是否已注册
         server.getWxByCode(code).then((response)=>{

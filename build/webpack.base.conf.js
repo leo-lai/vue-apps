@@ -10,6 +10,8 @@ var cssLoaders = require('./css-loaders')
 var entries = getEntry('./src/apps/*/main.js') // 获得入口js文件
 var chunks = Object.keys(entries)
 
+var autoprefixer = require('autoprefixer')
+
 module.exports = {
   entry: entries,
   output: {
@@ -58,11 +60,11 @@ module.exports = {
       },
       {
         test   : /\.css$/,
-        loader : 'style-loader!css-loader!autoprefixer-loader?browsers=last 2 versions'
+        loader : 'style-loader!css-loader!postcss-loader'
       }, 
     	{
         test: /\.less$/, 
-        loader: 'style!css!autoprefixer-loader?browsers=last 2 versions!less'
+        loader: 'style!css!autoprefixer-loader?postcss-loader!less'
       },
       {
         test: /\.html$/,
@@ -78,7 +80,7 @@ module.exports = {
       },
       {
         //test: /\.(png|jpe?g|gif|svg|woff2?|eot|ttf|otf)(\?.*)?$/,
-        test: /\.(png|jpe?g|gif|ico)(\?.*)?$/,
+        test: /\.(png|jpe?g|gif|ico|mp3)(\?.*)?$/,
         loader: 'url',
         query: {
           limit: 10000,
@@ -91,6 +93,7 @@ module.exports = {
 	    }
     ]
   },
+  postcss: [ autoprefixer({ browsers: ['last 2 versions'] }) ],
   vue: {
     loaders: cssLoaders()
   },

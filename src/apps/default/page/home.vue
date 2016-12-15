@@ -9,7 +9,7 @@
         </masker>  
       </div>
       <div class="l-rest" style="margin-left:0.4rem;">
-        <masker class="l-masker-item" :opacity="0.5" v-link="{path:'/booking'}">
+        <masker class="l-masker-item" :opacity="0.5" v-link="{path:'/welfare'}">
           <div class="l-img" :style="{backgroundImage: 'url(' + images.img2 + ')'}"></div>
           <div class="l-title" slot="content">新人领福利</div>
         </masker>
@@ -20,19 +20,19 @@
         <img src="~assets/imgs/icon-001.jpg">
         <p>企业简介</p>
       </div>
-      <div class="l-flex-vhc l-grid-item">
+      <!-- <div class="l-flex-vhc l-grid-item">
         <img src="~assets/imgs/icon-002.jpg">
         <p>企业荣誉</p>
-      </div>
+      </div> -->
       <div class="l-flex-vhc l-grid-item" v-link="{path: '/store/list'}">
         <img src="~assets/imgs/icon-003.jpg">
         <p>门店展示</p>
       </div>
-      <div class="l-flex-vhc l-grid-item">
+      <!-- <div class="l-flex-vhc l-grid-item">
         <img src="~assets/imgs/icon-004.jpg">
         <p>案列分享</p>
-      </div>
-      <div class="l-flex-vhc l-grid-item">
+      </div> -->
+      <div class="l-flex-vhc l-grid-item" v-link="{path: '/product/list'}">
         <img src="~assets/imgs/icon-005.jpg">
         <p>产品展示</p>
       </div>
@@ -40,28 +40,38 @@
         <img src="~assets/imgs/icon-006.jpg">
         <p>智慧生活</p>
       </div>
-      <div class="l-flex-vhc l-grid-item">
+      <div class="l-flex-vhc l-grid-item" v-link="{path: '/australia'}"> 
         <img src="~assets/imgs/icon-007.jpg">
         <p>澳式风情</p>
       </div>
-      <div class="l-flex-vhc l-grid-item">
+      <div class="l-flex-vhc l-grid-item" v-link="{path: 'http://www.hzzx3d.com/news/aylson/index.html'}">
         <img src="~assets/imgs/icon-008.jpg">
         <p>720展厅</p>
       </div>
     </div>
-    <panel class="l-margin-tb" header="<h3 style='color:#333;'>艾臣资讯</h3>" :footer="news.footer" :list="news.data" type="1"></panel>
+
+    <div class="l-flex-hc l-title-hd" v-link="{path: '/news/list'}">
+      <h3 class="l-rest">艾臣资讯</h3>
+      <a class="l-fsize-sm"><i class="iconfont">&#xe602;</i></a>
+    </div>
+    <news-list></news-list>
   </div>
 </template>
 <script>
 import config from '../config'
-import { Swiper, Masker, Flexbox, FlexboxItem, Divider, Panel } from 'vux-components'
+import { Swiper, Masker, Flexbox, FlexboxItem } from 'vux-components'
+import NewsList from './news-list'
 
 export default {
   components: {
-    Swiper, Masker, Flexbox, FlexboxItem, Divider, Panel
+    Swiper, Masker, Flexbox, FlexboxItem, NewsList
   },
-  route: config.routeHook,
   events: config.vueHook,
+  route: {
+    data(transition) {
+      
+    }
+  },
   data() {
     return {
       images: {
@@ -76,24 +86,7 @@ export default {
         url: 'javascript:;',
         img: require('assets/imgs/temp-001.jpg'),
         title: ''
-      }],
-      news: {
-        data: [{
-          src: 'http://placeholder.qiniudn.com/60x60/3cc51f/ffffff',
-          title: '标题一',
-          desc: '由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。',
-          url: ''
-        }, {
-          src: 'http://placeholder.qiniudn.com/60x60/3cc51f/ffffff',
-          title: '标题二',
-          desc: '由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。',
-          url: ''
-        }],
-        footer: {
-          title: '查看更多',
-          url: ''
-        }
-      }
+      }]
     }
   }
 }

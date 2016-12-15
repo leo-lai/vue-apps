@@ -100,12 +100,16 @@ export default {
     
   },
   events: {
-    'hook:ready': () => {
-      let swiper = new Swiper({
-        container: '.l-swiper',
-        item: '.l-swiper-item',
-        direction: 'vertical',
-        activeClass: 'l-swiper-active'
+    'hook:ready': function() {
+      this.$nextTick(()=>{
+        setTimeout(()=>{
+          let swiper = new Swiper({
+            container: '.l-swiper',
+            item: '.l-swiper-item',
+            direction: 'vertical',
+            activeClass: 'l-swiper-active'
+          }) 
+        }, 1000)
       })
     }
   },

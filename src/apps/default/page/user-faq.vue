@@ -8,7 +8,7 @@
     <group title="我的反馈">
       <cell v-for="item in feedbackList" :title="item.title" :link="{path: '/user/faq/feedback?id='+item.id }">
         <span slot="icon">{{$index+1}}、</span>
-        <span slot="after-title" class="reddot-demo vux-reddot"></span>
+        <span slot="after-title"></span>
       </cell>
     </group>
     <div class="l-btn-area">

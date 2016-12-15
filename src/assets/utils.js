@@ -167,7 +167,7 @@ export let utils = {
     return !isNaN( parseFloat(value) ) && isFinite( value )
   },
 	setTitle(title) {
-		document.title = title
+		document.title = title || '艾臣安全智能门窗'
     // 判断是否为ios设备的微信浏览器，加载iframe来刷新title
     if (isWechat && isIphone) {
     	let iframe = document.createElement('iframe')

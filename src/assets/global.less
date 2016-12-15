@@ -1,11 +1,11 @@
 // 字体图标 http://www.iconfont.cn/
 @font-face {
   font-family: 'iconfont';  /* project id 189309 */
-  src: url('//at.alicdn.com/t/font_t3tre0ecsl0g4x6r.eot');
-  src: url('//at.alicdn.com/t/font_t3tre0ecsl0g4x6r.eot?#iefix') format('embedded-opentype'),
-  url('//at.alicdn.com/t/font_t3tre0ecsl0g4x6r.woff') format('woff'),
-  url('//at.alicdn.com/t/font_t3tre0ecsl0g4x6r.ttf') format('truetype'),
-  url('//at.alicdn.com/t/font_t3tre0ecsl0g4x6r.svg#iconfont') format('svg');
+  src: url('//at.alicdn.com/t/font_h3hjtuiocrllerk9.eot');
+  src: url('//at.alicdn.com/t/font_h3hjtuiocrllerk9.eot?#iefix') format('embedded-opentype'),
+  url('//at.alicdn.com/t/font_h3hjtuiocrllerk9.woff') format('woff'),
+  url('//at.alicdn.com/t/font_h3hjtuiocrllerk9.ttf') format('truetype'),
+  url('//at.alicdn.com/t/font_h3hjtuiocrllerk9.svg#iconfont') format('svg');
 }
 .iconfont {
   font: normal 22px/1 'iconfont';
@@ -158,11 +158,7 @@ ins.ins4-1{
   box-flex: 1;
   align-self: auto; // 子项的排版设置
 }
-.l-flex-v .l-rest{
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-}
+
 // 弹性布局===================end
 .l-fill-color {
   white-space: nowrap;
@@ -193,11 +189,64 @@ ins.ins4-1{
   -webkit-line-clamp: 2;
 }
 
+.l-spin{animation: spin 3s 0s infinite linear;}
+@keyframes spin{
+  0% {transform:rotate(0deg);}
+  100% {transform:rotate(360deg);}
+}
+
+.l-title-hd{
+  background-color: #fff;
+  padding: 0.186667rem 0.266667rem;
+  h3{
+    font-weight: 400;
+    font-size: 17px;
+  }
+  a{
+    color: #aaa;
+    i{
+      vertical-align: middle;
+    }
+  }
+}
+
+.l-scrolling{
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.l-border-t, 
+.l-border-b{
+  position: relative;
+}
+.l-border-t:before, 
+.l-border-b:after{
+  content: " ";
+  width: 200%;
+  position: absolute;
+  border: 1px solid #E5E5E5;
+  color: #E5E5E5;
+  height: 1px;
+  transform: scale(0.5);
+  transform-origin: 0 0;
+  box-sizing: border-box;
+}
+
+.l-border-t:before{
+  top: 0;
+  left: 0;
+}
+.l-border-b:after{
+  bottom: -1px;
+  left: 0;
+}
+
 .l-blur {filter: blur(10px);}
-.l-fsize-sm {font-size: 12px;}
-.l-fsize-s {font-size: 14px;}
-.l-fsize {font-size: 17px;}
-.l-fsize-l {font-size: 20px;}
+.l-fsize-sm {font-size: 12px !important;}
+.l-fsize-s {font-size: 14px !important;}
+.l-fsize {font-size: 17px !important;}
+.l-fsize-l {font-size: 20px !important;}
 .l-fgray {color: #999;}
 .l-fl{float: left;}
 .l-fr{float: right;}
@@ -209,6 +258,10 @@ ins.ins4-1{
   margin-top: 0.4rem;
   margin-bottom: 0.4rem;
 }
+.l-margin-b{
+  margin-bottom: 0.4rem;
+}
+
 
 .l-btn-square{
   border-radius: 0 !important;

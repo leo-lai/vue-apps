@@ -1,8 +1,8 @@
 <template>
   <article class="l-article">
-    <div class="l-article-hd">
+    <div class="l-article-hd l-border-b">
       <h1 v-if="title" v-text="title"></h1>
-      <p v-if="time" v-text="time"></p>  
+      <p v-text="time"></p>  
     </div>
     <div class="l-article-bd">
       <slot></slot>
@@ -34,6 +34,7 @@ export default {
   font-size: 15px;
   .l-article-hd {
     margin-bottom: 0.4rem;
+    overflow: hidden;
     h1 {
       font-size: 18px;
       font-weight: 400;
@@ -42,6 +43,11 @@ export default {
       font-size: 12px;
       color: #999;
     }
+  }
+  * {
+    max-width: 100%;
+    box-sizing: border-box;
+    word-wrap: break-word;
   }
   section {
     margin-bottom: 1.5em;
@@ -59,13 +65,8 @@ export default {
     font-size: 15px;
     margin-bottom: .34em;
   }
-  * {
-    max-width: 100%;
-    box-sizing: border-box;
-    word-wrap: break-word;
-  }
   p {
-    margin: 0 0 .8em;
+    margin: 0 0 .6em;
   }
 }
 </style>

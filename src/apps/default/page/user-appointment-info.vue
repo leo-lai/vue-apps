@@ -46,14 +46,14 @@
         <tfoot>
           <td colspan="5" class="l-tr">
             <div style="color:#333;">合计：{{amount | currency ''}}</div>
-            <div style="color:#999;">优惠券：0.00</div>
+            <!-- <div style="color:#999;">优惠券：0.00</div> -->
             <div style="color:#000;">实付金额：{{amount | currency ''}}</div>
             <div style="color:red;">预收定金：{{amount/2 | currency ''}}</div>
           </td>
         </tfoot>
       </table>
     </div>
-    <div class="l-btn-area">
+    <div class="l-btn-area" v-if="info.state !== 10">
       <x-button type="primary" @click="confirmInfo">确定报价信息</x-button>
       <x-button @click="resetDesign">不满意，重新报价</x-button>
     </div>
@@ -188,6 +188,8 @@ export default {
           return '已确认报价'
         case 91:
           return '待重新报价'
+        case 10:
+          return '已生成订单'
       }
     },
     resetDesign() {
