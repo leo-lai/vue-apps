@@ -25,7 +25,7 @@ export default {
       }, {
         title: '智慧生活',
         img: require('assets/imgs/temp-013.jpg'),
-        url: ''
+        url: '/wellife'
       }, {
         title: '澳式风情',
         img: require('assets/imgs/temp-014.jpg'),

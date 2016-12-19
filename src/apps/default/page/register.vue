@@ -1,7 +1,10 @@
 <template>
   <div>
-    <div class="vux-center l-fsize-l" style="height: 1.6rem;">
+    <div v-if="!avatar" class="vux-center l-fsize-l" style="height: 1.6rem;">
       填写注册信息
+    </div>
+    <div v-else class="vux-center" style="padding:0.4rem 0;">
+      <img style="width:2.133333rem;height:2.133333rem;border-radius:50%;border:1px solid #ccc" :src="avatar">
     </div>
     <group class="weui_cells_form">
       <x-input placeholder="请输入手机号码" :value.sync="formData.mobilePhone" class="weui_vcode" keyboard="number" is-type="china-mobile">
@@ -18,8 +21,8 @@
   </div>
 </template>
 <script>
-import { utils } from 'assets/lib'
 import { Group, XInput, XButton } from 'vux-components'
+import { utils, storage } from 'assets/lib'
 import { store, actions } from '../vuex'
 import server from '../server'
 
@@ -32,16 +35,26 @@ export default {
     actions
   },
   route: {
+    data() {
+      let wxinfo = storage.session.get('wxinfo')
+      if(wxinfo && wxinfo.wxHeadPhoto){
+        this.avatar = wxinfo.wxHeadPhoto
+      }
+    },
     canActivate(transition){
       const code = transition.to.query.code
       if(code){ // 如果页面已授权
         // 获取微信信息及判断是否已注册
-        server.getWxByCode(code).then((response)=>{
-          if(response.body.success && response.body.data && response.body.data.mobilePhone){
-            transition.redirect('/user')
-          }else{
-            transition.next()    
+        server.getWxByCode(code).then(({ body })=>{
+          if(body.success && body.data){
+            if(body.data.mobilePhone){
+              storage.local.set('userinfo', body.data)
+              transition.redirect('/user')  
+            }else{
+              storage.session.set('wxinfo', body.data)
+            }
           }
+          transition.next()
         })
       }else{
         transition.next()
@@ -50,6 +63,7 @@ export default {
   },
   data() {
     return {
+      avatar: '',
       formData: {
         mobilePhone: '',
         validCode: '',
@@ -63,7 +77,14 @@ export default {
       server.sendMobiCode(this.formData.mobilePhone, this.$els.sendBtn)
     },
     submit() {
-      let self = this
+      const self = this
+      let wxinfo = storage.session.get('wxinfo')
+
+      if( !(wxinfo && wxinfo.wxOpenId) ){
+        self.$vux.toptips.show('没有获取到微信授权信息，请重新进入页面')
+        return  
+      }
+
       if(!utils.regexp.mobile.test(self.formData.mobilePhone)){
         self.$vux.toptips.show('请输入正确手机号码')
         return  
@@ -81,19 +102,22 @@ export default {
         return
       }
 
+      utils.extend(self.formData, wxinfo)
+
       self.$vux.loading.show('注册中')
       self.$http.post('owner/visitor/register', self.formData)
-        .then((response) => {
-          self.$vux.loading.hide()
-          if(response.body.success){
-            self.$router.replace('/user')  
-          }else{
-            self.$vux.toptips.show(response.body.message || '注册失败')
-          }
-        }, (error) => {
-          self.$vux.loading.hide()
-          self.$vux.toptips.show('服务器繁忙，请稍后重试！')
-        })
+      .then(({ body }) => {
+        self.$vux.loading.hide()
+        if(body.success && body.data){
+          storage.local.set('userinfo', body.data)
+          self.$router.replace('/user')  
+        }else{
+          self.$vux.toptips.show(body.message || '注册失败')
+        }
+      }, (error) => {
+        self.$vux.loading.hide()
+        self.$vux.toptips.show('服务器繁忙，请稍后重试！')
+      })
     }
   }
 }

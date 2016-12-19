@@ -1,6 +1,7 @@
 import { Vue, utils, storage } from 'assets/lib'
 import Router from 'vue-router'
 import { sync } from 'vuex-router-sync'
+import RouterMap from './router-map'
 import store from './vuex/store'
 import config from './config'
 import App from './app'
@@ -21,6 +22,9 @@ Vue.use(ConfirmPlugin)
 Vue.use(ToptipsPlugin)
 Vue.use(LoadingPlugin)
 
+// ---------
+Vue.http.options.root = config.getServerPath()
+
 // https://github.com/vuejs/vue-router/tree/1.0/docs/zh-cn
 Vue.use(Router)
 const router = new Router({
@@ -32,16 +36,12 @@ const router = new Router({
 })
 
 // 设置路由
-router.map(config.routerMap)
+router.map(RouterMap)
 // 默认跳转home页面
 router.redirect({
   '/': '/home',
   '/index.html': '/home'
 })
-// 设置路径别名
-// router.alias({
-//  '/': '/home'
-// })
 
 // keep vue-router and vuex store in sync
 // store.state.route.path 
@@ -82,45 +82,43 @@ router.beforeEach(({ to, from, next }) => {
   // 记录当前地址和上一页地址
   _history.prevPath = from.path
   _history.currPath = to.path
-  storage.session.set('_history', _history)
-
+  
   // 判断页面进场方向
   let toIndex = _history[to.path]
   let fromIndex = _history[from.path]
   
-  if(fromIndex && to.query && to.query.direction){
-    store.dispatch('APP_DIRECTION', to.query.direction)
-    return true
-  }
-  
-  // 判断是否返回上一页 /user/info -> /user
-  // from.path.startsWith(to.path) 安卓微信报错
-  let isBack = from.path && from.path.indexOf(to.path) === 0
-
-  if(!toIndex && (isBack || (!from.mainPage && to.mainPage))){
-    toIndex = fromIndex
-    fromIndex = ++_history.count
-    _history[to.path] = toIndex
-    _history[from.path] = fromIndex
-  }
   
   if(!toIndex){
     Vue.$vux.loading.show()
     _history[to.path] = ++_history.count
-    if(!to.mainPage && fromIndex){
-      store.dispatch('APP_DIRECTION', 'in')
-    }else{
-      store.dispatch('APP_DIRECTION', '')
-    }
-  }else if(!to.mainPage || !from.mainPage){
-    if(fromIndex < toIndex){
-      store.dispatch('APP_DIRECTION', 'in')
-    }else{
-      store.dispatch('APP_DIRECTION', 'out')
-    }  
-  }else{
-    store.dispatch('APP_DIRECTION', '')
   }
+
+  if(!from.path || (from.mainPage && to.mainPage)){
+    store.dispatch('APP_DIRECTION', '')
+  }else if(!from.mainPage && to.mainPage){
+    store.dispatch('APP_DIRECTION', 'out') 
+  }else if(from.mainPage && !to.mainPage){
+    store.dispatch('APP_DIRECTION', 'in') 
+  }else if(!(toIndex < fromIndex)){
+    store.dispatch('APP_DIRECTION', 'in')
+  }else{
+    store.dispatch('APP_DIRECTION', 'out')
+  }
+
+  if(to.query && to.query.direction){
+    store.dispatch('APP_DIRECTION', to.query.direction)
+  }
+
+  // from.path.startsWith(to.path) 安卓微信报错
+  if(from.path){
+    if(from.path.indexOf(to.path) === 0){
+      store.dispatch('APP_DIRECTION', 'out')
+    }else if(to.path.indexOf(from.path) === 0){
+      store.dispatch('APP_DIRECTION', 'in')
+    }
+  }
+
+  storage.session.set('_history', _history)
   setTimeout(next, 50)
 })
 

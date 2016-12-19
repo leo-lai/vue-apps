@@ -29,7 +29,8 @@
           <h2>公司使命</h2>
           <p>Mission Statement</p>
           <br>
-          <p>引领人居健康生活模式</p>
+          <p>让每一个家庭</p>
+          <p>更安全  更健康  更舒适</p>
         </div>
         <img style="margin-top: -31%;z-index: -1;" src="~assets/imgs/temp-020.jpg">
       </div>
@@ -38,7 +39,8 @@
           <h2>核心价值观</h2>
           <p>Core Values</p>
           <br>
-          <p>以人为本  通力合作  个人价值最大化</p>
+          <p>以客户为中心  以奋斗者为本</p>
+          <p>坚持科技创新  坚持艰苦奋斗</p>
         </div>
         <img style="margin-top: -45%;z-index: -1;" src="~assets/imgs/temp-021.jpg">
       </div>

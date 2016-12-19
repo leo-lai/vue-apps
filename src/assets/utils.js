@@ -58,11 +58,11 @@ export let storage = {
   session: {
     set(key, value) {
       if(!key) return false
-      window.sessionStorage.setItem(STORE_PREFIX + name, JSON.stringify(value || {}))
+      window.sessionStorage.setItem(STORE_PREFIX + key, JSON.stringify(value || {}))
     },
     get(key) {
       if(!key) return null
-      return JSON.parse(window.sessionStorage.getItem(STORE_PREFIX + name))
+      return JSON.parse(window.sessionStorage.getItem(STORE_PREFIX + key))
     } 
   },
   local: {
@@ -112,6 +112,19 @@ export let utils = {
     mobile: /^\s*1\d{10}\s*$/
   },
   noop(){},
+  extend(target, ...objs) {
+    if(!utils.isPlainObject(target)) return null
+    objs.forEach((obj) => {
+      if(utils.isPlainObject(obj)){
+        Object.keys(obj).forEach((key)=>{
+          if(obj[key] !== null && obj[key] !== undefined){
+            target[key] = obj[key]
+          }
+        })
+      }
+    })
+    return target
+  },
   type(value) {
     //如果是null或者undefined，直接转成String返回
     if( value == null )  return String( value )
@@ -182,7 +195,8 @@ export let utils = {
     }
 	},
   alert(msg) {
-    window.alert(msg)
+    // window.alert(msg)
+    console.log(msg)
   },
   url: {
     getArgs(url) {

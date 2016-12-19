@@ -1,14 +1,17 @@
 // import { INCREMENT, DECREMENT } from './mutation-types'
-import { utils, storage } from 'assets/utils'
+import { storage } from 'assets/utils'
 // getters与actions命名不能相同
 const getters = {
 	route: (state) => state.route,
 	userinfo: (state) => {
+		let userinfo = null
 		if(state.app_userinfo && state.app_userinfo.mobilePhone){
-			return state.app_userinfo
+			userinfo = state.app_userinfo
 		}else{
-			return storage.local.get('userinfo') || {}
+			userinfo = storage.local.get('userinfo') || {}
 		}
+    console.log(userinfo)
+    return userinfo
 	},
   direction: (state) => state.app_direction
 }

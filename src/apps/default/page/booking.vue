@@ -8,8 +8,8 @@
     <div class="l-margin-tb" style="background-color:#fff;padding:0.8rem 0;">
       <img class="l-center" style="width:80%;" src="~assets/imgs/temp-009.jpg">
       <group class="l-booking-form">
-        <x-input name="username" placeholder="请输入姓名" :value.sync="formData.name" is-type="china-name"></x-input>
-        <x-input name="mobile" placeholder="请输入手机号码" :value.sync="formData.mobilePhone" keyboard="number" is-type="china-mobile"></x-input>
+        <x-input placeholder="请输入姓名" :value.sync="formData.name" is-type="china-name"></x-input>
+        <x-input placeholder="请输入手机号码" :value.sync="formData.mobilePhone" keyboard="number" is-type="china-mobile"></x-input>
         <address title="" :value.sync="address.value" raw-value :list="address.data" placeholder="请选择地区"></address>
       </group>
     </div>

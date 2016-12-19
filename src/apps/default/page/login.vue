@@ -34,8 +34,8 @@ export default {
   data() {
     return {
       formData: {
-        accountName: '18602029524',
-        pwd: '111111'
+        accountName: '',
+        pwd: ''
       }
     }
   },

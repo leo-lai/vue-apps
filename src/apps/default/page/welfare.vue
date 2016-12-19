@@ -6,49 +6,104 @@
     <div class="l-welfare-1">
       <img style="width: 3.866667rem; position: absolute; top: -1.6rem; left: 0; z-index: -1;" src="~assets/imgs/temp-040.png">
       <img style=" width: 1.333333rem;" class="l-block" src="~assets/imgs/temp-042.png">
-      <p class="l-box-1" v-if="shareList.length === 0">规则：查看物品，点击“领取礼品”呼唤伙伴获得助力，好友越多得到奖品越多，让我们一起来享受礼品界的饕餮盛宴吧！</p>
-      <div class="l-box-1" v-else>
-        <p>人品大爆发！已经有{{shareList.length}}位小伙伴使出了洪荒之力为您助力。</p>
-        <p>再加把劲，一人富不如众人富！让更多的小伙伴加入进来，把所有礼品装回家！</p>
-        <ul class="l-winner-list">
-          <li v-for="item in shareList" :style="{backgroundImage: 'url('+item.wxHeadPhoto+')'}"></li>
-        </ul>
+      <!-- 好友助力显示 -->
+      <div class="l-box-1" v-if="route.query.isFriend">
+        <div class="vux-center" v-if="sharer.wxNickName">
+          <img style="width:1.066667rem;height:1.066667rem;border: 1px solid #ebebeb;margin:0 15px 0 0;" 
+            :src="sharer.wxHeadPhoto || defaultVal.avatar">
+          {{sharer.wxNickName}} 邀请您帮他拼人脉
+          <br><br>
+        </div>
+        
+        <div class="l-flex-h l-chat-item">
+          <div class="l-thumb">
+            <img :src="sharer.wxHeadPhoto || defaultVal.avatar">  
+          </div>
+          <div class="l-rest">
+            <div class="l-chat-msg">
+              我正在参加艾臣智能家居，‘新人福利’免费领取礼品活动，我要让新家变的更美，快来帮帮我吧ಥ_ಥ~~
+            </div>
+          </div>
+        </div>
+        <div class="l-flex-h l-chat-item">
+          <div class="l-thumb">
+            <img :src="sharer.wxHeadPhoto || defaultVal.avatar">  
+          </div>
+          <div class="l-rest">
+            <div class="l-chat-msg">
+              已有 <b>{{shareList.length}}</b> 位好友助力，把大奖拿回家就差你是观音手啦~~
+            </div>
+          </div>
+        </div>
+        <br>
+        <img v-if="route.query.isFriend" @click="dialog.qrcode=true" class="l-block" style="width:5.333333rem;" src="~assets/imgs/temp-065.png">
       </div>
+      <!-- 自己分享显示 活动规则 -->
+      <div v-else>
+        <p class="l-box-1" v-if="shareList.length === 0">规则：查看物品，点击“领取礼品”呼唤伙伴获得助力，好友越多得到奖品越多，让我们一起来享受礼品界的饕餮盛宴吧！</p>
+        <div class="l-box-1" v-else>
+          <p>人品大爆发！已经有{{shareList.length}}位小伙伴使出了洪荒之力为您助力。</p>
+          <p>再加把劲，一人富不如众人富！让更多的小伙伴加入进来，把所有礼品装回家！</p>
+          <ul class="l-winner-list">
+            <li v-for="item in shareList" :style="{backgroundImage: 'url('+item.wxHeadPhoto+')'}"></li>
+          </ul>
+        </div>
+        <img class="l-block" style="max-width:85%;" src="~assets/imgs/temp-043.jpg">
+      </div>
+      <br>
     </div>
-    <img class="l-block" style="max-width:85%;" src="~assets/imgs/temp-043.jpg">
-    <div class="l-welfare-2">
-      <div class="l-step-1">
-        <img class="l-prize" src="~assets/imgs/temp-051.png">
+    
+    <!-- 自己分享显示 奖品列表 -->
+    <div class="l-welfare-2" v-if="!route.query.isFriend">
+      <div class="l-step-first">
+        <img style="width: 3.466667rem; top: -1.866667rem; left: 0.533333rem;" class="l-prize" src="~assets/imgs/temp-051.png">
         <img src="~assets/imgs/temp-045.jpg">
       </div>
-      <div class="l-step-2" :class="{'l-not-get': shareList.length < giftList[0].integral}">
+      <div class="l-step-2" :class="{'l-can-get': giftList[0].whetherExchange, 'l-got': giftList[0].isExchanged}">
         <img class="l-prize" :src="giftList[0].imgUrl" @click="showGift(0)">
         <img src="~assets/imgs/temp-046.jpg">
+        <div class="l-tip l-flex-vc" v-if="giftList[0].show" @click="showGift(0)">
+          <p>礼品名称：{{giftList[0].giftName}}</p>
+          <p>领取条件：需要{{giftList[0].integral}}好友助力完成</p>
+        </div>
       </div>
-      <div class="l-step-1" :class="{'l-not-get': shareList.length < giftList[0].integral}">
-        <img style="left:-0.4rem;" class="l-prize" :src="giftList[1].imgUrl" @click="showGift(1)">
+      <div class="l-step-1" :class="{'l-can-get': giftList[1].whetherExchange, 'l-got': giftList[1].isExchanged}">
+        <img style="left:-0.266667rem;" class="l-prize" :src="giftList[1].imgUrl" @click="showGift(1)">
         <img src="~assets/imgs/temp-047.jpg">
+        <div class="l-tip l-flex-vc" v-if="giftList[1].show" @click="showGift(1)">
+          <p>礼品名称：{{giftList[1].giftName}}</p>
+          <p>领取条件：需要{{giftList[1].integral}}好友助力完成</p>
+        </div>
       </div>
-      <div class="l-step-2" :class="{'l-not-get': shareList.length < giftList[0].integral}">
-        <img style="right:-0.666667rem;top:-2.0rem;" class="l-prize" :src="giftList[2].imgUrl" @click="showGift(2)">
+      <div class="l-step-2" :class="{'l-can-get': giftList[2].whetherExchange, 'l-got': giftList[2].isExchanged}">
+        <img style="right:-0.666667rem;top:-1.6rem;" class="l-prize" :src="giftList[2].imgUrl" @click="showGift(2)">
         <img src="~assets/imgs/temp-048.jpg">
+        <div class="l-tip l-flex-vc" v-if="giftList[2].show" @click="showGift(2)">
+          <p>礼品名称：{{giftList[2].giftName}}</p>
+          <p>领取条件：需要{{giftList[2].integral}}好友助力完成</p>
+        </div>
       </div>
-      <div class="l-step-1" :class="{'l-not-get': shareList.length < giftList[0].integral}">
+      <div class="l-step-1" :class="{'l-can-get': giftList[3].whetherExchange, 'l-got': giftList[3].isExchanged}">
         <img style="left:-0.933333rem;" class="l-prize" :src="giftList[3].imgUrl" @click="showGift(3)">
         <img src="~assets/imgs/temp-049.jpg">
+        <div class="l-tip l-flex-vc" v-if="giftList[3].show" @click="showGift(3)">
+          <p>礼品名称：{{giftList[3].giftName}}</p>
+          <p>领取条件：需要{{giftList[3].integral}}好友助力完成</p>
+        </div>
       </div>
       <img class="l-block" style="width: 80%; margin-top: -0.96rem; z-index: 1; position: relative;" src="~assets/imgs/temp-050.png">
     </div>
 
+    <!-- 获奖名单 -->
     <div class="l-welfare-3" v-if="winnerList.length > 0">
       <img class="l-block" style="max-width:85%;" src="~assets/imgs/temp-056.jpg">
       <div class="l-name-list">
         <table>
           <tbody>
             <tr v-for="item in winnerList">
-              <td>古天乐</td>
-              <td>1889815****</td>
-              <td>空气净化器</td>
+              <td v-text="item.consignee"></td>
+              <td v-text="item.consigneePhone"></td>
+              <td v-text="item.giftName"></td>
             </tr>
           </tbody>
         </table>
@@ -56,6 +111,7 @@
       <br>
     </div>
 
+    <!-- 活动规则 -->
     <div class="l-welfare-4">
       <img class="l-block" src="~assets/imgs/temp-057.jpg">
       <br>
@@ -72,11 +128,18 @@
         </ol>
       </div>
       <br>
-      <img class="l-block" style="width:5.333333rem" src="~assets/imgs/temp-060.jpg">
+      <img v-if="!route.query.isFriend" @click="receiveGift" class="l-block" style="width:5.333333rem" src="~assets/imgs/temp-060.jpg">
       <br>
     </div>
-
-    <dialog :show.sync="dialog.show" :scroll="dialog.scroll" @click="dialog.show=false">
+    <!-- 好友助力二维码 -->
+    <dialog :show.sync="dialog.qrcode" :scroll="dialog.scroll" @click="dialog.qrcode=false">
+      <div v-if="route.query.isFriend">
+        <img style="width:5.333333rem; height:5.333333rem; display:block;margin: 0.266667rem auto;" :src="tempQrCode || defaultVal.qrcode">
+        <p style="color:#d29504; font-size:14px; font-weight: 500; padding:10px;">这是一个友好的二维码，请长按或扫描关注我们，完成为好友助力壮举！同时我们也会将最新优惠资讯发送给您。</p>
+      </div>
+    </dialog>
+    <!-- 奖品详情 -->
+    <!-- <dialog :show.sync="dialog.show" :scroll="dialog.scroll" @click="dialog.show=false">
       <div style="padding:0.266667rem; background-color:#fff;">
         <img height="200" :src="$image.thumb(dialog.itemInfo.imgUrl, 640, 400)">
         <div style="text-align:left;margin-top:0.266667rem;">
@@ -84,79 +147,135 @@
           <p>领取条件：需要{{dialog.itemInfo.integral}}好友助力完成</p>    
         </div>
       </div>
+    </dialog> -->
+    <!-- 分享提示 -->
+    <dialog class="l-share-dialog" :show.sync="dialog.share" :scroll="dialog.scroll" @click="dialog.share=false">
+      <img src="~assets/imgs/share-arrow.png">
     </dialog>
   </div>
 </template>
 <script>
+import { Dialog } from 'vux-components'
 import { utils, storage } from 'assets/lib'
 import { store, actions, getters } from '../vuex'
-import { Dialog } from 'vux-components'
 import config from '../config'
 import server from '../server'
+import wx from 'weixin-js-sdk'
 
 export default {
   components: {
     Dialog
   },
-  events: {
-    'hook:created': function() { 
-      console.log('%s components created!', this.$route.path)
-    },
-    'hook:ready': function() {
-      console.log('%s components ready!(loadingRouteData:%s)' , this.$route.path, this.$loadingRouteData)
-    }
-  },
   route: {
     data() {
       const self = this
+      const wxinfo = storage.session.get('wxinfo') || {}
+
       // 获取奖品列表
-      server.welfare.getGiftList().then((response)=>{
-        if(response.body.success && response.body.data){
-          self.giftList = response.body.data
+      server.welfare.getGiftList(wxinfo.wxOpenId).then(({ body })=>{
+        if(body.success && body.data){
+          self.giftList = body.data
         }
       })
-      // 获取中奖名单
-      server.welfare.getWinner().then((response)=>{
-        if(response.body.success && response.body.data){
-          self.winnerList = response.body.data.rowsObject
+
+      // 获取分享人数
+      server.welfare.getShareList(wxinfo.wxOpenId).then(({ body })=>{
+        if(body.success && body.data){
+          self.shareList = body.data.shareList.rowsObject
+          self.sharer = body.data.sharer
         }
-      })      
+      })
+
+      // 获取中奖名单
+      server.welfare.getWinner().then(({ body })=>{
+        if(body.success && body.data){
+          self.winnerList = body.data.rowsObject
+        }
+      })
+
+      // 好友助力二维码
+      if(self.route.query.isFriend){
+        server.getWxTempQrCode(wxinfo.wxOpenId, wxinfo.wxUnionId).then(({ body })=>{
+          if(body.success){
+            self.tempQrCode = body.data
+          }else{
+            console.log('获取好友二维码失败')
+          }
+        })
+      }
+
+      // jssdk授权
+      server.getWxConfig(window.location.href, ( config )=>{
+        wx.config(config)
+        wx.ready(()=>{
+          let url = utils.url.setArgs(window.location.href, {
+            isFriend: new Date().getTime(),
+            wxOpenId: wxinfo.wxOpenId,
+            wxUnionId: wxinfo.wxUnionId
+          })
+          console.log(url, wxinfo)
+          const shareConfig = {
+            title: '考验友谊的时候到了，来帮我拼人脉吧~',                     // 分享标题
+            desc: '我正在参加艾臣安全智能门窗新人领福利活动，速来围观！',     // 分享描述
+            link: url,                                                        // 分享链接
+            imgUrl: require('assets/imgs/temp-064.jpg'),                      // 分享图标
+            type: 'link',                                                     // 分享类型,music、video或link，不填默认为link
+            dataUrl: '',                                                      // 如果type是music或video，则要提供数据链接，默认为空
+            success: function() {
+              server.welfare.addShare(wxinfo.wxOpenId, wxinfo.wxUnionId, wxinfo.wxHeadPhoto, wxinfo.wxNickName)
+              .then(({ body })=>{
+                self.dialog.share = false
+                if(body.success){
+                  console.log('分享成功')
+                  self.$vux.toast.show('分享成功')
+                }else{
+                  console.log('分享失败')
+                  self.$vux.toast.show('分享失败')
+                }
+              })
+            }
+          }
+          // 分享到朋友圈/好友
+          wx.onMenuShareTimeline(shareConfig)
+          wx.onMenuShareAppMessage(shareConfig)
+        })
+        wx.error((res)=>{
+          console.log(res)
+        })
+      })
     },
-    canActivate(transition){
-      const self = this
-      const userinfo = storage.local.get('userinfo') || {}
-      const code = transition.to.query.code
-      console.log(userinfo)
+    canActivate({ to, next, abort }) {
       let promise = null
-      if(!userinfo.wxOpenId){
+      let { code, wxOpenId, wxUnionId }  = to.query
+      const userinfo = storage.local.get('userinfo')
+
+      if(wxOpenId && wxUnionId){
+        storage.session.set('wxinfo', {
+          wxOpenId, wxUnionId
+        })
+      }else if(userinfo && userinfo.wxOpenId && userinfo.wxUnionId){
+        storage.session.set('wxinfo', userinfo)
+      }else{
         if(!code){ // 跳转授权
           let absUrl = utils.url.join(config.getHost(), config.getPath(), '/welfare')
           absUrl = server.getGrantUrl(absUrl)
           if(!/\d+.\d+.\d.\d+/.test(window.location.hostname) && utils.device.isWechat){
             utils.url.replace(absUrl)
-          }else{
-            transition.next()
+            setTimeout(abort, 50)
+            // return false
           }
-        }else{ // 获取微信信息openId
-          server.getWxByCode(code).then((response)=>{
-            if(response.body.success && response.body.data && response.body.data.wxOpenId){
-              promise = server.welfare.getShareList(response.body.data.wxOpenId)
-            }else{
-              transition.next()    
+        }else{ // 通过code获取微信信息
+          promise = server.getWxByCode(code).then(({ body })=>{
+            if(body.success && body.data && body.data.wxOpenId && body.data.wxUnionId){
+              // 保存微信信息
+              storage.session.set('wxinfo', body.data)
             }
-          }) 
+          })
+          // return promise
         }
-      }else{
-        promise = server.welfare.getShareList(userinfo.wxOpenId)
       }
-      if(promise){
-        promise.then((response)=>{
-          console.log(response)
-          if(response.body.success && response.body.data){
-            self.shareList = response.body.data
-          }
-        })
-      }
+      
+      setTimeout(next, 50)
     }
   },
   store,
@@ -165,24 +284,58 @@ export default {
   },
   data() {
     return {
+      tempQrCode: '',
+      isFriend: false,
+      defaultVal: config.defaultVal,
       dialog: {
         itemInfo: {},
         show: false,
-        scroll: false
+        scroll: false,
+        share: false,
+        qrcode: false
       },
       shareList: [],
+      sharer: {},
       giftList: [{},{},{},{},{}],
       winnerList: []
     }
   },
   methods: {
     showGift(index) {
-      this.dialog.show = true
-      this.dialog.itemInfo = this.giftList[index]
+      this.giftList[index].show = !this.giftList[index].show
+      this.giftList.$set(index, this.giftList[index])
+      // this.dialog.show = true
+      // this.dialog.itemInfo = this.giftList[index]
+    },
+    receiveGift() {
+      const wxinfo = storage.session.get('wxinfo')
+      let hasGift = false
+      this.giftList.forEach((item)=>{
+        if(item.whetherExchange){
+          hasGift = true
+          return false
+        }
+      })
+      if(hasGift){
+        this.$router.go(`/welfare/gift?wxOpenId=${wxinfo.wxOpenId}&wxUnionId=${wxinfo.wxUnionId}`)  
+      }else{
+        this.dialog.share = true 
+      }
     }
   }
 }
 </script>
+<style lang="less">
+.l-share-dialog{
+  .weui_dialog{
+    background-color: transparent;
+    margin-top: -35%;
+  }
+  .weui_mask{
+    background-color: rgba(0,0,0,0.8)
+  }
+}
+</style>
 <style scoped lang="less">
 .l-winner-list{
   overflow:hidden;
@@ -234,18 +387,34 @@ export default {
   }
   .l-prize{
     position: absolute;
-    top: -1.466667rem;
-    width: 3.333333rem;
+    top: -0.8rem;
+    width: 2.4rem;
   }
   .l-step-1{
     .l-prize {
-      left: 0.266667rem;  
+      left: -0.533333rem;
+      filter: grayscale(100%)
     }
   }
   .l-step-2{
     .l-prize {
       right: 0.266667rem;
+      filter: grayscale(100%)
     }
+  }
+
+  .l-tip{
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 70%;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    border-radius: 5px;
+    padding: 0 10px;
+    box-sizing: border-box;
+    font-size: 14px;
   }
 }
 
@@ -263,7 +432,11 @@ export default {
   background-color: #4083c7;
 }
 
-.l-not-get{
-  opacity: 0.5;
+.l-can-get .l-prize{
+  filter: none !important;
+}
+
+.l-got{
+  filter: grayscale(100%) !important;
 }
 </style>

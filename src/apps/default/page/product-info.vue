@@ -32,7 +32,7 @@
       </div>
     </div>
     <div class="l-product-realshow" v-show="tab.index === 1">
-      <div v-for="(index,item) in realShow" @click="$refs.previewer.show(index)">
+      <div v-for="(index, item) in realShow" @click="$refs.previewer.show(index)">
         <img class="previewer-img" :src="item.src"/>  
       </div>
     </div>
@@ -60,13 +60,17 @@ export default {
       server.product.getInfo(id).then(({body})=>{
         if(body.success && body.data){
           if(body.data.pictureShows){
-            self.realShow = body.data.pictureShows.split('<;>').map((item)=>{
-              return {
-                w: 640,
-                h: 400,
-                src: self.$image.thumb(item, 640, 400)
+            let realShow = []
+            body.data.pictureShows.split('<;>').forEach((item)=>{
+              if(item){
+                realShow.push({
+                  w: 640,
+                  h: 400,
+                  src: self.$image.thumb(item, 640, 400)
+                })
               }
             })
+            self.realShow = realShow
           }
           self.info = body.data
         }

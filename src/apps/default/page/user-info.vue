@@ -36,7 +36,7 @@ export default {
     return {
       defaultVal: config.defaultVal,
       formData: {
-        photo: this.userinfo.photo,
+        photo: this.userinfo.photo || this.userinfo.wxHeadPhoto,
         realName: this.userinfo.realName,
         email: this.userinfo.email,
         qq: this.userinfo.qq,

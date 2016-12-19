@@ -5,6 +5,7 @@ import Vue from 'vue'
 import Resource from 'vue-resource'
 import { utils, storage } from 'assets/utils'
 
+// mixin 合并策略
 const strategies = Vue.config.optionMergeStrategies
 strategies.route = strategies.methods
 
@@ -19,7 +20,8 @@ Vue.mixin({ // 设备检测
 	      width = width || 320
 
 	      if(!src){ 
-	      	return `http://placeholder.qiniudn.com/${width}/3cc51f/ffffff` 
+	      	return ''
+	      	// return `http://placeholder.qiniudn.com/${width}/3cc51f/ffffff` 
 	      }
 	      
 	      // return src += '?imageMogr2/gravity/Center/crop/'+width+'x'+height;
@@ -37,7 +39,6 @@ Vue.mixin({ // 设备检测
 // https://github.com/pagekit/vue-resource/blob/master/docs/http.md
 Vue.use(Resource)
 Vue.http.options.emulateJSON = true
-Vue.http.options.root = 'http://test.aylsonclub.com/owner'
 // Vue.http.options.xhr = { withCredentials: true }
 // Vue.http.headers.common['Authorization'] = 'Basic YXBpOnBhc3N3b3Jk'
 // Vue.http.options.emulateHTTP = true

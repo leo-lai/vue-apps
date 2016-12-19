@@ -1,13 +1,13 @@
 <template>
   <div class="l-select-none">
     <blur class="l-user-avatar l-flex-hc" :blur-amount="15" :height="120" :url="defaultVal.avatarBg" v-link="'/user/info'">
-      <div class="avatar" :style="{'background-image': 'url('+ (userinfo.photo || defaultVal.avatar) +')'}"></div>
+      <div class="avatar" :style="{'background-image': 'url('+ (userinfo.photo || userinfo.wxHeadPhoto || defaultVal.avatar) +')'}"></div>
       <div v-if="userinfo.mobilePhone" class="l-rest">
         <h3 v-text="userinfo.realName || '未设置姓名'"></h3>
         <p v-text="userinfo.mobilePhone">13800138000</p>
       </div>
       <div v-else class="l-rest">
-        <p>登录/注册</p>
+        <p>您还没登录</p>
       </div>
       <div style="width:40px;text-align:center;"><i class="iconfont icon-arrow">&#xe601;</i></div>
     </blur>

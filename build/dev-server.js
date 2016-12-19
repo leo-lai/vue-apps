@@ -18,6 +18,7 @@ var compiler = webpack(webpackConfig)
 var devMiddleware = require('webpack-dev-middleware')(compiler, {
   publicPath: webpackConfig.output.publicPath,
   stats: {
+    progress: true,
     colors: true,
     chunks: false
   }

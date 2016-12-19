@@ -26,7 +26,7 @@
     <div class="l-appointment-item">
       <table class="l-fsize-sm">
         <thead>
-          <tr>
+          <tr class="l-text-truncate">
             <th>产品名称</th>
             <th>数量(套)</th>
             <th>面积(m²)</th>
@@ -34,13 +34,17 @@
             <th>小计(元)</th>
           </tr>
         </thead>
-        <tbody>
-          <tr v-for="item in products">
-            <td v-text="item.productName"></td>
-            <td v-text="item.pruductNum"></td>
-            <td v-text="item.areas"></td>
-            <td v-text="item.unitPrice"></td>
-            <td v-text="item.amount"></td>
+        <tbody v-for="item in products">
+          <tr>
+            <td colspan="4" style="background-color:#fefefe" v-text="item.typeName"></td>
+            <td v-text="item.orderAmount | currency '' 2"></td>
+          </tr>
+          <tr v-for="product in item.list">
+            <td v-text="product.productName"></td>
+            <td v-text="product.pruductNum"></td>
+            <td v-text="product.areas"></td>
+            <td v-text="product.unitPrice"></td>
+            <td v-text="product.amount | currency '' 2"></td>
           </tr>
         </tbody>
         <tfoot>
@@ -48,7 +52,7 @@
             <div style="color:#333;">合计：{{amount | currency ''}}</div>
             <!-- <div style="color:#999;">优惠券：0.00</div> -->
             <div style="color:#000;">实付金额：{{amount | currency ''}}</div>
-            <div style="color:red;">预收定金：{{amount/2 | currency ''}}</div>
+            <!-- <div style="color:red;">预收定金：{{amount/2 | currency ''}}</div> -->
           </td>
         </tfoot>
       </table>
@@ -127,11 +131,9 @@ export default {
   computed: {
     designImgs() {
       let ret = []
-      let amount = 0
       if(this.info && this.info.designVoList){
         for (let i = 0, item = null; i < this.info.designVoList.length; i++) {
           item = this.info.designVoList[i]
-          item.orderAmount && (amount += item.orderAmount)
           if(item.drawUrl){
             ret.push({
               url: 'javascript:;',
@@ -143,25 +145,46 @@ export default {
           }
         }
       }
-      this.amount = amount
+
       return ret
     },
     products() {
       let ret = []
+      let cateObj = {}
+      let product = {}
       let amount = 0
+
+      let typeName = ['安全门', '安全窗', '贵族阳光房']
+      let categoryName = ['钢结构', '主立柱', '靠墙立柱', '次立柱', '三角面积', '屋顶', '水槽', '水槽堵塞网', '清风双悬推拉门', '95手摇开窗-固定部分', '95手摇开窗-扇部分']
       if(this.info && this.info.designVoList){
         for (let i = 0, item = null; i < this.info.designVoList.length; i++) {
           item = this.info.designVoList[i]
+          amount += item.salesAmount
           if(item.quotationVo){
-            if(item.quotationVo.designType === 3){
-              item.quotationVo.detailSRVoList && ret.push.apply(ret, item.quotationVo.detailSRVoList)
-            }else{
-              item.quotationVo.detailDWVoList && ret.push.apply(ret, item.quotationVo.detailDWVoList)
+            cateObj = {
+              designType: item.designType,
+              typeName: typeName[item.designType-1],
+              orderAmount: item.salesAmount,
+              list: []
             }
+
+            if(item.quotationVo.designType === 3){
+              item.quotationVo.detailSRVoList && (cateObj.list = item.quotationVo.detailSRVoList)
+            }else{
+              item.quotationVo.detailDWVoList && (cateObj.list = item.quotationVo.detailDWVoList)
+            }
+
+            if(cateObj.designType === 3){
+              for (let i = 0; i < cateObj.list.length; i++) {
+                cateObj.list[i].productName = categoryName[cateObj.list[i].structure - 1]
+              }
+            }
+            ret.push(cateObj)
           }
         }
-        console.log(ret)
       }
+
+      this.amount = amount
       return ret
     }
   },

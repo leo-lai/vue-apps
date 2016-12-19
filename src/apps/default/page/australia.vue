@@ -122,22 +122,27 @@
 import config from '../config'
 import Swiper from 'iswiper'
 
-const musicfile = require('assets/imgs/blue-lotus.mp3')
+const musicfile = require('assets/imgs/the-old-you.mp3')
 function createAudio(){
-  let audio = document.createElement('audio')
-  document.body.appendChild(audio)
-  audio.id = 'audio'
-  audio.style.display = 'none'
-  audio.loop = true
-  audio.autoplay = true
-  audio.volume = 0.8
-
-  if(audio.addEventListener){
-    audio.addEventListener('loadeddata',function(e){  
-      document.getElementById('audio-btn').className = 'l-spin'
-    })
+  let audioBtn = document.getElementById('audio-btn')
+  let audio = document.getElementById('audio')
+  if(!audio){
+    audio = document.createElement('audio')
+    audio.id = 'audio'
+    audio.style.display = 'none'
+    audio.loop = true
+    audio.autoplay = false
+    audio.volume = 0.8
+    audio.src = musicfile
+    document.body.appendChild(audio)
   }
-  audio.src = musicfile
+
+  document.addEventListener('touchstart', function touch(){ 
+    document.removeEventListener('touchstart', touch)
+    audioBtn.className = 'l-spin'
+    audio.paused && audio.play()
+  }, false)
+  // audio.load()
   // audio.play()
 }
 
@@ -156,11 +161,12 @@ export default {
             activeClass: 'l-swiper-active'
           })
           createAudio()
+          this.playAudio(true)
         }, 1000)
       })
     },
     'hook:beforeDestroy': function() {
-      this.playAudio()
+      this.playAudio(false)
     }
   },
   data() {
@@ -169,13 +175,15 @@ export default {
     }
   },
   methods: {
-    playAudio() {
+    playAudio(isPlay = true) {
       let audio = document.getElementById('audio')
       let audioBtn = document.getElementById('audio-btn')
       if(audio){
         if(audio.paused){
-          audio.play()
-          audioBtn.className = 'l-spin'
+          if(isPlay){
+            audio.play() 
+            audioBtn.className = 'l-spin'
+          }
         }else{
           audio.pause()
           audioBtn.className = ''

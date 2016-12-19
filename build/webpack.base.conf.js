@@ -64,7 +64,7 @@ module.exports = {
       }, 
     	{
         test: /\.less$/, 
-        loader: 'style!css!autoprefixer-loader?postcss-loader!less'
+        loader: 'style!css!postcss-loader!less'
       },
       {
         test: /\.html$/,
@@ -93,7 +93,7 @@ module.exports = {
 	    }
     ]
   },
-  postcss: [ autoprefixer({ browsers: ['last 2 versions'] }) ],
+  postcss: [ autoprefixer({ browsers: ['last 2 versions', '> 1%'] }) ],
   vue: {
     loaders: cssLoaders()
   },

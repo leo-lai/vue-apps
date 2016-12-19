@@ -36,7 +36,7 @@
         <img src="~assets/imgs/icon-005.jpg">
         <p>产品展示</p>
       </div>
-      <div class="l-flex-vhc l-grid-item">
+      <div class="l-flex-vhc l-grid-item" v-link="{path: '/wellife'}">
         <img src="~assets/imgs/icon-006.jpg">
         <p>智慧生活</p>
       </div>
@@ -67,11 +67,6 @@ export default {
     Swiper, Masker, Flexbox, FlexboxItem, NewsList
   },
   events: config.vueHook,
-  route: {
-    data(transition) {
-      
-    }
-  },
   data() {
     return {
       images: {
@@ -81,10 +76,6 @@ export default {
       banner: [{
         url: 'javascript:;',
         img: require('assets/imgs/temp-016.jpg'),
-        title: ''
-      }, {
-        url: 'javascript:;',
-        img: require('assets/imgs/temp-001.jpg'),
         title: ''
       }]
     }
