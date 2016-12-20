@@ -34,9 +34,10 @@
             <th>小计(元)</th>
           </tr>
         </thead>
+        <tr class="l-table-line"><td colspan="5"></td></tr>
         <tbody v-for="item in products">
-          <tr>
-            <td colspan="4" style="background-color:#fefefe" v-text="item.typeName"></td>
+          <tr class="l-table-th">
+            <td colspan="4" v-text="item.typeName"></td>
             <td v-text="item.orderAmount | currency '' 2"></td>
           </tr>
           <tr v-for="product in item.list">
@@ -49,9 +50,11 @@
         </tbody>
         <tfoot>
           <td colspan="5" class="l-tr">
-            <div style="color:#333;">合计：{{amount | currency ''}}</div>
-            <!-- <div style="color:#999;">优惠券：0.00</div> -->
-            <div style="color:#000;">实付金额：{{amount | currency ''}}</div>
+            <div style="color:#333;">合计：{{amount | currency '' 2}}</div>
+            <div v-if="info._state === 8" style="color:#4083c7;text-decoration: underline;" v-link="'/user/coupon/select'">
+              优惠券：-{{ ( couponValue || 0) | currency '' 2 }}
+            </div>
+            <div style="color:#000;">实付金额：{{ (amount - couponValue) | currency '' 2}}</div>
             <!-- <div style="color:red;">预收定金：{{amount/2 | currency ''}}</div> -->
           </td>
         </tfoot>
@@ -73,7 +76,7 @@
 </template>
 <script>
 import { store, getters, actions } from '../vuex'
-import { Divider, Swiper, SwiperItem, Previewer, XTextarea, XButton, Dialog, Group } from 'vux-components'
+import { Divider, Swiper, SwiperItem, Previewer, XTextarea, XButton, Dialog, Group, PopupPicker } from 'vux-components'
 export default {
   components: {
     Divider, Swiper, SwiperItem, Previewer, XTextarea, XButton, Dialog, Group
@@ -186,6 +189,9 @@ export default {
 
       this.amount = amount
       return ret
+    },
+    couponValue() {
+      return this.coupon.couponValue || 0
     }
   },
   methods: {
@@ -258,11 +264,17 @@ export default {
         }
       }
 
+      if(sure && self.coupon.id){
+        self.formData.couponId = self.coupon.id
+        self.formData.couponUserId = self.userinfo.id
+      }
+
       self.$vux.loading.show('提交中')
       self.$http.post('owner/visitor/confirmAllQuotation', self.formData)
         .then((response) => {
           self.$vux.loading.hide()
           if(response.body.success){
+            self.acSelectCoupon()
             if(!sure){
               self.$vux.toast.show({
                 text: '感谢您的反馈，我们工作人员将尽快与你联系沟通。',

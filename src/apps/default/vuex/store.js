@@ -5,6 +5,7 @@ Vue.use(Vuex)
 // 应用状态
 const state = {
   app_userinfo: {},
+  app_coupon: {},
   app_direction: ''  // in or out
 }
 
@@ -15,6 +16,9 @@ const mutations = {
   },
   APP_USERINFO(state, userinfo){
     state.app_userinfo = userinfo
+  },
+  APP_COUPON(state, coupon){
+    state.app_coupon = coupon
   }
 }
 

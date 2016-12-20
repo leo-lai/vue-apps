@@ -8,7 +8,7 @@
         <div class="l-bottom">
           <a href="tel:{{item.workPhone}}" class="l-fr"><i class="iconfont">&#xe612;</i> 电话</a>
           <a class="l-fr"><i class="iconfont">&#xe600;</i> 导航</a>
-          <a><i class="iconfont">&#xe634;</i>2km</a>
+          <!-- <a><i class="iconfont">&#xe634;</i>2km</a> -->
         </div>
       </div>
       <div>

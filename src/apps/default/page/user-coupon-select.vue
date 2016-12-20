@@ -1,31 +1,7 @@
 <template>
   <div>
-    <sticky>
-      <tab :line-width="2" :index.sync="tabIndex">
-        <tab-item :selected="tabIndex === 0" @click="tabClick(0)">未使用</tab-item>
-        <tab-item :selected="tabIndex === 1" @click="tabClick(1)">已使用</tab-item>
-        <tab-item :selected="tabIndex === 2" @click="tabClick(2)">已过期</tab-item>
-      </tab>
-    </sticky>
-    <div class="l-coupon-list" v-show="tabIndex === 0" >
-      <div class="l-flex-h l-coupon-item-0" v-for="item in tabData[tabIndex]">
-        <div class="l-rest par">
-          <p v-text="item.couponName"></p>
-          <sub class="sign">￥</sub><span v-text="item.couponValue"></span>
-          <p class="l-fsize-sm" v-text="item.ruleDesc"></p>
-        </div>
-        <div class="copy l-flex-vhc">
-          <p>有效日期</p>
-          <div class="time">
-            {{getDate(item.startTime)}}<br>{{getDate(item.endTime)}}
-          </div>
-          <!-- <x-button mini v-link="'/booking?direction=in&id=' + item.id">立即使用</x-button> -->
-        </div>
-        <i></i>
-      </div>
-    </div>
-    <div class="l-coupon-list" v-show="tabIndex === 1">
-      <div class="l-flex-h l-coupon-item-used" v-for="item in tabData[tabIndex]">
+    <div class="l-coupon-list">
+      <div class="l-flex-hc l-coupon-item-0" v-for="item in list" @click="slt(item)">
         <div class="l-rest par">
           <p v-text="item.couponName"></p>
           <sub class="sign">￥</sub><span v-text="item.couponValue"></span>
@@ -37,69 +13,62 @@
             {{getDate(item.startTime)}}<br>{{getDate(item.endTime)}}
           </div>
         </div>
-        <i></i>
-      </div>
-    </div>
-    <div class="l-coupon-list" v-show="tabIndex === 2">
-      <div class="l-flex-h l-coupon-item-used" v-for="item in tabData[tabIndex]">
-        <div class="l-rest par">
-          <p v-text="item.couponName"></p>
-          <sub class="sign">￥</sub><span v-text="item.couponValue"></span>
-          <p class="l-fsize-sm" v-text="item.ruleDesc"></p>
-        </div>
-        <div class="copy l-flex-vhc">
-          <p>有效日期</p>
-          <div class="time">
-            {{getDate(item.startTime)}}<br>{{getDate(item.endTime)}}
-          </div>
-        </div>
-        <i></i>
+        <icon class="l-icon-slt" :type="item.slted ? 'success' : 'circle' "></icon>
+        <i class="l-decorate"></i>
       </div>
     </div>
   </div>
 </template>
 <script>
-import {store, getters } from '../vuex'
+import {store, getters, actions } from '../vuex'
 import server from '../server'
-import {Tab, TabItem, Divider, XButton, Sticky } from 'vux-components'
+import { Divider, XButton, Icon } from 'vux-components'
 
 export default {
-  components: {Tab, TabItem, Divider, Sticky, XButton },
+  components: { Divider, XButton, Icon },
   route: {
     data() {
-      this.tabClick(0)
+      const self = this
+      server.coupon.getList(self.userinfo.mobilePhone)
+      .then(({ body })=>{
+        if(body.success && body.data ){
+          self.list = body.data.map((item) => {
+            if(self.coupon.id === item.id){
+              item.slted = true  
+            }else{
+              item.slted = false
+            }
+            return item
+          })
+        }
+      })
     }
   },
   store,
   vuex: {
-    getters
+    getters, actions
   },
   data() {
     return {
-      tabDirection: 'vux-pop-in',
-      tabIndex: -1,
-      tabData: [[],[],[]]
+      list: []
     }
   },
   methods: {
-    tabClick(index) {
-      const self = this
-      if(self.tabIndex === index) return
-      self.tabDirection =  index < self.tabIndex ? 'vux-pop-out' : 'vux-pop-in'
-      self.tabIndex = index
-
-      if(self.tabData[index].length === 0){
-        server.coupon.getList(self.userinfo.mobilePhone, index)
-        .then((response)=>{
-          if(response.body.success && response.body.data ){
-            self.tabData.$set(index, response.body.data)
-          }
-        })
-      }
-    },
     getDate(datetime) {
       if(!datetime) return ''
       return datetime.split(' ')[0]
+    },
+    slt(coupon) {
+      coupon.slted = !coupon.slted
+      this.list = this.list.map((item)=>{
+        if(item.id !== coupon.id){
+          item.slted = false  
+        }
+        return item
+      })
+
+      this.acSelectCoupon(coupon)
+      window.history.back()
     }
   }
 }
@@ -128,7 +97,7 @@ export default {
   padding: 0 10px;
   position: relative;
   overflow: hidden;
-  i {
+  i.l-decorate {
     position: absolute;
     left: -20%;
     top: 20%;
@@ -171,6 +140,9 @@ export default {
       font-size: 12px;
       margin: 10px;
     }
+  }
+  .l-icon-slt:before{
+    color: #fff;
   }
 }
 

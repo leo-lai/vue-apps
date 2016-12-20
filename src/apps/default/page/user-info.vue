@@ -30,6 +30,15 @@ export default {
   components: {
     Group, XInput, Cell, XButton, Address, AddressChinaData
   },
+  route: {
+    data() {
+      let valueArr = []
+      this.userinfo.provinceId && (valueArr[0] = this.userinfo.provinceId + '')
+      this.userinfo.cityId && (valueArr[1] = this.userinfo.cityId + '')
+      this.userinfo.areaId && (valueArr[2] = this.userinfo.areaId + '')
+      this.address.value = valueArr
+    }
+  },
   store,
   vuex: { getters, actions },
   data() {

@@ -254,7 +254,7 @@ export default {
   },
   // 优惠券
   coupon: {
-    getList(phoneNum, type) {
+    getList(phoneNum, type = 0) {
       if(!phoneNum) return PROMISE
       switch(type){
         case 1:

@@ -13,6 +13,7 @@ const getters = {
     console.log(userinfo)
     return userinfo
 	},
+	coupon: (state) => state.app_coupon,
   direction: (state) => state.app_direction
 }
 
@@ -23,6 +24,9 @@ const actions = {
 	acClearUserInfo({ dispatch }) {
 		storage.local.set('userinfo', null, 0)
 		dispatch('APP_USERINFO', {})
+	},
+	acSelectCoupon({ dispatch }, coupon = {}) {
+		dispatch('APP_COUPON', coupon)
 	}
 }
 module.exports = { getters, actions }

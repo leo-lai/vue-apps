@@ -1,6 +1,10 @@
 // 应用配置
 const _PAGE = './page'
 export default {
+  '*': {
+    title: '找不到页面',
+    component: (resolve) => require([_PAGE + '/404'], resolve)
+  },
 	'/login': {
     title: '登录',
     component: (resolve) => require([_PAGE + '/login'], resolve)
@@ -110,6 +114,11 @@ export default {
     title: '我的优惠券',
     auth: true,
     component: (resolve) => require([_PAGE + '/user-coupon'], resolve)
+  },
+  '/user/coupon/select': {
+    title: '选择优惠券',
+    auth: true,
+    component: (resolve) => require([_PAGE + '/user-coupon-select'], resolve)
   },
   '/user/coupon/info': {
     title: '优惠券详情',

@@ -4,7 +4,7 @@
       <div class="l-flex-h l-thumb">
         <img :src="$image.thumb(info.thumbnail, 80, 80)">
         <div class="l-rest">
-          <span class="l-fr l-fgray"><i class="iconfont">&#xe634;</i>2km</span>
+          <!-- <span class="l-fr l-fgray"><i class="iconfont">&#xe634;</i>2km</span> -->
           <h3 v-text="info.storeName"></h3>
         </div>
       </div>
