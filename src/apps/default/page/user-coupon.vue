@@ -56,6 +56,7 @@
         <i></i>
       </div>
     </div>
+    <div v-if="loading" class="l-loading"><br><br><br><br><br></div>
   </div>
 </template>
 <script>
@@ -76,6 +77,7 @@ export default {
   },
   data() {
     return {
+      loading: true,
       tabDirection: 'vux-pop-in',
       tabIndex: -1,
       tabData: [[],[],[]]
@@ -89,10 +91,12 @@ export default {
       self.tabIndex = index
 
       if(self.tabData[index].length === 0){
+        self.loading = true
         server.coupon.getList(self.userinfo.mobilePhone, index)
-        .then((response)=>{
-          if(response.body.success && response.body.data ){
-            self.tabData.$set(index, response.body.data)
+        .then(({ body })=>{
+          self.loading = false
+          if(body.success && body.data ){
+            self.tabData.$set(index, body.data)
           }
         })
       }

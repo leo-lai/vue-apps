@@ -70,9 +70,9 @@ export default {
 
       self.$vux.loading.show('保存中')
       self.$http.post('owner/modifyMemPersonalInfo', self.formData)
-        .then((response) => {
+        .then(({ body }) => {
           self.$vux.loading.hide()
-          if(response.body.success){
+          if(body.success){
             storage.local.set('userinfo', Object.assign(self.userinfo, self.formData))
             self.acUpdateUserInfo()
             self.$vux.toast.show({
@@ -82,7 +82,7 @@ export default {
               }
             })
           }else{
-            self.$vux.toptips.show(response.body.message || '保存失败')
+            self.$vux.toptips.show(body.message || '保存失败')
           }
         }, (error) => {
           self.$vux.loading.hide()

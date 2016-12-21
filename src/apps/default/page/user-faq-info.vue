@@ -1,6 +1,6 @@
 <template>
   <div>
-    <l-article :title="info.question" time="2016-12-12">
+    <l-article v-if="info" :title="info.question" time="2016-12-12">
       <div v-html="info.answer"></div>
       <!-- <div slot="footer" class="l-btn-area">
         <x-button mini>已解决</x-button>
@@ -20,17 +20,21 @@ export default {
     LArticle
   },
   route: {
-    data(transition) {
+    data({ to }) {
       const self = this
-      const promise = self.$http.get('owner/visitor/getHelpDetail', {
+      let promise = self.$http.get('owner/visitor/getHelpDetail', {
         params: {
-          helpId: transition.to.query.id
+          helpId: to.query.id
+        }
+      }).then(({ body })=>{
+        if(body.success){
+          self.info = body.data
         }
       })
-      promise.then((response)=>{
-        if(response.body.success){
-          self.info = response.body.data
-        }
+
+      self.$vux.loading.show()
+      Promise.all([promise]).finally(()=>{
+        self.$vux.loading.hide()
       })
     }
   },

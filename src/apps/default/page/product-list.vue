@@ -18,14 +18,15 @@
               <img :src="$image.thumb(item.thumbnail, 60, 60)">
             </div>
             <div class="l-rest l-content">
-              <h4 class="l-text-truncate" v-text="item.productName"></h4>
-              <p class="l-line-clamp2" v-text="item.videoDesc"></p>
+              <h4 class="l-text-wrap" v-text="item.productName"></h4>
+              <p class="l-text-clamp2" v-text="item.videoDesc"></p>
             </div>
             <div>
               <i class="iconfont icon-arrow">&#xe601;</i>
             </div>  
           </div>
-        </div>  
+        </div>
+        <div v-if="loading" class="l-loading"><br><br><br><br><br></div>
       </div>
     <!-- </scroller> -->
   </div>
@@ -40,16 +41,22 @@ export default {
   route: {
     data(transition) {
       const self = this
-      server.product.getCategory().then(({ body })=>{
+      let promise = server.product.getCategory().then(({ body })=>{
         if(body.success){
           self.tab.data = body.data
           self.tabClick(0)
         }
       })
+
+      self.$vux.loading.show()
+      Promise.all([promise]).finally(()=>{
+        self.$vux.loading.hide()
+      })
     }
   },
   data() {
     return {
+      loading: false,
       tab: {
         direction: 'vux-pop-in',
         index: -1,
@@ -74,8 +81,9 @@ export default {
       self.tab.index = index
 
       if(self.tab.list[index].length === 0){
-        server.product.getList(self.tab.data[index].id)
-        .then(({ body })=>{
+        self.loading = true
+        server.product.getList(self.tab.data[index].id).then(({ body })=>{
+          self.loading = false
           if(body.success){
             self.tab.list.$set(index, body.data.rowsObject)
             self.$nextTick(() => {

@@ -3,7 +3,9 @@ import config from './config'
 
 Vue.http.options.root = config.getServerPath()
 
-const PROMISE = { then() { console.log('参数不正确') } }
+const PROMISE = new Promise((resolve, reject) => {
+  resolve()
+})
 const ERROR_MSG = {
   api: '服务器繁忙，请稍后重试！'
 }
@@ -138,6 +140,121 @@ export default {
       return error
     })
     return promise
+  },
+  // 获取当前地理位置(经纬度)
+  getPosition(success = utils.noop, error = utils.noop) {
+    let lng = storage.local.get('lng')
+    let lat = storage.local.get('lat')
+    let position = {
+      coords: {
+        longitude: lng,
+        latitude: lat
+      }
+    }
+    let promise = PROMISE
+
+    if(lng && lat){
+      success(position)
+      return promise
+    }
+
+    if(navigator && navigator.geolocation){
+      promise = new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition( position => {
+          lng = position.coords.longitude
+          lat = position.coords.latitude
+          storage.local.set('lng', lng, 1000 * 1800)
+          storage.local.set('lat', lat, 1000 * 1800)
+          success(position)
+          resolve(position)
+        }, err => {
+          let errHtml = ''
+          switch(error.code){ 
+            case error.PERMISSION_DENIED: 
+              errHtml = "用户拒绝对获取地理位置的请求。" 
+              break
+            case error.POSITION_UNAVAILABLE: 
+              errHtml = "位置信息是不可用的。" 
+              break
+            case error.TIMEOUT: 
+              errHtml = "请求用户地理位置超时。" 
+              break
+            case error.UNKNOWN_ERROR: 
+              errHtml = "未知错误。" 
+              break
+          } 
+          console.log('获取当前地理位置失败:'+ errHtml)
+          error(err, errHtml)
+          resolve(err, errHtml)
+        }) 
+      })
+    }
+    return promise
+  },
+  // 获取当前地理位置(地址)
+  getAddress(success = utils.noop, error = utils.noop) {
+    // 使用腾讯地图WebService API
+    this.getPosition( position => {
+      let address = storage.local.get('address')
+      if(address){
+        success(address)
+        return
+      }
+      Vue.http.jsonp('http://apis.map.qq.com/ws/geocoder/v1/', {
+        params: {
+          location: position.coords.latitude + ',' + position.coords.longitude,
+          key: 'GPIBZ-V7YH3-CD735-3HDQM-CNM3F-4PFQP',
+          output: 'jsonp'
+        }
+      }).then(({ body })=>{
+        if(body.status == 0){
+          storage.local.set('address', body.result, 1000 * 1800);
+          success(body.result)
+        }
+      })
+    }, error)
+  },
+  // 获取两个经纬度的距离
+  getDistance({ lng1 = 0, lat1 = 0 }, { lng2 = 0, lat2 = 0 }) {
+
+    var EARTH_RADIUS = 6378137.0    //单位M
+    var PI = Math.PI
+    var getRad = function(d){
+      return d*PI/180.0
+    }
+
+    var f = getRad((lat1 + lat2)/2)
+    var g = getRad((lat1 - lat2)/2)
+    var l = getRad((lng1 - lng2)/2)
+    
+    var sg = Math.sin(g)
+    var sl = Math.sin(l)
+    var sf = Math.sin(f)
+    
+    var s,c,w,r,d,h1,h2
+    var a = EARTH_RADIUS
+    var fl = 1/298.257
+    
+    sg = sg*sg
+    sl = sl*sl
+    sf = sf*sf
+    
+    s = sg*(1-sl) + (1-sf)*sl
+    c = (1-sg)*(1-sl) + sf*sl
+    
+    w = Math.atan(Math.sqrt(s/c))
+    r = Math.sqrt(s*c)/w
+    d = 2*w*a
+    h1 = (3*r -1)/2/c
+    h2 = (3*r +1)/2/s
+    
+    var m = d*(1 + fl*(h1*sf*(1-sg) - h2*(1-sf)*sg))
+
+    if(Number.isNaN(m)){
+      return 0
+    }
+
+    return (m/1000).toFixed(2)
   },
   // 新人福利
   welfare: {

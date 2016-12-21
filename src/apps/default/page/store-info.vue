@@ -4,7 +4,7 @@
       <div class="l-flex-h l-thumb">
         <img :src="$image.thumb(info.thumbnail, 80, 80)">
         <div class="l-rest">
-          <!-- <span class="l-fr l-fgray"><i class="iconfont">&#xe634;</i>2km</span> -->
+          <span class="l-fr l-fgray"><i class="iconfont">&#xe634;</i>{{info.distance}}km</span>
           <h3 v-text="info.storeName"></h3>
         </div>
       </div>
@@ -14,7 +14,7 @@
       <cell :title="'订货电话 ' + info.workPhone">
         <i class="iconfont" slot="icon">&#xe612;</i>
       </cell>
-      <cell :title="'门店地址 ' + info.address">
+      <cell :title="'门店地址 ' + info.address" :is-link='true' @click="openMap(info)">
         <i class="iconfont" slot="icon">&#xe600;</i>
       </cell>
     </group>
@@ -29,8 +29,11 @@
   </div>
 </template>
 <script>
-import config from '../config'
 import { Group, Cell, Previewer, Dialog } from 'vux-components'
+import { utils, storage } from 'assets/lib'
+import config from '../config'
+import server from '../server'
+import wx from 'weixin-js-sdk'
 
 export default {
   components: {
@@ -39,13 +42,15 @@ export default {
   route: {
     data(transition) {
       const self = this
-      self.$http.get('owner/visitor/getStoreDetail', {
+      let promise1 = self.$http.get('owner/visitor/getStoreDetail', {
         params: {
           storeId: transition.to.query.id
         }
-      }).then((response)=>{
-        if(response.body.success){
-          self.info = response.body.data
+      })
+
+      promise1.then(({ body })=>{
+        if(body.success){
+          self.info = body.data
           if(self.info.storeImgList){
             self.storeImgList = self.info.storeImgList.map((item) => {
               return {
@@ -56,6 +61,34 @@ export default {
             })
           }
         }
+      })
+
+      let promise2 = server.getPosition()
+
+      // jssdk授权
+      let promise3 = server.getWxConfig(window.location.href, ( config )=>{
+        wx.config(config)
+        wx.ready(()=>{
+          self.wxReay = true
+        })
+        wx.error((res)=>{
+          self.wxReay = false
+        })
+      })
+
+      self.$vux.loading.show()
+      Promise.all([promise1, promise2, promise3]).finally(()=>{
+        let lng = storage.local.get('lng')
+        let lat = storage.local.get('lat')
+
+        self.info.distance = server.getDistance({
+            lng1: lng, 
+            lat1: lat
+          }, {
+            lng2: self.info.longitude,
+            lat2: self.info.latitude
+          })
+        self.$vux.loading.hide()
       })
     }
   },
@@ -78,6 +111,18 @@ export default {
           // http://javascript.info/tutorial/coordinates
         }
       }
+    }
+  },
+  methods: {
+    openMap(storeEntity) {
+      wx.openLocation({
+        latitude: storeEntity.latitude,  
+        longitude: storeEntity.longitude, 
+        name: storeEntity.storeName,
+        address: storeEntity.address, 
+        scale: 15, // 地图缩放级别,整形值,范围从1~28。默认为最大
+        infoUrl: '' // 在查看位置界面底部显示的超链接,可点击跳转
+      })
     }
   }
 }

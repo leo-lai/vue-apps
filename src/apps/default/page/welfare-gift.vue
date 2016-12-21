@@ -40,7 +40,7 @@ export default {
       const wxOpenId = self.route.query.wxOpenId
       const wxUnionId = self.route.query.wxUnionId
       // 获取奖品列表
-      server.welfare.getGiftList(wxOpenId).then(({ body })=>{
+      let promise1 = server.welfare.getGiftList(wxOpenId).then(({ body })=>{
         if(body.success && body.data){
           let giftList = []
           let ids = []
@@ -58,7 +58,7 @@ export default {
         }
       })
       // jssdk授权
-      server.getWxConfig(window.location.href, ( config )=>{
+      let promise2 = server.getWxConfig(window.location.href, ( config )=>{
         wx.config(config)
         wx.ready(()=>{
           let url = utils.url.setArgs(window.location.href, {
@@ -79,6 +79,11 @@ export default {
         wx.error((res)=>{
           console.log(res)
         })
+      })
+
+      self.$vux.loading.show()
+      Promise.all([promise1, promise2]).finally(()=>{
+        self.$vux.loading.hide()
       })
     }
   },

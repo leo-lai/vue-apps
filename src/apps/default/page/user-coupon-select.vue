@@ -17,6 +17,7 @@
         <i class="l-decorate"></i>
       </div>
     </div>
+    <div v-if="loading" class="l-loading"><br><br><br><br><br></div>
   </div>
 </template>
 <script>
@@ -29,7 +30,7 @@ export default {
   route: {
     data() {
       const self = this
-      server.coupon.getList(self.userinfo.mobilePhone)
+      let promise = server.coupon.getList(self.userinfo.mobilePhone)
       .then(({ body })=>{
         if(body.success && body.data ){
           self.list = body.data.map((item) => {
@@ -42,6 +43,11 @@ export default {
           })
         }
       })
+
+      self.loading = true
+      Promise.all([promise]).finally(()=>{
+        self.loading = false
+      })
     }
   },
   store,
@@ -50,6 +56,7 @@ export default {
   },
   data() {
     return {
+      loading: true,
       list: []
     }
   },

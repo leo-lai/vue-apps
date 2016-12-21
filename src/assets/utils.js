@@ -6,6 +6,22 @@ const isIpod = /(iPod)(.*OS\s([\d_]+))?/.test(ua)
 const isIphone = !isIpad && /(iPhone\sOS)\s([\d_]+)/.test(ua)
 const isWechat = /micromessenger/i.test(ua)
 
+Promise.prototype.done = Promise.prototype.done || function (onFulfilled, onRejected) {
+  this.then(onFulfilled, onRejected)
+    .catch(function (reason) {
+      // 抛出一个全局错误
+      setTimeout(() => { throw reason }, 0)
+    })
+}
+
+Promise.prototype.finally = Promise.prototype.finally || function (callback) {
+  let P = this.constructor
+  return this.then(
+    value  => P.resolve(callback()).then(() => value),
+    reason => P.resolve(callback()).then(() => { throw reason })
+  )
+} 
+
 
 /*========本地存储===========*/
 const STORE_PREFIX = '_yz_'
@@ -66,13 +82,13 @@ export let storage = {
     } 
   },
   local: {
-    set(key, value, seconds = 1000*3600*24*365) {
+    set(key, value, ms = 1000*3600*24*365) {
       if(!key) return false
       
       key = STORE_PREFIX + key
       let newValue = {
         value: value,
-        expires: seconds,
+        expires: ms,
         time: new Date().getTime()
       }
       window.localStorage.setItem(key, JSON.stringify(newValue))

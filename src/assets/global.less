@@ -178,13 +178,13 @@ ins.ins4-1{
   white-space: nowrap;
   -webkit-box-reflect:below 0 linear-gradient(transparent,transparent 50%,rgba(255,255,255,.3));
 }
-.l-text-truncate {
+.l-text-wrap {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
 }
 
-.l-line-clamp2 {
+.l-text-clamp2 {
   text-overflow: ellipsis;
   overflow: hidden;
   max-height: 2.4em;
@@ -194,6 +194,13 @@ ins.ins4-1{
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+}
+
+.l-loading{
+  box-sizing: border-box;
+  background: url('~assets/imgs/loading.gif') no-repeat 50% 50%;
+  padding: 0.8rem 0;
+  background-size: 15px;
 }
 
 .l-spin{animation: spin 3s 0s infinite linear;}

@@ -155,7 +155,7 @@
   </div>
 </template>
 <script>
-import { Dialog } from 'vux-components'
+import { Dialog, Loading } from 'vux-components'
 import { utils, storage } from 'assets/lib'
 import { store, actions, getters } from '../vuex'
 import config from '../config'
@@ -170,42 +170,29 @@ export default {
     data() {
       const self = this
       const wxinfo = storage.session.get('wxinfo') || {}
+      const promises = []
 
       // 获取奖品列表
-      server.welfare.getGiftList(wxinfo.wxOpenId).then(({ body })=>{
+      let promise1 = server.welfare.getGiftList(wxinfo.wxOpenId).then(({ body })=>{
         if(body.success && body.data){
           self.giftList = body.data
         }
       })
-
       // 获取分享人数
-      server.welfare.getShareList(wxinfo.wxOpenId).then(({ body })=>{
+      let promise2 = server.welfare.getShareList(wxinfo.wxOpenId).then(({ body })=>{
         if(body.success && body.data){
           self.shareList = body.data.shareList.rowsObject
           self.sharer = body.data.sharer
         }
       })
-
       // 获取中奖名单
-      server.welfare.getWinner().then(({ body })=>{
+      let promise3 = server.welfare.getWinner().then(({ body })=>{
         if(body.success && body.data){
           self.winnerList = body.data.rowsObject
         }
       })
-
-      // 好友助力二维码
-      if(self.route.query.isFriend){
-        server.getWxTempQrCode(wxinfo.wxOpenId, wxinfo.wxUnionId).then(({ body })=>{
-          if(body.success){
-            self.tempQrCode = body.data
-          }else{
-            console.log('获取好友二维码失败')
-          }
-        })
-      }
-
       // jssdk授权
-      server.getWxConfig(window.location.href, ( config )=>{
+      let promise4 = server.getWxConfig(window.location.href, ( config )=>{
         wx.config(config)
         wx.ready(()=>{
           let url = utils.url.setArgs(window.location.href, {
@@ -243,6 +230,28 @@ export default {
           console.log(res)
         })
       })
+
+      promises.push(promise1)
+      promises.push(promise2)
+      promises.push(promise3)
+      promises.push(promise4)
+
+      // 好友助力二维码
+      if(self.route.query.isFriend){
+        let promise5 = server.getWxTempQrCode(wxinfo.wxOpenId, wxinfo.wxUnionId).then(({ body })=>{
+          if(body.success){
+            self.tempQrCode = body.data
+          }else{
+            console.log('获取好友二维码失败')
+          }
+        })
+        promises.push(promise5)
+      }
+      
+      self.$vux.loading.show()
+      Promise.all(promises).finally(()=>{
+        self.$vux.loading.hide()
+      })
     },
     canActivate({ to, next, abort }) {
       let promise = null
@@ -274,7 +283,6 @@ export default {
           // return promise
         }
       }
-      
       setTimeout(next, 50)
     }
   },

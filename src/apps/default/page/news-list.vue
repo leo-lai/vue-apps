@@ -6,13 +6,14 @@
           <img :src="$image.thumb(item.thumb, 60, 60)">
         </div>
         <div class="l-rest">
-          <h4 class="l-text-truncate" v-text="item.title"></h4>
-          <p class="l-line-clamp2" v-text="item.summary"></p>
+          <h4 class="l-text-wrap" v-text="item.title"></h4>
+          <p class="l-text-clamp2" v-text="item.summary"></p>
         </div>
         <div>
           <i class="iconfont icon-arrow">&#xe601;</i>
         </div>
       </div>
+      <div v-if="news.loading" class="l-loading"></div>
     </div>
   </div>
 </template>
@@ -22,15 +23,21 @@ import server from '../server'
 export default {
   created() {
     const self = this
-    server.news.getList().then((response)=>{
-      if(response.body.success){
-        self.news.data = response.body.data.rowsObject
+    let promise = server.news.getList().then(({ body })=>{
+      if(body.success){
+        self.news.data = body.data.rowsObject
       }
+    })
+
+    self.news.loading = true
+    Promise.all([promise]).finally(()=>{
+      self.news.loading = false
     })
   },
   data() {
     return {
       news: {
+        loading: true,
         data: []
       }
     }

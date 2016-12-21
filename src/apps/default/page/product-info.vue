@@ -57,7 +57,7 @@ export default {
     data({ to }) {
       const self = this
       let id = to.query.id 
-      server.product.getInfo(id).then(({body})=>{
+      let promise = server.product.getInfo(id).then(({body})=>{
         if(body.success && body.data){
           if(body.data.pictureShows){
             let realShow = []
@@ -74,6 +74,11 @@ export default {
           }
           self.info = body.data
         }
+      })
+
+      self.$vux.loading.show()
+      Promise.all([promise]).finally(()=>{
+        self.$vux.loading.hide()
       })
     }
   },

@@ -21,6 +21,7 @@
     "iswiper": "^1.4.1",
     "lib-flexible": "^0.3.2",
     "sprint-js": "^0.1.0",
+    "swiper": "^3.4.1",
     "vue": "^1.0.26",
     "vue-resource": "^1.0.3",
     "vue-router": "^0.7.5",

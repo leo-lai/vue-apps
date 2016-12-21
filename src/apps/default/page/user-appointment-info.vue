@@ -26,7 +26,7 @@
     <div class="l-appointment-item">
       <table class="l-fsize-sm">
         <thead>
-          <tr class="l-text-truncate">
+          <tr class="l-text-wrap">
             <th>产品名称</th>
             <th>数量(套)</th>
             <th>面积(m²)</th>
@@ -84,12 +84,11 @@ export default {
   route: {
     data(transition) {
       const self = this
-      const promise = self.$http.get('owner/visitor/getAppointDetail', {
+      self.$http.get('owner/visitor/getAppointDetail', {
         params: {
           appointId: transition.to.query.id
         }
-      })
-      promise.then((response)=>{
+      }).then((response)=>{
         if(response.body.success){
           self.info = response.body.data
           self.info._state = Number(String(self.info.state).substr(0,1))
@@ -264,9 +263,9 @@ export default {
         }
       }
 
-      if(sure && self.coupon.id){
-        self.formData.couponId = self.coupon.id
-        self.formData.couponUserId = self.userinfo.id
+      if(sure && self.coupon.couponFkid){
+        self.formData.couponId = self.coupon.couponFkid
+        self.formData.couponUserId = self.coupon.id
       }
 
       self.$vux.loading.show('提交中')

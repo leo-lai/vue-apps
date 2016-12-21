@@ -21,10 +21,15 @@ export default {
     data(transition) {
       const self = this
       let id = transition.to.query.id
-      server.order.getInfo(id).then((response)=>{
-        if(response.body.success && response.body.data){
-          self.info = response.body.data
+      let promise = server.order.getInfo(id).then(({ body })=>{
+        if(body.success && body.data){
+          self.info = body.data
         }
+      })
+
+      self.$vux.loading.show()
+      Promise.all([promise]).finally(()=>{
+        self.$vux.loading.hide()
       })
     }
   },

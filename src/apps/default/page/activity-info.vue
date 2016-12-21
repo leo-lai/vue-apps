@@ -27,10 +27,15 @@ export default {
   	data({ to }) {
   		const self = this
   		let id = to.query.id
-      server.activity.getList(id).then((response)=>{
-        if(response.body.success){
-          self.info = response.body.data.rowsObject[0]
+      let promise = server.activity.getList(id).then(({ body })=>{
+        if(body.success){
+          self.info = body.data.rowsObject[0]
         }
+      })
+
+      self.$vux.loading.show()
+      Promise.all([promise]).finally(()=>{
+        self.$vux.loading.hide()
       })
   	}
   },
@@ -67,11 +72,11 @@ export default {
       }else{
         self.$vux.loading.show('领取中')
         server.activity.receive(self.userinfo.mobilePhone, self.info.id, self.info.couponFkid)
-        .then((response)=>{
+        .then(({ body })=>{
           self.$vux.loading.hide()
           if(response.body.success){
             self.$vux.toast.show({
-              text: '领取成功',
+              text: body.message || '领取成功',
               onHide() {
                 self.$router.go('/user/coupon?direction=in')
               }

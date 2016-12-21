@@ -10,6 +10,7 @@
         <i class="iconfont icon-arrow">&#xe601;</i>
       </div>
     </div>
+    <div v-if="loading" class="l-loading"><br><br><br><br><br></div>
   </div>
 </template>
 <script>
@@ -22,16 +23,20 @@ export default {
   route: {
     data(transition) {
       const self = this
-      const promise = self.$http.get('owner/visitor/getAppointList', {
+      let promise = self.$http.get('owner/visitor/getAppointList', {
         params: {
           mobilePhone: transition.to.query.phone || self.userinfo.mobilePhone,
           rows: 50
         }
-      })
-      promise.then((response)=>{
-        if(response.body.success){
-          self.list = response.body.data.rowsObject
+      }).then(({ body })=>{
+        if(body.success){
+          self.list = body.data.rowsObject
         }
+      })
+
+      self.loading = true
+      Promise.all([promise]).finally(()=>{
+        self.loading = false
       })
     }
   },
@@ -41,6 +46,7 @@ export default {
   },
   data() {
     return {
+      loading: true,
       list: []
     }
   },

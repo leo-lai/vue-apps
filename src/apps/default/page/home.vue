@@ -70,8 +70,8 @@ export default {
   data() {
     return {
       images: {
-        img1: require('assets/imgs/temp-017.jpg'),
-        img2: require('assets/imgs/temp-018.jpg')
+        img1: require('assets/imgs/booking.png'),
+        img2: require('assets/imgs/fuli.png')
       },
       banner: [{
         url: 'javascript:;',

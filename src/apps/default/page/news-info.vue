@@ -1,6 +1,6 @@
 <template>
   <div>
-    <l-article :title="info.title" :time="info.createTime">
+    <l-article v-if="info" :title="info.title" :time="info.createTime">
       <div v-html="info.content"></div>
     </l-article>
   </div>
@@ -18,16 +18,21 @@ export default {
     data({ to }) {
       const self = this
       let id = to.query.id
-      server.news.getInfo(id).then((response)=>{
-        if(response.body.success){
-          self.info = response.body.data
+      let promise = server.news.getInfo(id).then(({ body })=>{
+        if(body.success){
+          self.info = body.data
         }
+      })
+
+      self.$vux.loading.show()
+      Promise.all([promise]).finally(()=>{
+        self.$vux.loading.hide()
       })
     }
   },
   data() {
     return {
-      info: {}
+      info: null
     }
   }
 }

@@ -1,6 +1,7 @@
 <template>
   <div class="l-flex-v" style="height:100%;">
     <div class="l-rest l-chat-list l-scrolling">
+      <div v-if="loading" class="l-loading"></div>
       <div class="l-flex-h" 
         :class="{'l-chat-item-me': item.replyType == 1, 'l-chat-item-other': item.replyType == 2}" 
         v-for="item in feedBackReplyList">
@@ -37,15 +38,20 @@ export default {
   route: {
     data(transition) {
       const self = this
-      self.$http.get('owner/getMyFeedBackDetail', {
+      let promise = self.$http.get('owner/getMyFeedBackDetail', {
         params: {
           feedBackId: transition.to.query.id
         }
-      }).then((response)=>{
-        if(response.body.success){
-          self.info = response.body.data
-          self.feedBackReplyList = response.body.data.feedBackReplyPage.rowsObject
+      }).then(({ body })=>{
+        if(body.success){
+          self.info = body.data
+          self.feedBackReplyList = body.data.feedBackReplyPage.rowsObject
         }
+      })
+
+      self.loading = true
+      Promise.all([promise]).finally(()=>{
+        self.loading = false
       })
     }
   },
@@ -55,6 +61,7 @@ export default {
   },
   data() {
     return {
+      loading: true,
       meAvatar: this.userinfo.photo || this.userinfo.wxHeadPhoto || config.defaultVal.avatar,
       kefuAvatar: require('assets/imgs/kefu.jpg') || config.defaultVal.avatar,
       feedBackReplyList: [],
@@ -81,8 +88,8 @@ export default {
       })
 
       self.$http.post('owner/replyFeedBack', self.formData)
-      .then((response)=>{
-        if(response.body.success){
+      .then(({ body })=>{
+        if(body.success){
           self.$vux.toast.show({
             text: '回复成功',
             onHide() {
@@ -91,7 +98,7 @@ export default {
             }
           })
         }else{
-          self.$vux.toast.show(response.body.message || '回复失败')
+          self.$vux.toast.show(body.message || '回复失败')
         }
       })
     },
