@@ -38,7 +38,7 @@ export default {
     data() {
       let wxinfo = storage.session.get('wxinfo')
       if(wxinfo && wxinfo.wxHeadPhoto){
-        this.avatar = this.$image.wxHead(wxinfo.wxHeadPhoto)
+        this.avatar = utils.image.wxHead(wxinfo.wxHeadPhoto)
       }
     },
     canActivate(transition){
@@ -48,6 +48,7 @@ export default {
         server.getWxByCode(code).then(({ body })=>{
           if(body.success && body.data){
             if(body.data.mobilePhone){
+              body.data.photo = utils.image.wxHead( body.data.photo || body.data.wxHeadPhoto )
               storage.local.set('userinfo', body.data)
               transition.redirect('/user')  
             }else{
@@ -109,6 +110,7 @@ export default {
       .then(({ body }) => {
         self.$vux.loading.hide()
         if(body.success && body.data){
+          body.data.photo = utils.image.wxHead( body.data.photo || body.data.wxHeadPhoto )
           storage.local.set('userinfo', body.data)
           self.$router.replace('/user')  
         }else{

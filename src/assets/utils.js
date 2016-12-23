@@ -285,7 +285,34 @@ export let utils = {
         })
       return passPath.join('/')
     }
+  },
+  image: {
+    thumb(src, width, height) {
+      width = width || 320
+      if(!src){ 
+        return ''
+        return `http://placeholder.qiniudn.com/${width}/ebebeb/cccccc` 
+      }
+      // return src += '?imageMogr2/gravity/Center/crop/'+width+'x'+height;
+      src += `?imageMogr2/format/jpg/interlace/1/quality/60/gravity/Center/thumbnail/${width}x`
+      if(height){
+        src += `/crop/x${height}`
+      }
+
+      return src
+    },
+    wxHead(src) {
+      if(!src) {
+        let avatar = require('assets/imgs/avatar.png')
+        return avatar
+      }
+      if(src.indexOf('wx.qlogo.cn') === -1){
+        return src
+      }
+      return src.replace(/\/0$/, '/64')
+    }
   }
+  
 }
 
 export default utils

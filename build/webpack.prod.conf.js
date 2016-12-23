@@ -9,8 +9,8 @@ module.exports = merge(baseWebpackConfig, {
   //devtool: config.build.productionSourceMap ? '#source-map' : false,
   output: {
     path: config.build.assetsRoot,
-    filename: config.build.assetsSubDirectory + '/[name].[hash:7].js',
-    chunkFilename: config.build.assetsSubDirectory + '/[id].chunk.[hash:7].js'
+    filename: config.build.assetsSubDirectory + '/[hash:7]/[name].js',
+    chunkFilename: config.build.assetsSubDirectory + '/[hash:7]/[id].chunk.js'
   },
   vue: {
     loaders: cssLoaders({

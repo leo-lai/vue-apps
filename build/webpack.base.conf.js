@@ -19,7 +19,7 @@ module.exports = {
     publicPath: config.build.assetsPublicPath,
 	  /* ---- 生成的例子 vendors.61714a310523a3df9869.js --- */
     //filename: '[name].[hash].js'
-    filename: '[name].[hash:7].js'
+    filename: '[name].js'
   },
   resolve: {
     extensions: ['', '.js', '.vue', '.less', '.css'],
@@ -106,7 +106,7 @@ module.exports = {
       minChunks: chunks.length
     }),
     // 配置提取出的样式文件
-    new ExtractTextPlugin(config.build.assetsSubDirectory + '/[name].[hash:7].css')
+    new ExtractTextPlugin(config.build.assetsSubDirectory + '/[hash:7]/[name].css')
   ],
   externals:[
     require('webpack-require-http')
