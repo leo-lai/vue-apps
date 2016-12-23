@@ -9,9 +9,9 @@
       <!-- 好友助力显示 -->
       <div class="l-box-1" v-if="route.query.isFriend">
         <div class="vux-center" v-if="sharer.wxNickName">
-          <img style="width:1.066667rem;height:1.066667rem;border: 1px solid #ebebeb;margin:0 15px 0 0;" 
-            :src="sharer.wxHeadPhoto || defaultVal.avatar">
-          {{sharer.wxNickName}} 邀请您帮他拼人脉
+          <!-- <img style="width:1.066667rem;height:1.066667rem;border: 1px solid #ebebeb;margin:0 15px 0 0;" 
+            :src="sharer.wxHeadPhoto || defaultVal.avatar"> -->
+          您的好友 {{sharer.wxNickName}} 邀请您帮他拼人脉
           <br><br>
         </div>
         
@@ -160,7 +160,7 @@ import { utils, storage } from 'assets/lib'
 import { store, actions, getters } from '../vuex'
 import config from '../config'
 import server from '../server'
-import wx from 'weixin-js-sdk'
+// import wx from 'weixin-js-sdk'
 
 export default {
   components: {
@@ -192,43 +192,36 @@ export default {
         }
       })
       // jssdk授权
-      let promise4 = server.getWxConfig(window.location.href, ( config )=>{
-        wx.config(config)
-        wx.ready(()=>{
-          let url = utils.url.setArgs(window.location.href, {
-            isFriend: new Date().getTime(),
-            wxOpenId: wxinfo.wxOpenId,
-            wxUnionId: wxinfo.wxUnionId
-          })
-          console.log(url, wxinfo)
-          const shareConfig = {
-            title: '考验友谊的时候到了，来帮我拼人脉吧~',                     // 分享标题
-            desc: '我正在参加艾臣安全智能门窗新人领福利活动，速来围观！',     // 分享描述
-            link: url,                                                        // 分享链接
-            imgUrl: require('assets/imgs/temp-064.jpg'),                      // 分享图标
-            type: 'link',                                                     // 分享类型,music、video或link，不填默认为link
-            dataUrl: '',                                                      // 如果type是music或video，则要提供数据链接，默认为空
-            success: function() {
-              server.welfare.addShare(wxinfo.wxOpenId, wxinfo.wxUnionId, wxinfo.wxHeadPhoto, wxinfo.wxNickName)
-              .then(({ body })=>{
-                self.dialog.share = false
-                if(body.success){
-                  console.log('分享成功')
-                  self.$vux.toast.show('分享成功')
-                }else{
-                  console.log('分享失败')
-                  self.$vux.toast.show('分享失败')
-                }
-              })
-            }
+      let promise4 = server.getWxConfig().then((wx)=>{
+        let url = utils.url.setArgs(window.location.href, {
+          isFriend: new Date().getTime(),
+          wxOpenId: wxinfo.wxOpenId,
+          wxUnionId: wxinfo.wxUnionId
+        })
+        const shareConfig = {
+          title: '考验友谊的时候到了，来帮我拼人脉吧~',                     // 分享标题
+          desc: '我正在参加艾臣安全智能门窗新人领福利活动，速来围观！',     // 分享描述
+          link: url,                                                        // 分享链接
+          imgUrl: require('assets/imgs/temp-064.jpg'),                      // 分享图标
+          type: 'link',                                                     // 分享类型,music、video或link，不填默认为link
+          dataUrl: '',                                                      // 如果type是music或video，则要提供数据链接，默认为空
+          success: function() {
+            server.welfare.addShare(wxinfo.wxOpenId, wxinfo.wxUnionId, wxinfo.wxHeadPhoto, wxinfo.wxNickName)
+            .then(({ body })=>{
+              self.dialog.share = false
+              if(body.success){
+                console.log('分享成功')
+                // self.$vux.toast.show('分享成功')
+              }else{
+                console.log('分享失败')
+                self.$vux.toast.show('分享失败')
+              }
+            })
           }
-          // 分享到朋友圈/好友
-          wx.onMenuShareTimeline(shareConfig)
-          wx.onMenuShareAppMessage(shareConfig)
-        })
-        wx.error((res)=>{
-          console.log(res)
-        })
+        }
+        // 分享到朋友圈/好友
+        wx.onMenuShareTimeline(shareConfig)
+        wx.onMenuShareAppMessage(shareConfig)
       })
 
       promises.push(promise1)

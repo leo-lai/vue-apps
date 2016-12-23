@@ -175,6 +175,9 @@ export default {
       this.playAudio()
     })
   },
+  destroyed() {
+    this.playAudio()
+  },
   methods: {
     playAudio(isPlay = true) {
       let audio = document.getElementById('audio')
@@ -203,14 +206,14 @@ export default {
         audio.volume = 0.8
         audio.src = musicfile
         document.body.appendChild(audio)
+        document.addEventListener('touchstart', function touch(){ 
+        document.removeEventListener('touchstart', touch)
+          audioBtn.className = 'l-spin'
+          audio.paused && audio.play()
+        }, false)
       }
 
-      document.addEventListener('touchstart', function touch(){ 
-        document.removeEventListener('touchstart', touch)
-        audioBtn.className = 'l-spin'
-        audio.paused && audio.play()
-      }, false)
-      // audio.load()
+      audio.load()
       // audio.play()
     }
   }

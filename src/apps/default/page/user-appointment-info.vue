@@ -44,8 +44,8 @@
             <td v-text="product.productName"></td>
             <td v-text="product.pruductNum"></td>
             <td v-text="product.areas"></td>
-            <td v-text="product.unitPrice"></td>
-            <td v-text="product.amount | currency '' 2"></td>
+            <td v-text="product.showUnitPrice"></td>
+            <td v-text="product.showAmount | currency '' 2"></td>
           </tr>
         </tbody>
         <tfoot>
@@ -54,7 +54,8 @@
             <div v-if="info._state === 8" style="color:#4083c7;text-decoration: underline;" v-link="'/user/coupon/select'">
               优惠券：-{{ ( couponValue || 0) | currency '' 2 }}
             </div>
-            <div style="color:#000;">实付金额：{{ (amount - couponValue) | currency '' 2}}</div>
+            <div v-if="info._state === 10">优惠券：-{{amountCoupon | currency '' 2}}</div>
+            <div style="color:#000;">实付金额：{{ (amount - couponValue - amountCoupon) | currency '' 2}}</div>
             <!-- <div style="color:red;">预收定金：{{amount/2 | currency ''}}</div> -->
           </td>
         </tfoot>
@@ -62,7 +63,7 @@
     </div>
     <div class="l-btn-area" v-if="info.state !== 10">
       <x-button type="primary" @click="confirmInfo">确定报价信息</x-button>
-      <x-button @click="resetDesign">不满意，重新报价</x-button>
+      <!-- <x-button @click="resetDesign">不满意，重新报价</x-button> -->
     </div>
 
     <dialog :show.sync="dialog.show" :scroll="dialog.scroll" @click="dialog.show=false">
@@ -88,17 +89,19 @@ export default {
         params: {
           appointId: transition.to.query.id
         }
-      }).then((response)=>{
-        if(response.body.success){
-          self.info = response.body.data
-          self.info._state = Number(String(self.info.state).substr(0,1))
+      }).then(({ body })=>{
+        self.$vux.loading.hide()
+        if(body.success){
+          self.info = body.data
+          self.info._state = self.info.state > 20 ? Number(String(self.info.state).substr(0,1)) : self.info.state
         }
       })
+      self.$vux.loading.show()
     }
   },
   store,
   vuex: {
-    getters
+    getters, actions
   },
   data() {
     return {
@@ -112,6 +115,7 @@ export default {
         show: false,
         scroll: false
       },
+      amountCoupon: 0,
       amount: 0,
       options: {
         getThumbBoundsFn (index) {
@@ -155,18 +159,21 @@ export default {
       let cateObj = {}
       let product = {}
       let amount = 0
+      let amountCoupon = 0
 
       let typeName = ['安全门', '安全窗', '贵族阳光房']
       let categoryName = ['钢结构', '主立柱', '靠墙立柱', '次立柱', '三角面积', '屋顶', '水槽', '水槽堵塞网', '清风双悬推拉门', '95手摇开窗-固定部分', '95手摇开窗-扇部分']
       if(this.info && this.info.designVoList){
-        for (let i = 0, item = null; i < this.info.designVoList.length; i++) {
+        for (let i = 0, item = null, orderAmount = 0; i < this.info.designVoList.length; i++) {
           item = this.info.designVoList[i]
-          amount += item.salesAmount
+          orderAmount = this.info.byAgentUserId ? item.salesAmount : item.orderAmount
+          amount += orderAmount
+          amountCoupon += item.couponValue
           if(item.quotationVo){
             cateObj = {
               designType: item.designType,
               typeName: typeName[item.designType-1],
-              orderAmount: item.salesAmount,
+              orderAmount: orderAmount,
               list: []
             }
 
@@ -175,18 +182,22 @@ export default {
             }else{
               item.quotationVo.detailDWVoList && (cateObj.list = item.quotationVo.detailDWVoList)
             }
-
-            if(cateObj.designType === 3){
-              for (let i = 0; i < cateObj.list.length; i++) {
-                cateObj.list[i].productName = categoryName[cateObj.list[i].structure - 1]
+            
+            cateObj.list.forEach((item)=>{
+              if(cateObj.designType === 3){
+                item.productName = categoryName[item.structure - 1]
               }
-            }
+              item.showAmount = this.info.byAgentUserId ? item.salesUnitAmount : item.amount
+              item.showUnitPrice = this.info.byAgentUserId ? item.salesUnitPrice : item.unitPrice
+            })
+
             ret.push(cateObj)
           }
         }
       }
 
       this.amount = amount
+      this.amountCoupon = amountCoupon
       return ret
     },
     couponValue() {
@@ -270,9 +281,9 @@ export default {
 
       self.$vux.loading.show('提交中')
       self.$http.post('owner/visitor/confirmAllQuotation', self.formData)
-        .then((response) => {
+        .then(({ body }) => {
           self.$vux.loading.hide()
-          if(response.body.success){
+          if(body.success){
             self.acSelectCoupon()
             if(!sure){
               self.$vux.toast.show({
@@ -293,7 +304,7 @@ export default {
             }
             
           }else{
-            self.$vux.toptips.show(response.body.message || '提交失败')
+            self.$vux.toptips.show(body.message || '提交失败')
           }
         }, (error) => {
           self.$vux.loading.hide()

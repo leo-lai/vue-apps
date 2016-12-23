@@ -11,13 +11,13 @@ const state = {
 
 // 变更函数
 const mutations = {
-  APP_DIRECTION (state, inOrout) {
+  APP_DIRECTION (state, inOrout = '') {
     state.app_direction = inOrout
   },
-  APP_USERINFO(state, userinfo){
+  APP_USERINFO(state, userinfo = {}){
     state.app_userinfo = userinfo
   },
-  APP_COUPON(state, coupon){
+  APP_COUPON(state, coupon = {}){
     state.app_coupon = coupon
   }
 }

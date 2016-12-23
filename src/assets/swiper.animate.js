@@ -3,7 +3,7 @@ export default {
   animate(swiper, once = false) {
 		!once && this.clear()
     let aniElements = swiper.slides[swiper.activeIndex].querySelectorAll('.ani')
-    aniElements.forEach((elem) => {
+    Array.prototype.forEach.call(aniElements, (elem) => {
       elem.style.visibility = 'visible'
 
       let animated = elem.attributes['animated'] ? elem.attributes['animated'] : ''
@@ -26,7 +26,7 @@ export default {
   },
   cache() {
     let aniElements = window.document.documentElement.querySelectorAll('.ani')
-    aniElements.forEach((elem) => {
+    Array.prototype.forEach.call(aniElements, (elem) => {
       elem.attributes['style'] ?
         elem.setAttribute('ani-style-cache', elem.attributes['style'].value) :
         elem.setAttribute('ani-style-cache', ' '), elem.style.visibility = 'hidden'
@@ -34,7 +34,7 @@ export default {
   },
   clear() {
     let aniElements = window.document.documentElement.querySelectorAll('.ani')
-    aniElements.forEach((elem) => {
+    Array.prototype.forEach.call(aniElements, (elem) => {
       elem.attributes['ani-style-cache'] && elem.setAttribute('style', elem.attributes['ani-style-cache'].value)
       elem.style.visibility = 'hidden'
       elem.className = elem.className.replace(' animated', '')

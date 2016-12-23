@@ -12,8 +12,8 @@
 </template>
 
 <script>
-import { store, getters, actions } from '../vuex'
 import LArticle from 'components/l-article'
+import server from '../server'
 
 export default {
   components: {
@@ -22,36 +22,17 @@ export default {
   route: {
     data({ to }) {
       const self = this
-      let promise = self.$http.get('owner/visitor/getHelpDetail', {
-        params: {
-          helpId: to.query.id
-        }
-      }).then(({ body })=>{
-        if(body.success){
-          self.info = body.data
-        }
-      })
-
-      self.$vux.loading.show()
-      Promise.all([promise]).finally(()=>{
+      server.faq.getHelpDetail(to.query.id).then( info => {
+        self.info = info
         self.$vux.loading.hide()
       })
+      self.$vux.loading.show()
     }
-  },
-  store,
-  vuex: {
-    getters
   },
   data() {
     return {
       info: {}
     }
-  },
-  methods: {
-
   }
 }
 </script>
-<style scoped lang="less">
-
-</style>

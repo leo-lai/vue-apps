@@ -214,6 +214,9 @@ export let utils = {
     // window.alert(msg)
     console.log(msg)
   },
+  debug(msg = '') {
+    // window.alert(window.JSON.stringify(msg))
+  },
   url: {
     getArgs(url) {
       if(typeof url !== 'string') url = window.location.href
@@ -261,6 +264,9 @@ export let utils = {
       hash && (url += '#'+hash)
       
       return url
+    },
+    reload(){
+      window.location.reload()
     },
     replace(url) {
       window.location.replace(url)

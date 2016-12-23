@@ -1,7 +1,7 @@
 <template>
   <div class="l-select-none">
     <blur class="l-user-avatar l-flex-hc" :blur-amount="15" :height="120" :url="defaultVal.avatarBg" v-link="'/user/info'">
-      <div class="avatar" :style="{'background-image': 'url('+ (userinfo.photo || userinfo.wxHeadPhoto || defaultVal.avatar) +')'}"></div>
+      <div class="avatar" :style="{'background-image': 'url('+ (userinfo.photo || defaultVal.avatar) +')'}"></div>
       <div v-if="userinfo.mobilePhone" class="l-rest">
         <h3 v-text="userinfo.realName || '未设置姓名'"></h3>
         <p v-text="userinfo.mobilePhone">13800138000</p>

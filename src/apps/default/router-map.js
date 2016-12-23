@@ -26,6 +26,10 @@ export default {
     mainPage: true,
     component: (resolve) => require([_PAGE + '/home'], resolve)
   },
+  '/order/tracking': {
+    title: '订单跟踪',
+    component: (resolve) => require([_PAGE + '/order-tracking'], resolve)
+  },
   '/wellife': {
     title: '智慧生活',
     component: (resolve) => require([_PAGE + '/wellife'], resolve)

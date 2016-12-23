@@ -48,6 +48,10 @@
         <img src="~assets/imgs/icon-008.jpg">
         <p>720展厅</p>
       </div>
+      <div class="l-flex-vhc l-grid-item" v-link="{path: '/order/tracking'}">
+        <img src="~assets/imgs/icon-014.jpg">
+        <p>订单跟踪</p>
+      </div>
     </div>
 
     <div class="l-flex-hc l-title-hd" v-link="{path: '/news/list'}">

@@ -3,16 +3,18 @@ import config from './config'
 
 Vue.http.options.root = config.getServerPath()
 
-const PROMISE = new Promise((resolve, reject) => {
-  resolve()
-})
+const PROMISE = function(response = '接口参数不正确') {
+  return new Promise((resolve) => {
+    resolve(response)
+  })
+}
 const ERROR_MSG = {
   api: '服务器繁忙，请稍后重试！'
 }
 export default {
   // 获取微信授权路径 url为绝对路径
   getGrantUrl(url, params) {
-    if(!url) return false
+    if(!url) return ''
 
     let appid = config.getAppid()
     url = utils.url.setArgs(url, params)
@@ -21,7 +23,7 @@ export default {
   },
   // 获取微信信息
   getWxByCode(code, callback) {
-    if(!code) return PROMISE
+    if(!code) return PROMISE()
     callback = utils.isFunction(callback) ? callback : utils.noop
 
     let promise = Vue.http.get('owner/getByCode', {
@@ -40,47 +42,78 @@ export default {
     return promise
   },
   // 获取jssdk授权配置
-  getWxConfig(url, callback) {
-    if(!utils.isString(url)) return PROMISE
-    url = url.split('#')[0]
-    callback = utils.isFunction(callback) ? callback : utils.noop
+  getWxConfig(url) {
+    url = url || storage.session.get('wx_url')
+    let self = this
+    let config = {
+      debug: false,
+      appId: '',
+      timestamp: '',
+      nonceStr: '',
+      signature: '',
+      jsApiList: ['onMenuShareTimeline', 'onMenuShareAppMessage', 'onMenuShareQQ', 'onMenuShareWeibo', 'onMenuShareQZone', 'chooseImage', 'previewImage', 'uploadImage', 'downloadImage', 'openLocation', 'getLocation', 'hideOptionMenu', 'showOptionMenu']
+    }
 
-    let promise = Vue.http.get('wx/frame/getWxSignature', {
-      params: { url }
-    }).then((response)=>{
-      if(!response.body.success){
-        utils.alert(response.body.message)
+    let promise = new Promise((resolve) => {
+      if(!window.wx){
+        utils.alert('找不到jweixin.js文件')
+        resolve({})
       }else{
-        let config = {
-          debug: false,
-          appId: response.body.data.appId,
-          timestamp: response.body.data.timestamp,
-          nonceStr: response.body.data.noncestr,
-          signature: response.body.data.signature,
-          jsApiList: [
-            'onMenuShareTimeline',
-            'onMenuShareAppMessage',
-            'onMenuShareQQ',
-            'onMenuShareWeibo',
-            'onMenuShareQZone',
-            'chooseImage',
-            'previewImage',
-            'uploadImage',
-            'downloadImage',
-            'openLocation',
-            'getLocation',
-            'hideOptionMenu',
-            'showOptionMenu'
-          ]
-        }
-        callback.call(promise, config)
-      }
-      return response
-    }, (error)=>{
-      utils.alert(ERROR_MSG.api)
-      return error
-    })
+        window.wx._ready = false
+        Vue.http.get('wx/frame/getWxSignature', {
+          params: { url, t: new Date().getTime() }
+        }).then(({ body })=>{
+          if(body.success){
+            config.appId = body.data.appId
+            config.timestamp = body.data.timestamp
+            config.nonceStr = body.data.noncestr
+            config.signature = body.data.signature
 
+            window.wx.config(config)
+
+            window.wx.ready(()=>{
+              wx.checkJsApi({
+                jsApiList: config.jsApiList,
+                success(res) {
+                  utils.debug(res)
+                  config.jsApiList.forEach((item)=>{
+                    if(window.wx._try){
+                      resolve(window.wx)
+                    }
+
+                    if(res.checkResult[item]){
+                      window.wx._ready = true
+                      window.wx._try = false
+                      resolve(window.wx)
+                      return true
+                    }
+                  })
+                }
+              })
+            })
+
+            window.wx.error((error)=>{
+              window.wx._ready = false
+              utils.debug(error)
+              if(!window.wx._try){
+                window.wx._try = true
+                self.getWxConfig(window.location.href)
+              }else{
+                resolve(window.wx) 
+              }
+            })
+
+            if(!utils.device.isWechat){
+              resolve(window.wx)
+            }
+          }else{
+            resolve(window.wx)
+          }
+        }, (error)=>{
+          resolve(window.wx)
+        })
+      }
+    })
     return promise
   },
   // 获取临时二维码
@@ -102,7 +135,7 @@ export default {
   sendMobiCode(phone, btn) {
     if(!utils.regexp.mobile.test(phone)){
       utils.alert('请输入正确手机号码')
-      return PROMISE
+      return PROMISE()
     }
       
     btn.setAttribute('disabled', true)
@@ -142,77 +175,92 @@ export default {
     return promise
   },
   // 获取当前地理位置(经纬度)
-  getPosition(success = utils.noop, error = utils.noop) {
-    let lng = storage.local.get('lng')
-    let lat = storage.local.get('lat')
-    let position = {
-      coords: {
-        longitude: lng,
-        latitude: lat
+  getPosition() {
+    // let position = storage.local.get('position') || {}
+    let position = {}
+    // 方圆E时光
+    // position = { 
+    //   latitude: 23.1292,
+    //   longitude: 113.3671,
+    //   speed: -1,
+    //   accuracy: 105.7295
+    // }
+    storage.local.set('position', position, 1000 * 1800)
+
+    let promise = new Promise((resolve)=>{
+      if(position.latitude){
+        resolve(position)
+      }else{
+        if(utils.device.isWechat){
+          this.getWxConfig().then((wx)=>{
+            wx.getLocation({
+              type: 'wgs84', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+              success(res) {
+                position = res
+                storage.local.set('position', position, 1000 * 1800)
+                resolve(position)
+              }
+            })
+            if(wx._try && !wx._ready){
+              resolve(position)
+            }
+          })
+        }else{
+          navigator.geolocation.getCurrentPosition( (response) => {
+            position.latitude = response.coords.latitude
+            position.longitude = response.coords.longitude
+            storage.local.set('position', position, 1000 * 1800)
+            resolve(position)
+          }, error => {
+            let errHtml = ''
+            switch(error.code){ 
+              case error.PERMISSION_DENIED: 
+                errHtml = "用户拒绝对获取地理位置的请求。" 
+                break
+              case error.POSITION_UNAVAILABLE: 
+                errHtml = "位置信息是不可用的。" 
+                break
+              case error.TIMEOUT: 
+                errHtml = "请求用户地理位置超时。" 
+                break
+              case error.UNKNOWN_ERROR: 
+                errHtml = "未知错误。" 
+                break
+            } 
+            console.log('获取当前地理位置失败:'+ errHtml)
+            position.error = errHtml
+            resolve(position)
+          })
+        }
       }
-    }
-    let promise = PROMISE
+    })
 
-    if(lng && lat){
-      success(position)
-      return promise
-    }
-
-    if(navigator && navigator.geolocation){
-      promise = new Promise((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition( position => {
-          lng = position.coords.longitude
-          lat = position.coords.latitude
-          storage.local.set('lng', lng, 1000 * 1800)
-          storage.local.set('lat', lat, 1000 * 1800)
-          success(position)
-          resolve(position)
-        }, err => {
-          let errHtml = ''
-          switch(error.code){ 
-            case error.PERMISSION_DENIED: 
-              errHtml = "用户拒绝对获取地理位置的请求。" 
-              break
-            case error.POSITION_UNAVAILABLE: 
-              errHtml = "位置信息是不可用的。" 
-              break
-            case error.TIMEOUT: 
-              errHtml = "请求用户地理位置超时。" 
-              break
-            case error.UNKNOWN_ERROR: 
-              errHtml = "未知错误。" 
-              break
-          } 
-          console.log('获取当前地理位置失败:'+ errHtml)
-          error(err, errHtml)
-          resolve(err, errHtml)
-        }) 
-      })
-    }
     return promise
   },
   // 获取当前地理位置(地址)
-  getAddress(success = utils.noop, error = utils.noop) {
+  getAddress(callback) {
+    callback = utils.isFunction(callback) ? callback : utils.noop
+    let address = storage.local.get('address')
+    if(address){
+      callback(address)
+      return PROMISE(address)
+    }
     // 使用腾讯地图WebService API
-    this.getPosition( position => {
-      let address = storage.local.get('address')
-      if(address){
-        success(address)
-        return
-      }
-      Vue.http.jsonp('http://apis.map.qq.com/ws/geocoder/v1/', {
+    return this.getPosition().then( (position) => {
+      let promise = Vue.http.jsonp('http://apis.map.qq.com/ws/geocoder/v1/', {
         params: {
-          location: position.coords.latitude + ',' + position.coords.longitude,
+          location: position.latitude + ',' + position.longitude,
           key: 'GPIBZ-V7YH3-CD735-3HDQM-CNM3F-4PFQP',
           output: 'jsonp'
         }
       }).then(({ body })=>{
         if(body.status == 0){
           storage.local.set('address', body.result, 1000 * 1800);
-          success(body.result)
+          callback(body.result)
         }
       })
-    }, error)
+      return promise
+    })
   },
   // 获取两个经纬度的距离
   getDistance({ lng1 = 0, lat1 = 0 }, { lng2 = 0, lat2 = 0 }) {
@@ -254,7 +302,7 @@ export default {
       return 0
     }
 
-    return (m/1000).toFixed(2)
+    return Number((m/1000).toFixed(2))
   },
   // 新人福利
   welfare: {
@@ -279,7 +327,7 @@ export default {
     },
     // 获取新人福利分享信息
     getShareList(wxOpenId) {
-      if(!wxOpenId) return PROMISE
+      if(!wxOpenId) return PROMISE()
 
       let promise = Vue.http.get('owner/visitor/getShareList', {
         params: { 
@@ -300,7 +348,7 @@ export default {
     },
     // 获取活动礼品列表
     getGiftList(wxOpenId = 'opILHvwh76lIxO5xo3S6CoO-jNy0') {
-      if(!wxOpenId) return PROMISE
+      if(!wxOpenId) return PROMISE()
 
       let promise = Vue.http.get('owner/visitor/getGiftList', {
         params: { 
@@ -352,7 +400,7 @@ export default {
       return promise
     },
     getInfo(id) {
-      if(!id)  return PROMISE
+      if(!id)  return PROMISE()
       let promise = Vue.http.get('owner/visitor/getPublishDetail', {
         params: {
           publishId: id
@@ -372,7 +420,7 @@ export default {
   // 优惠券
   coupon: {
     getList(phoneNum, type = 0) {
-      if(!phoneNum) return PROMISE
+      if(!phoneNum) return PROMISE()
       switch(type){
         case 1:
           type = 1
@@ -401,7 +449,7 @@ export default {
       return promise
     },
     getInfo(id) {
-      if(!id)  return PROMISE
+      if(!id)  return PROMISE()
       let promise = Vue.http.get('owner/visitor/getCouponDetail', {
         params: {
           id
@@ -438,11 +486,11 @@ export default {
       return promise
     },
     getInfo(id) {
-      if(!id)  return PROMISE
+      if(!id)  return PROMISE()
       return this.getList(id)
     },
     receive(phoneNum, activityFkid, couponFkid) {
-      if(!phoneNum)  return PROMISE
+      if(!phoneNum)  return PROMISE()
       let promise = Vue.http.post('owner/visitor/addCouponUserRelations', {
         phoneNum,  activityFkid, couponFkid
       }).then((response)=>{
@@ -460,37 +508,52 @@ export default {
   // 我的订单
   order: {
     getList(phoneOrNo) {
-      if(!phoneOrNo) return PROMISE
-
-      let promise = Vue.http.get('owner/visitor/getOrderList', {
-        params: {
-          phoneOrNo
+      let ret = []
+      let promise = new Promise((resolve, reject)=>{
+        if(!phoneOrNo){
+          resolve(ret)
+        }else{
+          Vue.http.get('owner/visitor/getOrderList', {
+            params: {
+              phoneOrNo
+            }
+          }).then(({ body })=>{
+            if(body.success && body.data){
+              resolve(body.data.rowsObject)
+            }else{
+              resolve(ret)
+              utils.alert.call(Vue, body.message)
+            }
+          }, (error)=>{
+            resolve(ret)
+            utils.alert.call(Vue, ERROR_MSG.api)
+          })
         }
-      }).then((response)=>{
-        if(!response.body.success){
-          utils.alert(response.body.message)
-        }
-        return response
-      }, (error)=>{
-        utils.alert(ERROR_MSG.api)
-        return error
       })
       return promise
     },
-    getInfo(id) {
-      if(!id)  return PROMISE
-      let promise = Vue.http.get('owner/visitor/getOrderDetail', {
-        params: {
-          orderId: id
+    getInfo(orderId) {
+      let ret = {}
+      let promise = new Promise((resolve, reject)=>{
+        if(!orderId){
+          resolve(ret)
+        }else{
+          Vue.http.get('owner/visitor/getOrderDetail', {
+            params: {
+              orderId
+            }
+          }).then(({ body })=>{
+            if(body.success && body.data){
+              resolve(body.data)
+            }else{
+              resolve(ret)
+              utils.alert.call(Vue, body.message)
+            }
+          }, (error)=>{
+            resolve(ret)
+            utils.alert.call(Vue, ERROR_MSG.api)
+          })
         }
-      }).then((response)=>{
-        if(!response.body.success){
-          utils.alert(response.body.message)
-        }
-        return response
-      }, (error)=>{
-        utils.alert(ERROR_MSG.api)
-        return error
       })
       return promise
     }
@@ -511,7 +574,7 @@ export default {
       return promise
     },
     getList(type) {
-      if(!type) return PROMISE
+      if(!type) return PROMISE()
 
       let promise = Vue.http.get('owner/visitor/getProductList', {
         params: {
@@ -530,7 +593,7 @@ export default {
       return promise
     },
     getInfo(id) {
-      if(!id)  return PROMISE
+      if(!id)  return PROMISE()
       let promise = Vue.http.get('owner/visitor/getProductDetail', {
         params: {
           productId: id
@@ -543,6 +606,122 @@ export default {
       }, (error)=>{
         utils.alert(ERROR_MSG.api)
         return error
+      })
+      return promise
+    }
+  },
+  faq: {
+    getHelpList() {
+      let ret = []
+      let promise = new Promise((resolve, reject)=>{
+        Vue.http.get('owner/visitor/getHelpList')
+        .then(({ body })=>{
+          if(body.success && body.data){
+            resolve(body.data.rowsObject)
+          }else{
+            resolve(ret)
+            utils.alert.call(Vue, body.message)
+          }
+        }, (error)=>{
+          resolve(ret)
+          utils.alert.call(Vue, ERROR_MSG.api)
+        })
+      })
+      return promise
+    },
+    getHelpDetail(id){
+      let ret = {}
+      let promise = new Promise((resolve, reject)=>{
+        if(!id){
+          resolve(ret)
+        }else{
+          Vue.http.get('owner/visitor/getHelpDetail', {
+            params: {
+              helpId: id
+            }
+          }).then(({ body })=>{
+            if(body.success && body.data){
+              resolve(body.data)
+            }else{
+              resolve(ret)
+              utils.alert.call(Vue, body.message)
+            }
+          }, (error)=>{
+            resolve(ret)
+            utils.alert.call(Vue, ERROR_MSG.api)
+          })
+        }
+      })
+      return promise
+    },
+    getFeedBackList(userId) {
+      let ret = []
+      let promise = new Promise((resolve, reject)=>{
+        if(!userId){
+          resolve(ret)
+        }else{
+          Vue.http.get('owner/getMyFeedBackList', {
+            params: {
+              clientId: userId
+            }
+          }).then(({ body })=>{
+            if(body.success && body.data){
+              resolve(body.data.rowsObject)
+            }else{
+              resolve(ret)
+              utils.alert.call(Vue, body.message)
+            }
+          }, (error)=>{
+            resolve(ret)
+            utils.alert.call(Vue, ERROR_MSG.api)
+          })
+        }
+      })
+      return promise
+    },
+    getFeedBackDetail(id){
+      let ret = {}
+      let promise = new Promise((resolve, reject)=>{
+        if(!id){
+          resolve(ret)
+        }else{
+          Vue.http.get('owner/getMyFeedBackDetail', {
+            params: {
+              feedBackId: id
+            }
+          }).then(({ body })=>{
+            if(body.success && body.data){
+              resolve(body.data)
+            }else{
+              resolve(ret)
+              utils.alert.call(Vue, body.message)
+            }
+          }, (error)=>{
+            resolve(ret)
+            utils.alert.call(Vue, ERROR_MSG.api)
+          })
+        }
+      })
+      return promise
+    },
+    getEditFeedBack(id){
+      let ret = {}
+      let promise = new Promise((resolve, reject)=>{
+        if(!id){
+          resolve(ret)
+        }else{
+          Vue.http.post('owner/editFeedBack', {
+            id
+          }).then(({ body })=>{
+            if(body.success && body.data){
+              resolve(body.data)
+            }else{
+              resolve(ret)
+            }
+          }, (error)=>{
+            resolve(ret)
+          })
+        }
       })
       return promise
     }

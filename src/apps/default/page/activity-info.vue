@@ -74,7 +74,7 @@ export default {
         server.activity.receive(self.userinfo.mobilePhone, self.info.id, self.info.couponFkid)
         .then(({ body })=>{
           self.$vux.loading.hide()
-          if(response.body.success){
+          if(body.success){
             self.$vux.toast.show({
               text: body.message || '领取成功',
               onHide() {

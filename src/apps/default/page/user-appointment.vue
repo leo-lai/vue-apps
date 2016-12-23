@@ -1,10 +1,18 @@
 <template>
   <div>
-    <div class="l-flex-hc l-appointment-item" v-for="item in list" @click="view(item.id)">
+    <div class="l-flex-hc l-appointment-item l-border-b" v-for="item in list" @click="view(item.id)">
       <div class="l-rest">
-        <p><i class="iconfont">&#xe6d0;</i>&nbsp;&nbsp;<strong>{{item.name}}</strong>&nbsp;&nbsp;&nbsp;&nbsp;{{item.mobilePhone}}</p>
-        <p>{{item.appointDate}}&nbsp;&nbsp;&nbsp;&nbsp;<b>{{getStatus(item.state)}}</b></p>
-        <p>{{item.province+item.city+item.area+(item.address||'')}}</p>
+        <p>
+          <span class="l-fr">{{getDate(item.appointDate)}}</span>
+          <i class="iconfont">&#xe6d0;</i>&nbsp;
+          <strong>{{item.billCode}}</strong>
+        </p>
+        <p>
+          <b class="l-fr">{{getStatus(item.state)}}</b>
+          <span>{{item.name}}</span>&nbsp;&nbsp;&nbsp;
+          <span>{{item.mobilePhone}}</span>
+        </p>
+        <p><span>{{item.province+item.city+item.area+(item.address||'')}}</span></p>
       </div>
       <div>
         <i class="iconfont icon-arrow">&#xe601;</i>
@@ -77,6 +85,10 @@ export default {
           return '已生成订单'
       }
     },
+    getDate(datetime) {
+      if(!datetime) return ''
+      return datetime.split(' ')[0]
+    },
     view(id) {
       this.$router.go(`/user/appointment/info?id=${id}`)
     }
@@ -88,12 +100,17 @@ export default {
 <style scoped lang="less">
 .l-appointment-item{
   color: #999;
-  padding: 0.4rem;
-  margin:0 0 0.4rem 0;
+  padding: 0.266667rem 0.4rem;
   background-color: #fff;
   font-size: 14px;
+  .iconfont{
+    font-size: 18px;
+  }
+  p{
+    margin: 5px 0;
+  }
   strong {
-    font-size: 16px;
+    font-weight: 400;
     color: #333;
   }
   b{

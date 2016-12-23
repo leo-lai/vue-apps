@@ -26,33 +26,24 @@
 
 <script>
 import { XButton } from 'vux-components'
-import LArticle from 'components/l-article'
 import { store, getters, actions } from '../vuex'
 import config from '../config'
-
+import server from '../server'
 
 export default {
   components: {
-    LArticle, XButton
+    XButton
   },
   route: {
-    data(transition) {
+    data({ to }) {
       const self = this
-      let promise = self.$http.get('owner/getMyFeedBackDetail', {
-        params: {
-          feedBackId: transition.to.query.id
-        }
-      }).then(({ body })=>{
-        if(body.success){
-          self.info = body.data
-          self.feedBackReplyList = body.data.feedBackReplyPage.rowsObject
-        }
-      })
-
-      self.loading = true
-      Promise.all([promise]).finally(()=>{
+      server.faq.getFeedBackDetail(to.query.id).then( info => {
+        self.info = info
+        self.feedBackReplyList = info.feedBackReplyPage.rowsObject
         self.loading = false
       })
+      // 设置已读
+      server.faq.getEditFeedBack(to.query.id)
     }
   },
   store,
@@ -62,7 +53,7 @@ export default {
   data() {
     return {
       loading: true,
-      meAvatar: this.userinfo.photo || this.userinfo.wxHeadPhoto || config.defaultVal.avatar,
+      meAvatar: this.userinfo.photo || config.defaultVal.avatar,
       kefuAvatar: require('assets/imgs/kefu.jpg') || config.defaultVal.avatar,
       feedBackReplyList: [],
       info: {},

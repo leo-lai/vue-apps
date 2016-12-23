@@ -7,39 +7,77 @@
       <p>手机号码：<span v-text="info.mobilePhone"></span></p>
       <p>楼盘地址：<span v-text="info.province+info.city+info.area+(info.address||'')"></span></p>
     </div>
+
+    <div class="l-status">
+      <div class="l-status-item l-flex-h" v-for="item in statusList" :class="{'l-finish': item.done}">
+        <div>
+          <img :src="item.icon">
+          <p v-text="item.datetime"></p>
+        </div>
+        <div>
+          <h4 v-text="item.title"></h4>
+          <p v-text="item.remark"></p>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 <script>
-import { store, getters, actions } from '../vuex'
-import { Divider, XButton, Dialog, Group } from 'vux-components'
 import server from '../server'
 export default {
-  components: {
-    Divider, XButton, Dialog, Group
-  },
   route: {
-    data(transition) {
+    data({ to }) {
       const self = this
-      let id = transition.to.query.id
-      let promise = server.order.getInfo(id).then(({ body })=>{
-        if(body.success && body.data){
-          self.info = body.data
-        }
-      })
-
-      self.$vux.loading.show()
-      Promise.all([promise]).finally(()=>{
+      let id = to.query.id
+      server.order.getInfo(id).then( info => {
         self.$vux.loading.hide()
+        let status = null
+        self.info = info
+        info.scheduleVoList.forEach((item, index)=>{
+          status = self.statusList[index]
+          status.datetime = item.createTime
+          status.remark = item.remark
+          status.done = true
+          self.statusList.$set(index, status)
+        })
       })
+      self.$vux.loading.show()
     }
-  },
-  store,
-  vuex: {
-    getters
   },
   data() {
     return {
-      info: {}
+      info: {},
+      statusList: [{
+        icon: require('assets/imgs/icon-009.png'),
+        datetime: '',
+        title: '确认订单',
+        remark: '',
+        done: false
+      },{
+        icon: require('assets/imgs/icon-010.png'),
+        datetime: '',
+        title: '已经生产完成',
+        remark: '',
+        done: false
+      },{
+        icon: require('assets/imgs/icon-011.png'),
+        datetime: '',
+        title: '产品入库中',
+        remark: '',
+        done: false
+      },{
+        icon: require('assets/imgs/icon-012.png'),
+        datetime: '',
+        title: '产品出库',
+        remark: '',
+        done: false
+      },{
+        icon: require('assets/imgs/icon-013.png'),
+        datetime: '',
+        title: '已经发货，预计30天后到达',
+        remark: '',
+        done: false
+      }]
     }
   },
   methods: {
@@ -72,6 +110,76 @@ export default {
   }
   span{
     color: #999;
+  }
+}
+.l-status{
+  background-color: #fff;
+}
+.l-status-item{
+  *{
+    box-sizing: border-box;
+    word-break: break-all;
+  }
+  p{
+    color: #999;
+    font-size: 14px;
+    line-height: 1.2;
+  }
+  >div{
+    padding:15px 20px;
+  }
+  >div:nth-child(1){
+    width: 40%;
+    border-right: 1px solid #4083c7;
+    text-align: right;
+    p{
+      width: 80px;
+      text-align: center;
+      float: right;
+    }
+    img{
+      width: 50px;
+      margin: 5px 15px;
+      filter: grayscale(100%);
+      filter: gray;
+      opacity: 0.5;
+    }
+  }
+  >div:nth-child(2){
+    width: 60%; 
+    p{
+      margin-top: 5px;
+    }
+    h4{
+      margin-top: 24px;
+      position: relative;
+      color: #999;
+      line-height: 1.2;
+    }
+    h4:before{
+      content: '';
+      border: 7px solid #4083c7;
+      position: absolute;
+      left: -28px;
+      width: 0;
+      height: 0;
+      font-size: 0;
+      transform: rotate(45deg);
+      top: 1px;
+    }
+  }
+}
+.l-finish{
+  div:nth-child(1){
+    img{
+      filter: none;
+      opacity: 1;
+    }
+  }
+  div:nth-child(2){
+    h4{
+      color: inherit;
+    }
   }
 }
 </style>

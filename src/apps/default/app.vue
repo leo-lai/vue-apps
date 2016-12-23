@@ -35,6 +35,7 @@
 import $ from 'sprint-js'
 import { Tabbar, TabbarItem, ViewBox, XHeader } from 'vux-components'
 import { store, getters, actions } from './vuex'
+import server from './server'
 
 export default {
   components: {

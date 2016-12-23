@@ -49,6 +49,9 @@ router.redirect({
 // store.state.route.query
 sync(store, router)
 
+// 记录首次进入app的路径，用于微信授权登录
+storage.session.set('wx_url', window.location.href)
+
 // 跳转站外链接
 router.beforeEach(({to, next, abort}) => {
 

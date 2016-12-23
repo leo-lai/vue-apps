@@ -53,14 +53,15 @@ export default {
 
       self.$vux.loading.show('登录中')
       self.$http.post('owner/visitor/login', self.formData)
-        .then((response) => {
+        .then(({ body }) => {
           self.$vux.loading.hide()
-          if(response.body.success){
-            storage.local.set('userinfo', response.body.data)
+          if(body.success){
+            body.data.photo = self.$image.wxHead( body.data.photo || body.data.wxHeadPhoto )
+            storage.local.set('userinfo', body.data)
             self.acUpdateUserInfo()
             self.$router.replace( prevPath ? prevPath.indexOf('/register') === 0 ? '/' : prevPath : '/' )
           }else{
-            self.$vux.toptips.show(response.body.message || '登录失败')
+            self.$vux.toptips.show(body.message || '登录失败')
           }
         }, (error) => {
           self.$vux.loading.hide()

@@ -4,7 +4,7 @@
       <div class="l-flex-h l-thumb">
         <img :src="$image.thumb(info.thumbnail, 80, 80)">
         <div class="l-rest">
-          <span class="l-fr l-fgray"><i class="iconfont">&#xe634;</i>{{info.distance}}km</span>
+          <span class="l-fr l-fgray l-fsize-sm">{{info.distance}}km</span>
           <h3 v-text="info.storeName"></h3>
         </div>
       </div>
@@ -33,23 +33,21 @@ import { Group, Cell, Previewer, Dialog } from 'vux-components'
 import { utils, storage } from 'assets/lib'
 import config from '../config'
 import server from '../server'
-import wx from 'weixin-js-sdk'
+// import wx from 'weixin-js-sdk'
 
 export default {
   components: {
     Group, Cell, Previewer, Dialog
   },
   route: {
-    data(transition) {
+    data({ to }) {
       const self = this
-      let promise1 = self.$http.get('owner/visitor/getStoreDetail', {
+      self.$http.get('owner/visitor/getStoreDetail', {
         params: {
-          storeId: transition.to.query.id
+          storeId: to.query.id
         }
-      })
-
-      promise1.then(({ body })=>{
-        if(body.success){
+      }).then(({ body })=>{
+        if(body.success && body.data){
           self.info = body.data
           if(self.info.storeImgList){
             self.storeImgList = self.info.storeImgList.map((item) => {
@@ -60,36 +58,24 @@ export default {
               }
             })
           }
+          return self.info
         }
-      })
-
-      let promise2 = server.getPosition()
-
-      // jssdk授权
-      let promise3 = server.getWxConfig(window.location.href, ( config )=>{
-        wx.config(config)
-        wx.ready(()=>{
-          self.wxReay = true
-        })
-        wx.error((res)=>{
-          self.wxReay = false
-        })
-      })
-
-      self.$vux.loading.show()
-      Promise.all([promise1, promise2, promise3]).finally(()=>{
-        let lng = storage.local.get('lng')
-        let lat = storage.local.get('lat')
-
-        self.info.distance = server.getDistance({
-            lng1: lng, 
-            lat1: lat
+        return {}
+      }).then((info)=>{
+        server.getPosition().then((position)=>{
+          self.$vux.loading.hide()
+          let distance = server.getDistance({
+            lng1: position.longitude, 
+            lat1: position.latitude
           }, {
             lng2: self.info.longitude,
             lat2: self.info.latitude
           })
-        self.$vux.loading.hide()
+          self.$set('info.distance', distance)
+        })
       })
+
+      self.$vux.loading.show()
     }
   },
   data() {
@@ -115,13 +101,15 @@ export default {
   },
   methods: {
     openMap(storeEntity) {
-      wx.openLocation({
-        latitude: storeEntity.latitude,  
-        longitude: storeEntity.longitude, 
-        name: storeEntity.storeName,
-        address: storeEntity.address, 
-        scale: 15, // 地图缩放级别,整形值,范围从1~28。默认为最大
-        infoUrl: '' // 在查看位置界面底部显示的超链接,可点击跳转
+      server.getWxConfig().then((wx)=>{
+        wx.openLocation({
+          latitude: storeEntity.latitude,  
+          longitude: storeEntity.longitude, 
+          name: storeEntity.storeName,
+          address: storeEntity.address, 
+          scale: 15, // 地图缩放级别,整形值,范围从1~28。默认为最大
+          infoUrl: '' // 在查看位置界面底部显示的超链接,可点击跳转
+        })
       })
     }
   }

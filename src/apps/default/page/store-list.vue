@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="l-flex-hc l-store-item" v-for="item in list | orderBy 'distance'" v-link="{path: '/store/list/info?id=' + item.id}">
+    <div class="l-flex-hc l-store-item" v-for="item in list | orderBy 'distance' 1" v-link="{path: '/store/list/info?id=' + item.id}">
       <div class="l-thumb"><img :src="$image.thumb(item.thumbnail, 80, 80)"></div>
       <div class="l-rest">
         <h3 v-text="item.storeName"></h3>
@@ -20,68 +20,61 @@
 </template>
 <script>
 import { utils, storage } from 'assets/lib'
+import { store, getters, actions } from '../vuex'
 import config from '../config'
 import server from '../server'
-import wx from 'weixin-js-sdk'
+// import wx from 'weixin-js-sdk'
 
 export default {
+  store,
+  vuex: {
+    getters, actions
+  },
   route: {
     data() {
       const self = this
-      let storeList = []
-      let promise1 = self.$http.get('owner/visitor/getStoreList').then(({ body })=>{
+      
+      self.$http.get('owner/visitor/getStoreList')
+      .then(({ body })=>{
         if(body.success && body.data){
-          // 计算距离
-          storeList = body.data.rowsObject
+          return body.data.rowsObject
         }
-      })
-      let promise2 = server.getPosition()
-
-      // jssdk授权
-      let promise3 = server.getWxConfig(window.location.href, ( config )=>{
-        wx.config(config)
-        wx.ready(()=>{
-          self.wxReay = true
-        })
-        wx.error((res)=>{
-          self.wxReay = false
-        })
-      })
-
-      self.loading = true
-      Promise.all([promise1, promise2, promise3]).finally(()=>{
-        let lng = storage.local.get('lng')
-        let lat = storage.local.get('lat')
-        self.list = storeList.map( item => {
-          item.distance = server.getDistance({
-            lng1: lng, 
-            lat1: lat
-          }, {
-            lng2: item.longitude,
-            lat2: item.latitude
+        return []
+      }).then((list)=>{
+        server.getPosition().then((position)=>{
+          self.loading = false
+          self.list = list.map((item) => {
+            item.distance = server.getDistance({
+              lng1: position.longitude, 
+              lat1: position.latitude
+            }, {
+              lng2: item.longitude,
+              lat2: item.latitude
+            })
+            return item
           })
-          return item
         })
-        self.loading = false
       })
+      self.loading = true
     }
   },
   data() {
     return {
-      wxReay: false,
       loading: true,
       list: []
     }
   },
   methods: {
     openMap(storeEntity) {
-      wx.openLocation({
-        latitude: storeEntity.latitude,  
-        longitude: storeEntity.longitude, 
-        name: storeEntity.storeName,
-        address: storeEntity.address, 
-        scale: 15, // 地图缩放级别,整形值,范围从1~28。默认为最大
-        infoUrl: '' // 在查看位置界面底部显示的超链接,可点击跳转
+      server.getWxConfig().then((wx)=>{
+        wx.openLocation({
+          latitude: storeEntity.latitude,  
+          longitude: storeEntity.longitude, 
+          name: storeEntity.storeName,
+          address: storeEntity.address, 
+          scale: 15, // 地图缩放级别,整形值,范围从1~28。默认为最大
+          infoUrl: '' // 在查看位置界面底部显示的超链接,可点击跳转
+        })
       })
     }
   }

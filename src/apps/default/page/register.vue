@@ -38,7 +38,7 @@ export default {
     data() {
       let wxinfo = storage.session.get('wxinfo')
       if(wxinfo && wxinfo.wxHeadPhoto){
-        this.avatar = wxinfo.wxHeadPhoto
+        this.avatar = this.$image.wxHead(wxinfo.wxHeadPhoto)
       }
     },
     canActivate(transition){

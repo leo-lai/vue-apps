@@ -28,7 +28,7 @@ import { utils, storage } from 'assets/lib'
 import { store, actions, getters } from '../vuex'
 import config from '../config'
 import server from '../server'
-import wx from 'weixin-js-sdk'
+// import wx from 'weixin-js-sdk'
 
 export default {
   components: {
@@ -58,27 +58,21 @@ export default {
         }
       })
       // jssdk授权
-      let promise2 = server.getWxConfig(window.location.href, ( config )=>{
-        wx.config(config)
-        wx.ready(()=>{
-          let url = utils.url.setArgs(window.location.href, {
-            isFriend: new Date().getTime(),
-            wxOpenId,
-            wxUnionId
-          })
-          const shareConfig = {
-            title: '考验友谊的时候到了，来帮我拼人脉吧~',                     // 分享标题
-            desc: '我正在参加艾臣安全智能门窗新人领福利活动，速来围观！',     // 分享描述
-            link: url,                                                        // 分享链接
-            imgUrl: require('assets/imgs/temp-053.png')                       // 分享图标
-          }
-          // 分享到朋友圈/好友
-          wx.onMenuShareTimeline(shareConfig)
-          wx.onMenuShareAppMessage(shareConfig)
+      let promise2 = server.getWxConfig().then((wx)=>{
+        let url = utils.url.setArgs(window.location.href, {
+          isFriend: new Date().getTime(),
+          wxOpenId,
+          wxUnionId
         })
-        wx.error((res)=>{
-          console.log(res)
-        })
+        const shareConfig = {
+          title: '考验友谊的时候到了，来帮我拼人脉吧~',                     // 分享标题
+          desc: '我正在参加艾臣安全智能门窗新人领福利活动，速来围观！',     // 分享描述
+          link: url,                                                        // 分享链接
+          imgUrl: require('assets/imgs/temp-053.png')                       // 分享图标
+        }
+        // 分享到朋友圈/好友
+        wx.onMenuShareTimeline(shareConfig)
+        wx.onMenuShareAppMessage(shareConfig)
       })
 
       self.$vux.loading.show()
