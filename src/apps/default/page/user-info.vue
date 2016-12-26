@@ -1,7 +1,7 @@
 <template>
   <div>
     <group class="l-group l-user-info">
-      <cell title="头像" :is-link="true">
+      <cell title="头像">
         <img class="avatar" slot="value" width="50" height="50" :src="formData.photo || defaultVal.avatar">
       </cell>
       <cell title="手机号码" :value="userinfo.mobilePhone"></cell>

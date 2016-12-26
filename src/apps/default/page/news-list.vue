@@ -1,75 +1,74 @@
 <template>
-  <div>
-    <div class="l-news-list l-margin-b">
-      <div class="l-flex-hc l-news-item l-border-t" v-for="item in news.data" v-link="{path:'/news/list/info?id=' + item.id}">
-        <div class="l-thumb">
-          <img :src="$image.thumb(item.thumb, 60, 60)">
-        </div>
-        <div class="l-rest">
-          <h4 class="l-text-wrap" v-text="item.title"></h4>
-          <p class="l-text-clamp2" v-text="item.summary"></p>
-        </div>
-        <div>
-          <i class="iconfont icon-arrow">&#xe601;</i>
-        </div>
+  <div style="height:100%;">
+    <scroller v-ref:scroller lock-x scrollbar-y use-pullup use-pulldown 
+      @pullup:loading="loadMore" @pulldown:loading="refresh" 
+      :pulldown-status.sync="scroller.pulldownStatus"
+      :pullup-status.sync="scroller.pullupStatus">
+      <news-list :list="news.list" :loading="news.loading"></news-list>
+
+      <!--pulldown slot-->
+      <div slot="pulldown" class="l-pulldown">
+        <span v-show="scroller.pulldownStatus === 'down'">下拉刷新</span>
+        <span v-show="scroller.pulldownStatus === 'up'">释放刷新</span>
+        <span v-show="scroller.pulldownStatus === 'loading'"><spinner type="ios-small"></spinner></span>
       </div>
-      <div v-if="news.loading" class="l-loading"></div>
-    </div>
+      <!--pullup slot-->
+      <div slot="pullup" class="l-pullup">
+        <span v-show="scroller.pullupStatus === 'down'">释放加载更多</span>
+        <span v-show="scroller.pullupStatus === 'up'">{{scroller.pullupText}}</span>
+        <span v-show="scroller.pullupStatus === 'loading'"><spinner type="ios-small"></spinner>正在加载</span>
+      </div>
+    </scroller>
   </div>
 </template>
 <script>
+import { Scroller, Spinner } from 'vux-components'
+import NewsList from '../components/news-list'
 import server from '../server'
 
 export default {
-  created() {
-    const self = this
-    let promise = server.news.getList().then(({ body })=>{
-      if(body.success){
-        self.news.data = body.data.rowsObject
+  components: {
+    Scroller, Spinner, NewsList
+  },
+  route: {
+    data() {
+      this.newsList = server.news.getList(()=>{
+        this.news.loading = !this.newsList.isAjax
+        this.news.list = this.newsList.alldata  
+      })
+    }
+  },
+  methods: {
+    loadMore (uuid) {
+      this.newsList.next()
+      if(this.newsList.isNull){
+        this.scroller.pullupText = '没有更多了'
       }
-    })
-
-    self.news.loading = true
-    Promise.all([promise]).finally(()=>{
-      self.news.loading = false
-    })
+      this.$nextTick(() => {
+        this.$broadcast('pullup:reset', uuid)
+      })
+    },
+    refresh (uuid) {
+      this.newsList.init()
+      this.$nextTick(() => {
+        this.scroller.pullupText = '上拉加载更多'
+        this.$broadcast('pulldown:reset', uuid)
+      })
+    }
   },
   data() {
     return {
+      scroller: {
+        pulldownStatus: 'default',
+        pullupStatus: 'default',
+        pullupText: '上拉加载更多'
+      },
       news: {
         loading: true,
-        data: []
+        list: []
       }
     }
   }
 }
 </script>
-<style scoped lang="less">
-.l-news-item{
-  background-color: #fff;
-  padding: 0.266667rem;
-  .l-thumb{
-    width: 1.6rem;
-    height: 1.6rem;
-    margin-right: 0.266667rem;
-    img{
-      width: 100%;
-      height: 100%;
-    }
-  }
-  .l-rest{
-    h4{
-      font-size: 17px;
-      font-weight: 400;
-      margin-bottom: 5px;
-    }
-    p{
-      color: #999;
-      font-size: 12px;
-    }
-  }
-}
-.l-news-item:active{
-  background-color: #ebebeb;
-}
-</style>
+

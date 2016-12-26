@@ -18,32 +18,27 @@
         <i class="iconfont icon-arrow">&#xe601;</i>
       </div>
     </div>
+    <div class="l-center l-margin l-padding" v-if="!loading && list.length === 0">
+      <img class="l-center" style="width:3.75rem;" src="~assets/imgs/none.jpg">
+      <p class="l-fgray l-fsize-s l-margin-t">暂无内容</p>
+    </div>
     <div v-if="loading" class="l-loading"><br><br><br><br><br></div>
   </div>
 </template>
 <script>
-import { store, getters, actions } from '../vuex'
 import { Search, Sticky } from 'vux-components'
+import { store, getters, actions } from '../vuex'
+import server from '../server'
 export default {
   components: {
     Search, Sticky
   },
   route: {
-    data(transition) {
+    data({ to }) {
       const self = this
-      let promise = self.$http.get('owner/visitor/getAppointList', {
-        params: {
-          mobilePhone: transition.to.query.phone || self.userinfo.mobilePhone,
-          rows: 50
-        }
-      }).then(({ body })=>{
-        if(body.success){
-          self.list = body.data.rowsObject
-        }
-      })
-
-      self.loading = true
-      Promise.all([promise]).finally(()=>{
+      server.appointment.getList(to.query.phone || self.userinfo.mobilePhone)
+      .then( list => {
+        self.list = list
         self.loading = false
       })
     }

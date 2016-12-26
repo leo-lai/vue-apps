@@ -58,19 +58,27 @@
       <h3 class="l-rest">艾臣资讯</h3>
       <a class="l-fsize-sm"><i class="iconfont">&#xe602;</i></a>
     </div>
-    <news-list></news-list>
+    <news-list :list="news.list" :loading="news.loading"></news-list>
   </div>
 </template>
 <script>
-import config from '../config'
 import { Swiper, Masker, Flexbox, FlexboxItem } from 'vux-components'
-import NewsList from './news-list'
+import NewsList from '../components/news-list'
+import config from '../config'
+import server from '../server'
 
 export default {
   components: {
     Swiper, Masker, Flexbox, FlexboxItem, NewsList
   },
-  events: config.vueHook,
+  route: {
+    data() {
+      this.newsList = server.news.getList(()=>{
+        this.news.loading = !this.newsList.isAjax
+        this.news.list = this.newsList.data  
+      }, 2)
+    }
+  },
   data() {
     return {
       images: {
@@ -81,7 +89,11 @@ export default {
         url: 'javascript:;',
         img: require('assets/imgs/temp-016.jpg'),
         title: ''
-      }]
+      }],
+      news: {
+        list: [],
+        loading: true
+      }
     }
   }
 }

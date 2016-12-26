@@ -76,25 +76,20 @@
   </div>
 </template>
 <script>
-import { store, getters, actions } from '../vuex'
 import { Divider, Swiper, SwiperItem, Previewer, XTextarea, XButton, Dialog, Group, PopupPicker } from 'vux-components'
+import { store, getters, actions } from '../vuex'
+import server from '../server'
 export default {
   components: {
     Divider, Swiper, SwiperItem, Previewer, XTextarea, XButton, Dialog, Group
   },
   route: {
-    data(transition) {
+    data({ to }) {
       const self = this
-      self.$http.get('owner/visitor/getAppointDetail', {
-        params: {
-          appointId: transition.to.query.id
-        }
-      }).then(({ body })=>{
+      server.appointment.getInfo(to.query.id).then( info => {
+        info._state = info.state > 20 ? Number(String(info.state).substr(0,1)) : info.state
+        self.info = info
         self.$vux.loading.hide()
-        if(body.success){
-          self.info = body.data
-          self.info._state = self.info.state > 20 ? Number(String(self.info.state).substr(0,1)) : self.info.state
-        }
       })
       self.$vux.loading.show()
     }
@@ -314,8 +309,6 @@ export default {
   }
 }
 </script>
-
-
 <style scoped lang="less">
 .l-appointment-item{
   padding: 0.4rem;
@@ -340,7 +333,6 @@ export default {
   transform-origin: 0 0;
   box-sizing: border-box;
 }
-
 .l-dissatisfied-reason{
   background-color: #fff;
   position: relative;
@@ -350,5 +342,4 @@ export default {
     right:0;
   }
 }
-
 </style>

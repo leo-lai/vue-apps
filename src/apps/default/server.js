@@ -11,6 +11,109 @@ const PROMISE = function(response = '接口参数不正确') {
 const ERROR_MSG = {
   api: '服务器繁忙，请稍后重试！'
 }
+
+// 分页数据类
+class List {
+  constructor(type){
+    this._type = type
+    this.isLoading = false
+    this.isNull = false             // 表示后台已无数据返回，无需再发送请求
+    this.isAjax = false             // 是否已请求数据
+    this.alldata = []               // 累计分页已返回数据
+    this.data = []                  // 当前分页数据
+    this.page = 0                   // 当前页数
+    this.gotoPage = 1               // 跳转到第几页
+    this.pageList = [1]             // 分页数组
+    this.rows = 10                  // 条数
+    this.rowsList = [10, 20, 50]    // 每页条数
+    this.total = 1                  // 总条数
+    this.totalPage = 1              // 总页数 
+    this.isPage = true              // 是否分页
+    this.params = {}                // 异步发送数据
+    this.callback = utils.noop
+  }
+  init() {
+    this.alldata = []
+    this.data = []
+    this.page = 1
+    this.ajax()
+  }
+  next() {
+    if (this.isLoading || this.page >= this.totalPage) { 
+      return this
+    }
+    this.page = Math.min(++this.page, this.totalPage)
+    this.ajax()
+  }
+  prev() {
+    if (this.isLoading || this.page <= 1) { 
+      return this 
+    }
+    this.page = Math.min(--this.page, 1)
+    this.ajax()
+  }
+  goto(index = 1) {
+    if (!utils.isNumber(index) || this.isLoading || this.page === index) { 
+      return this 
+    }
+    index = Math.min(Math.max(index, 1), this.totalPage)
+    this.page = index
+    this.ajax()
+  }
+  ajax() {
+    if(this.isLoading){ return this }
+    let url = ''
+    switch (this._type) {
+      case 'news': // 新闻列表
+        url = 'owner/visitor/getPublishList'
+        break
+    }
+    this.params.page = this.page
+    this.params.rows = this.rows
+    this.isLoading = true
+    Vue.http.get(url, {
+      params: this.params
+    }).then(function({ body }){
+      this.isAjax = true
+      this.isLoading = false
+      if(body.success && body.data){
+        this.gotoPage = this.page
+        this.total = body.data.total
+        this.totalPage = body.data.totalPage
+
+        // 分页数组 [1,2,3,'...',10,11,12]
+        let pageList = []
+        for (let i = Math.max(this.page - 3, 1); i <= Math.min(this.page + 3, this.totalPage); i++) {
+          pageList.push(i)
+        }
+
+        if(this.totalPage > 10 && (this.totalPage - this.page) > 3){
+          pageList.push('...')
+          pageList.push(this.totalPage)
+        }
+
+        !body.data.rowsObject && (body.data.rowsObject = [])
+        this.data = body.data.rowsObject
+        this.alldata = this.alldata.concat(this.data)
+        if(body.data.page >= body.data.totalPage){
+          this.isNull = true
+        }
+      }else{
+        this.isAjax = true
+        this.isLoading = false
+        this.isNull = true
+      }
+      this.callback(true, body)
+    }.bind(this), function(error){
+      this.isAjax = true
+      this.isLoading = false
+      this.isNull = true
+      this.callback(false, error)
+    }.bind(this))
+  }
+}
+
+
 export default {
   // 获取微信授权路径 url为绝对路径
   getGrantUrl(url, params) {
@@ -386,33 +489,36 @@ export default {
   },
   // 艾臣资讯
   news: {
-    getList() {
-      let promise = Vue.http.get('owner/visitor/getPublishList')
-      promise.then((response)=>{
-        if(!response.body.success){
-          utils.alert(response.body.message)
-        }
-        return response
-      }, (error)=>{
-        utils.alert(ERROR_MSG.api)
-        return error
-      })
-      return promise
+    getList(callback, rows = 10) {
+      callback = utils.isFunction(callback) ? callback : utils.noop
+      let list = new List('news')
+      list.rows = rows
+      list.callback = callback
+      list.init()
+      return list
     },
-    getInfo(id) {
-      if(!id)  return PROMISE()
-      let promise = Vue.http.get('owner/visitor/getPublishDetail', {
-        params: {
-          publishId: id
+    getInfo(publishId) {
+      let ret = {}
+      let promise = new Promise((resolve, reject)=>{
+        if(!publishId){
+          resolve(ret)
+        }else{
+          Vue.http.get('owner/visitor/getPublishDetail', {
+            params: {
+              publishId
+            }
+          }).then(({ body })=>{
+            if(body.success && body.data){
+              resolve(body.data)
+            }else{
+              resolve(ret)
+              utils.alert.call(Vue, body.message)
+            }
+          }, (error)=>{
+            resolve(ret)
+            utils.alert.call(Vue, ERROR_MSG.api)
+          })
         }
-      }).then((response)=>{
-        if(!response.body.success){
-          utils.alert(response.body.message)
-        }
-        return response
-      }, (error)=>{
-        utils.alert(ERROR_MSG.api)
-        return error
       })
       return promise
     }
@@ -501,6 +607,60 @@ export default {
       }, (error)=>{
         utils.alert(ERROR_MSG.api)
         return error
+      })
+      return promise
+    }
+  },
+  // 我的预约
+  appointment: {
+    getList(mobilePhone) {
+      let ret = []
+      let promise = new Promise((resolve, reject)=>{
+        if(!mobilePhone){
+          resolve(ret)
+        }else{
+          Vue.http.get('owner/visitor/getAppointList', {
+            params: {
+              mobilePhone,
+              rows: 50
+            }
+          }).then(({ body })=>{
+            if(body.success && body.data){
+              resolve(body.data.rowsObject)
+            }else{
+              resolve(ret)
+              utils.alert.call(Vue, body.message)
+            }
+          }, (error)=>{
+            resolve(ret)
+            utils.alert.call(Vue, ERROR_MSG.api)
+          })
+        }
+      })
+      return promise
+    },
+    getInfo(appointId) {
+      let ret = {}
+      let promise = new Promise((resolve, reject)=>{
+        if(!appointId){
+          resolve(ret)
+        }else{
+          Vue.http.get('owner/visitor/getAppointDetail', {
+            params: {
+              appointId
+            }
+          }).then(({ body })=>{
+            if(body.success && body.data){
+              resolve(body.data)
+            }else{
+              resolve(ret)
+              utils.alert.call(Vue, body.message)
+            }
+          }, (error)=>{
+            resolve(ret)
+            utils.alert.call(Vue, ERROR_MSG.api)
+          })
+        }
       })
       return promise
     }

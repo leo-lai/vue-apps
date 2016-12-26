@@ -7,11 +7,11 @@
       placeholder="输入订单号或手机号查询"
       cancel-text="取消"> 
       <order-list :list="orderList"></order-list>
+      <div v-if="loaded && orderList.length === 0" style="text-align:center;color:#999;">
+        <br><br><br><br><p>找不到相关订单</p><br><br>
+      </div>
+      <div v-if="loading" class="l-loading"><br><br><br><br><br></div>
     </search>
-    <div v-if="loaded && orderList.length === 0" style="text-align:center;color:#999;">
-      <br><br><br><br><p>找不到相关订单</p><br><br>
-    </div>
-    <div v-if="loading" class="l-loading"><br><br><br><br><br></div>
   </div>
 </template>
 <script>
@@ -35,7 +35,6 @@ export default {
     getResult (val) {
       let self = this
       self.loaded = false
-      
       if(!val) return
         
       clearTimeout(timeout)
@@ -47,6 +46,7 @@ export default {
           self.orderList = list
           self.loaded = true
           self.loading = false
+          console.log(self.loaded)
         })
       }, 1000)
     }
