@@ -41,15 +41,9 @@ export default {
   route: {
     data(transition) {
       const self = this
-      let promise = server.product.getCategory().then(({ body })=>{
-        if(body.success){
-          self.tab.data = body.data
-          self.tabClick(0)
-        }
-      })
-
-      self.$vux.loading.show()
-      Promise.all([promise]).finally(()=>{
+      server.product.getCategory().then( list => {
+        self.tab.data = list
+        self.tabClick(0)
         self.$vux.loading.hide()
       })
     }

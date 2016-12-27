@@ -40,22 +40,20 @@ export default {
       const wxOpenId = self.route.query.wxOpenId
       const wxUnionId = self.route.query.wxUnionId
       // 获取奖品列表
-      let promise1 = server.welfare.getGiftList(wxOpenId).then(({ body })=>{
-        if(body.success && body.data){
-          let giftList = []
-          let ids = []
-          let names = []
-          body.data.forEach((item)=>{
-            if(item.whetherExchange && !item.isExchanged){
-              giftList.push(item)
-              ids.push(item.id)
-              names.push(item.giftName)
-            }
-          })
-          giftList.ids = ids.join(',')
-          giftList.names = names.join(',')
-          self.giftList = giftList
-        }
+      let promise1 = server.welfare.getGiftList(wxOpenId).then( list => {
+        let giftList = []
+        let ids = []
+        let names = []
+        list.forEach((item)=>{
+          if(item.whetherExchange && !item.isExchanged){
+            giftList.push(item)
+            ids.push(item.id)
+            names.push(item.giftName)
+          }
+        })
+        giftList.ids = ids.join(',')
+        giftList.names = names.join(',')
+        self.giftList = giftList
       })
       // jssdk授权
       let promise2 = server.getWxConfig().then((wx)=>{

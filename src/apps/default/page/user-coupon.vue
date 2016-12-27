@@ -92,12 +92,9 @@ export default {
 
       if(self.tabData[index].length === 0){
         self.loading = true
-        server.coupon.getList(self.userinfo.mobilePhone, index)
-        .then(({ body })=>{
+        server.coupon.getList(self.userinfo.mobilePhone, index).then( list => {
           self.loading = false
-          if(body.success && body.data ){
-            self.tabData.$set(index, body.data)
-          }
+          self.tabData.$set(index, list)
         })
       }
     },

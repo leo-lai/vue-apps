@@ -45,15 +45,13 @@ export default {
       const code = transition.to.query.code
       if(code){ // 如果页面已授权
         // 获取微信信息及判断是否已注册
-        server.getWxByCode(code).then(({ body })=>{
-          if(body.success && body.data){
-            if(body.data.mobilePhone){
-              body.data.photo = utils.image.wxHead( body.data.photo || body.data.wxHeadPhoto )
-              storage.local.set('userinfo', body.data)
-              transition.redirect('/user')  
-            }else{
-              storage.session.set('wxinfo', body.data)
-            }
+        server.getWxByCode(code).then( info =>{
+          if(info.mobilePhone){
+            info.photo = utils.image.wxHead( info.photo || info.wxHeadPhoto )
+            storage.local.set('userinfo', info)
+            transition.redirect('/user')  
+          }else{
+            storage.session.set('wxinfo', info)
           }
           transition.next()
         })

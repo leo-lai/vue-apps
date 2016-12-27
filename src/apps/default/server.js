@@ -16,61 +16,75 @@ const ERROR_MSG = {
 class List {
   constructor(type){
     this._type = type
-    this.isLoading = false
+    this.isLoading = false          // 正在请求数据
     this.isNull = false             // 表示后台已无数据返回，无需再发送请求
-    this.isAjax = false             // 是否已请求数据
+    this.isAjax = false             // 是否已请求过数据
     this.alldata = []               // 累计分页已返回数据
     this.data = []                  // 当前分页数据
     this.page = 0                   // 当前页数
     this.gotoPage = 1               // 跳转到第几页
     this.pageList = [1]             // 分页数组
-    this.rows = 10                  // 条数
     this.rowsList = [10, 20, 50]    // 每页条数
     this.total = 1                  // 总条数
-    this.totalPage = 1              // 总页数 
+    this.totalPage = 1              // 总页数
+
+    this.rows = 10                  // 条数
     this.isPage = true              // 是否分页
     this.params = {}                // 异步发送数据
+    this.beforeAjax = utils.noop
     this.callback = utils.noop
+
   }
   init() {
-    this.alldata = []
+    this.isAjax = false
+    this.isNull = false
     this.data = []
-    this.page = 1
-    this.ajax()
+    this.alldata = []
+    this.goto(1)
   }
   next() {
-    if (this.isLoading || this.page >= this.totalPage) { 
-      return this
+    if(!this.isLoading && this.page < this.totalPage){
+      this.page = Math.min(++this.page, this.totalPage)
+      this.ajax()  
     }
-    this.page = Math.min(++this.page, this.totalPage)
-    this.ajax()
+    return this
   }
   prev() {
-    if (this.isLoading || this.page <= 1) { 
-      return this 
+    if(!this.isLoading && this.page > 1){
+      this.page = Math.min(--this.page, 1)
+      this.ajax()  
     }
-    this.page = Math.min(--this.page, 1)
-    this.ajax()
+    return this
   }
   goto(index = 1) {
-    if (!utils.isNumber(index) || this.isLoading || this.page === index) { 
-      return this 
+    if(utils.isNumber(index) && !this.isLoading){
+      index = Math.min(Math.max(index, 1), this.totalPage)  
+      this.page = index
+      this.ajax()
     }
-    index = Math.min(Math.max(index, 1), this.totalPage)
-    this.page = index
-    this.ajax()
+    return this
   }
   ajax() {
     if(this.isLoading){ return this }
     let url = ''
     switch (this._type) {
-      case 'news': // 新闻列表
+      case 'news':        // 新闻列表
         url = 'owner/visitor/getPublishList'
+        break
+      case 'activity':    // 活动列表
+        url = 'owner/visitor/getCouponActivity'
+        break
+      case 'appointment': // 预约列表
+        url = 'owner/visitor/getAppointList'
+        break
+      case 'order':       // 订单列表
+        url = 'owner/visitor/getOrderList'
         break
     }
     this.params.page = this.page
     this.params.rows = this.rows
     this.isLoading = true
+    this.beforeAjax(this.isLoading)
     Vue.http.get(url, {
       params: this.params
     }).then(function({ body }){
@@ -78,6 +92,7 @@ class List {
       this.isLoading = false
       if(body.success && body.data){
         this.gotoPage = this.page
+        
         this.total = body.data.total
         this.totalPage = body.data.totalPage
 
@@ -86,33 +101,27 @@ class List {
         for (let i = Math.max(this.page - 3, 1); i <= Math.min(this.page + 3, this.totalPage); i++) {
           pageList.push(i)
         }
-
         if(this.totalPage > 10 && (this.totalPage - this.page) > 3){
           pageList.push('...')
           pageList.push(this.totalPage)
         }
 
-        !body.data.rowsObject && (body.data.rowsObject = [])
-        this.data = body.data.rowsObject
+        let data = body.data.rowsObject ? body.data.rowsObject : []
+        this.data = data
         this.alldata = this.alldata.concat(this.data)
         if(body.data.page >= body.data.totalPage){
           this.isNull = true
         }
-      }else{
-        this.isAjax = true
-        this.isLoading = false
-        this.isNull = true
+        
       }
-      this.callback(true, body)
+      this.callback(this.alldata)
     }.bind(this), function(error){
       this.isAjax = true
       this.isLoading = false
-      this.isNull = true
-      this.callback(false, error)
+      this.callback(this.alldata)
     }.bind(this))
   }
 }
-
 
 export default {
   // 获取微信授权路径 url为绝对路径
@@ -125,22 +134,26 @@ export default {
     return url
   },
   // 获取微信信息
-  getWxByCode(code, callback) {
-    if(!code) return PROMISE()
-    callback = utils.isFunction(callback) ? callback : utils.noop
-
-    let promise = Vue.http.get('owner/getByCode', {
-      params: { code }
-    }).then((response)=>{
-      if(!response.body.success){
-        utils.alert(response.body.message)
+  getWxByCode(code) {
+    let ret = {}
+    let promise = new Promise( (resolve) => {
+      if(!code){
+        resolve(ret)
       }else{
-        callback.call(promise, response.body)
+        Vue.http.get('owner/getByCode', {
+          params: { code }
+        }).then(({ body })=>{
+          if(body.success && body.data){
+            resolve(body.data)
+          }else{
+            resolve(ret)
+            utils.alert.call(Vue, body.message)
+          }
+        }, (error)=>{
+          resolve(ret)
+          utils.alert.call(Vue, ERROR_MSG.api)
+        })
       }
-      return response
-    }, (error)=>{
-      utils.alert(ERROR_MSG.api)
-      return error
     })
     return promise
   },
@@ -221,16 +234,27 @@ export default {
   },
   // 获取临时二维码
   getWxTempQrCode(inviterWxOpenId, inviterWxUnionId, channel = 'NewWelfare') {
-    let promise = Vue.http.get('wx/frame/getActivityQrCodeUrl', {
-      params: { inviterWxOpenId, inviterWxUnionId, channel }
-    }).then((response)=>{
-      if(!response.body.success){
-        utils.alert(response.body.message)
+    let ret = ''
+    let promise = new Promise((resolve) => {
+      if(!inviterWxOpenId || !inviterWxUnionId){
+        resolve(ret)
+      }else{
+        Vue.http.post('owner/visitor/addShare', {
+          channel,
+          inviterWxOpenId,
+          inviterWxUnionId
+        }).then(({ body })=>{
+          if(body.success && body.data){
+            resolve(body.data)
+          }else{
+            resolve(ret)
+            utils.alert.call(Vue, body.message)
+          }
+        }, (error)=>{
+          resolve(ret)
+          utils.alert.call(Vue, ERROR_MSG.api)
+        })
       }
-      return response
-    }, (error)=>{
-      utils.alert(ERROR_MSG.api)
-      return error
     })
     return promise
   },
@@ -253,7 +277,6 @@ export default {
         btn.textContent = oldtext
       }
     }, 1000)
-    // common/beforeSendValidCode
     let promise = Vue.http.get('common/getPhoneVerifyCode', {
       params: {
         phone: phone 
@@ -410,96 +433,125 @@ export default {
   // 新人福利
   welfare: {
     // 登记参加人信息
-    addShare(wxOpenId, wxUnionId, wxHeadPhoto, wxNickName) {
-      let promise = Vue.http.post('owner/visitor/addShare', {
-        channel: 'NewWelfare',
-        wxOpenId,
-        wxUnionId,
-        wxHeadPhoto,
-        wxNickName
-      }).then((response)=>{
-        if(!response.body.success){
-          utils.alert(response.body.message)
+    addShare(wxOpenId, wxUnionId, wxHeadPhoto = '', wxNickName = '') {
+      let ret = false
+      let promise = new Promise((resolve) => {
+        if(!wxOpenId || !wxUnionId){
+          resolve(ret)
+        }else{
+          Vue.http.post('owner/visitor/addShare', {
+            channel: 'NewWelfare',
+            wxOpenId,
+            wxUnionId,
+            wxHeadPhoto,
+            wxNickName
+          }).then(({ body })=>{
+            if(body.success){
+              resolve(true)
+            }else{
+              resolve(ret)
+              utils.alert.call(Vue, body.message)
+            }
+          }, (error)=>{
+            resolve(ret)
+            utils.alert.call(Vue, ERROR_MSG.api)
+          })
         }
-        return response
-      }, (error)=>{
-        utils.alert(ERROR_MSG.api)
-        return error
       })
       return promise
     },
     // 获取新人福利分享信息
     getShareList(wxOpenId) {
-      if(!wxOpenId) return PROMISE()
-
-      let promise = Vue.http.get('owner/visitor/getShareList', {
-        params: { 
-          channel: 'NewWelfare',
-          inviterWxOpenId: wxOpenId,
-          rows: 100
+      let ret = {}
+      let promise = new Promise((resolve) => {
+        if(!wxOpenId){
+          resolve(ret)
+        }else{
+          Vue.http.get('owner/visitor/getShareList', {
+            params: {
+              channel: 'NewWelfare',
+              inviterWxOpenId: wxOpenId,
+              rows: 100
+            }
+          }).then(({ body })=>{
+            if(body.success && body.data){
+              resolve(body.data)
+            }else{
+              resolve(ret)
+              utils.alert.call(Vue, body.message)
+            }
+          }, (error)=>{
+            resolve(ret)
+            utils.alert.call(Vue, ERROR_MSG.api)
+          })
         }
-      }).then((response)=>{
-        if(!response.body.success){
-          utils.alert(response.body.message)
-        }
-        return response
-      }, (error)=>{
-        utils.alert(ERROR_MSG.api)
-        return error
       })
       return promise
     },
     // 获取活动礼品列表
     getGiftList(wxOpenId = 'opILHvwh76lIxO5xo3S6CoO-jNy0') {
-      if(!wxOpenId) return PROMISE()
-
-      let promise = Vue.http.get('owner/visitor/getGiftList', {
-        params: { 
-          matchActivityCode: 'NewWelfare',
-          wxOpenId
+      let ret = []
+      let promise = new Promise((resolve) => {
+        if(!wxOpenId){
+          resolve(ret)
+        }else{
+          Vue.http.get('owner/visitor/getGiftList', {
+            params: {
+              matchActivityCode: 'NewWelfare',
+              wxOpenId
+            }
+          }).then(({ body })=>{
+            if(body.success && body.data){
+              resolve(body.data)
+            }else{
+              resolve(ret)
+              utils.alert.call(Vue, body.message)
+            }
+          }, (error)=>{
+            resolve(ret)
+            utils.alert.call(Vue, ERROR_MSG.api)
+          })
         }
-      }).then((response)=>{
-        if(!response.body.success){
-          utils.alert(response.body.message)
-        }
-        return response
-      }, (error)=>{
-        utils.alert(ERROR_MSG.api)
-        return error
       })
       return promise
     },
     // 获取获奖名单列表
     getWinner() {
-      let promise = Vue.http.get('owner/visitor/getWinningGiftList', {
-        params: { 
-          channel: 'NewWelfare'
-        }
-      }).then((response)=>{
-        if(!response.body.success){
-          utils.alert(response.body.message)
-        }
-        return response
-      }, (error)=>{
-        utils.alert(ERROR_MSG.api)
-        return error
+      let ret = []
+      let promise = new Promise((resolve) => {
+        Vue.http.get('owner/visitor/getWinningGiftList', {
+          params: {
+            channel: 'NewWelfare',
+            rows: 50
+          }
+        }).then(({ body })=>{
+          if(body.success && body.data){
+            resolve(body.data.rowsObject)
+          }else{
+            resolve(ret)
+            utils.alert.call(Vue, body.message)
+          }
+        }, (error)=>{
+          resolve(ret)
+          utils.alert.call(Vue, ERROR_MSG.api)
+        })
       })
       return promise
     }
   },
   // 艾臣资讯
   news: {
-    getList(callback, rows = 10) {
-      callback = utils.isFunction(callback) ? callback : utils.noop
-      let list = new List('news')
-      list.rows = rows
-      list.callback = callback
-      list.init()
-      return list
+    getList(rows = 10) {
+      let promise = new Promise((resolve) => {
+        let list = new List('news')
+        list.rows = rows
+        resolve(list)
+      })
+      return promise
     },
     getInfo(publishId) {
       let ret = {}
-      let promise = new Promise((resolve, reject)=>{
+      let promise = new Promise((resolve)=>{
         if(!publishId){
           resolve(ret)
         }else{
@@ -523,112 +575,44 @@ export default {
       return promise
     }
   },
-  // 优惠券
-  coupon: {
-    getList(phoneNum, type = 0) {
-      if(!phoneNum) return PROMISE()
-      switch(type){
-        case 1:
-          type = 1
-          break
-        case 2:
-          type = -1
-          break
-        default:
-          type = 0
-      }
-
-      let promise = Vue.http.get('owner/visitor/getCouponUserRelations', {
-        params: {
-          phoneNum,
-          isUsed: type
-        }
-      }).then((response)=>{
-        if(!response.body.success){
-          utils.alert(response.body.message)
-        }
-        return response
-      }, (error)=>{
-        utils.alert(ERROR_MSG.api)
-        return error
-      })
-      return promise
-    },
-    getInfo(id) {
-      if(!id)  return PROMISE()
-      let promise = Vue.http.get('owner/visitor/getCouponDetail', {
-        params: {
-          id
-        }
-      }).then((response)=>{
-        if(!response.body.success){
-          utils.alert(response.body.message)
-        }
-        return response
-      }, (error)=>{
-        utils.alert(ERROR_MSG.api)
-        return error
-      })
-      return promise
-    }
-  },
   // 优惠活动
   activity: {
-    getList(id) {
-      id = id || ''
-      let promise = Vue.http.get('owner/visitor/getCouponActivity', {
-        params: {
-          id
-        }
-      }).then((response)=>{
-        if(!response.body.success){
-          utils.alert(response.body.message)
-        }
-        return response
-      }, (error)=>{
-        utils.alert(ERROR_MSG.api)
-        return error
+    getList() {
+      let promise = new Promise((resolve) => {
+        let list = new List('activity')
+        resolve(list)
       })
       return promise
     },
     getInfo(id) {
-      if(!id)  return PROMISE()
-      return this.getList(id)
-    },
-    receive(phoneNum, activityFkid, couponFkid) {
-      if(!phoneNum)  return PROMISE()
-      let promise = Vue.http.post('owner/visitor/addCouponUserRelations', {
-        phoneNum,  activityFkid, couponFkid
-      }).then((response)=>{
-        if(!response.body.success){
-          utils.alert(response.body.message)
-        }
-        return response
-      }, (error)=>{
-        utils.alert(ERROR_MSG.api)
-        return error
-      })
-      return promise
-    }
-  },
-  // 我的预约
-  appointment: {
-    getList(mobilePhone) {
-      let ret = []
-      let promise = new Promise((resolve, reject)=>{
-        if(!mobilePhone){
+      let ret = {}
+      let promise = new Promise((resolve) => {
+        if(!id){
           resolve(ret)
         }else{
-          Vue.http.get('owner/visitor/getAppointList', {
-            params: {
-              mobilePhone,
-              rows: 50
-            }
+          let list = new List('activity')
+          list.params.id = id
+          list.callback = function(data){
+            resolve(data[0] || ret)
+          }
+          list.init()
+        }
+      })
+      return promise
+    },
+    receive(phoneNum, activityFkid, couponFkid) {
+      let ret = {}
+      let promise = new Promise((resolve) => {
+        if(!phoneNum || !activityFkid || !couponFkid){
+          resolve(ret)
+        }else{
+          Vue.http.post('owner/visitor/addCouponUserRelations', {
+            phoneNum,  activityFkid, couponFkid
           }).then(({ body })=>{
-            if(body.success && body.data){
-              resolve(body.data.rowsObject)
+            if(body.success){
+              resolve(body)
             }else{
-              resolve(ret)
+              resolve(body)
               utils.alert.call(Vue, body.message)
             }
           }, (error)=>{
@@ -636,6 +620,18 @@ export default {
             utils.alert.call(Vue, ERROR_MSG.api)
           })
         }
+      })
+
+      return promise
+    }
+  },
+  // 我的预约
+  appointment: {
+    getList(mobilePhone) {
+      let promise = new Promise((resolve) => {
+        let list = new List('appointment')
+        list.params.mobilePhone = mobilePhone
+        resolve(list)
       })
       return promise
     },
@@ -668,27 +664,10 @@ export default {
   // 我的订单
   order: {
     getList(phoneOrNo) {
-      let ret = []
-      let promise = new Promise((resolve, reject)=>{
-        if(!phoneOrNo){
-          resolve(ret)
-        }else{
-          Vue.http.get('owner/visitor/getOrderList', {
-            params: {
-              phoneOrNo
-            }
-          }).then(({ body })=>{
-            if(body.success && body.data){
-              resolve(body.data.rowsObject)
-            }else{
-              resolve(ret)
-              utils.alert.call(Vue, body.message)
-            }
-          }, (error)=>{
-            resolve(ret)
-            utils.alert.call(Vue, ERROR_MSG.api)
-          })
-        }
+      let promise = new Promise((resolve) => {
+        let list = new List('order')
+        list.params.phoneOrNo = phoneOrNo
+        resolve(list)
       })
       return promise
     },
@@ -718,18 +697,91 @@ export default {
       return promise
     }
   },
+  // 优惠券
+  coupon: {
+    getList(phoneNum, type = 0) {
+      switch(type){
+        case 1:
+          type = 1
+          break
+        case 2:
+          type = -1
+          break
+        default:
+          type = 0
+      }
+
+      let ret = []
+      let promise = new Promise((resolve) => {
+        if(!phoneNum){
+          resolve(ret)
+        }else{
+          Vue.http.get('owner/visitor/getCouponUserRelations', {
+            params: {
+              phoneNum,
+              isUsed: type
+            }
+          }).then(({ body })=>{
+            if(body.success && body.data){
+              resolve(body.data)
+            }else{
+              resolve(ret)
+              utils.alert.call(Vue, body.message)
+            }
+          }, (error)=>{
+            resolve(ret)
+            utils.alert.call(Vue, ERROR_MSG.api)
+          })
+        }
+      })
+      return promise
+    },
+    getInfo(id) {
+      let ret = {}
+      let promise = new Promise((resolve) => {
+        if(!id){
+          resolve(ret)
+        }else{
+          Vue.http.get('owner/visitor/getCouponDetail', {
+            params: {
+              id
+            }
+          }).then(({ body })=>{
+            if(body.success && body.data){
+              resolve(body.data)
+            }else{
+              resolve(ret)
+              utils.alert.call(Vue, body.message)
+            }
+          }, (error)=>{
+            resolve(ret)
+            utils.alert.call(Vue, ERROR_MSG.api)
+          })
+        }
+      })
+      return promise
+    }
+  },
   // 产品展示
   product: {
     getCategory() {
-      let promise = Vue.http.get('owner/visitor/getProductCategory')
-      promise.then((response)=>{
-        if(!response.body.success){
-          utils.alert(response.body.message)
+      let ret = []
+      let promise = new Promise((resolve) => {
+        if(!phoneNum){
+          resolve(ret)
+        }else{
+          Vue.http.get('owner/visitor/getProductCategory').then(({ body })=>{
+            if(body.success && body.data){
+              resolve(body.data)
+            }else{
+              resolve(ret)
+              utils.alert.call(Vue, body.message)
+            }
+          }, (error)=>{
+            resolve(ret)
+            utils.alert.call(Vue, ERROR_MSG.api)
+          })
         }
-        return response
-      }, (error)=>{
-        utils.alert(ERROR_MSG.api)
-        return error
       })
       return promise
     },
@@ -753,23 +805,32 @@ export default {
       return promise
     },
     getInfo(id) {
-      if(!id)  return PROMISE()
-      let promise = Vue.http.get('owner/visitor/getProductDetail', {
-        params: {
-          productId: id
+      let ret = {}
+      let promise = new Promise((resolve) => {
+        if(!id){
+          resolve(ret)
+        }else{
+          Vue.http.get('owner/visitor/getProductDetail', {
+            params: {
+              productId: id
+            }
+          }).then(({ body })=>{
+            if(body.success && body.data){
+              resolve(body.data)
+            }else{
+              resolve(ret)
+              utils.alert.call(Vue, body.message)
+            }
+          }, (error)=>{
+            resolve(ret)
+            utils.alert.call(Vue, ERROR_MSG.api)
+          })
         }
-      }).then((response)=>{
-        if(!response.body.success){
-          utils.alert(response.body.message)
-        }
-        return response
-      }, (error)=>{
-        utils.alert(ERROR_MSG.api)
-        return error
       })
       return promise
     }
   },
+  // 我的反馈
   faq: {
     getHelpList() {
       let ret = []

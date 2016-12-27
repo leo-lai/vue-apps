@@ -25,38 +25,15 @@ export default {
   },
   route: {
   	data({ to }) {
-  		const self = this
-  		let id = to.query.id
-      let promise = server.activity.getList(id).then(({ body })=>{
-        if(body.success){
-          self.info = body.data.rowsObject[0]
-        }
-      })
-
-      self.$vux.loading.show()
-      Promise.all([promise]).finally(()=>{
-        self.$vux.loading.hide()
+      server.activity.getInfo(to.query.id).then( info =>{
+        this.info = info
+        this.$vux.loading.hide()
       })
   	}
   },
   store,
   vuex: {
     getters
-  },
-  data() {
-  	return {
-  		info: {}
-  	}
-  },
-  computed:{
-    startDate() {
-      if(!this.info.startTime) return ''
-      return this.info.startTime.split(' ')[0]
-    },
-    endDate() {
-      if(!this.info.endTime) return ''
-      return this.info.endTime.split(' ')[0]
-    }
   },  
   methods: {
     receiveCoupon() {
@@ -72,23 +49,32 @@ export default {
       }else{
         self.$vux.loading.show('领取中')
         server.activity.receive(self.userinfo.mobilePhone, self.info.id, self.info.couponFkid)
-        .then(({ body })=>{
+        .then( body => {
           self.$vux.loading.hide()
-          if(body.success){
-            self.$vux.toast.show({
-              text: body.message || '领取成功',
-              onHide() {
-                self.$router.go('/user/coupon?direction=in')
-              }
-            })
-          }
+          self.$vux.toast.show({
+            text: body.message || '领取成功',
+            onHide() {
+              self.$router.replace('/user/coupon?direction=in')
+            }
+          })
         })
       }
+    }
+  },
+  data() {
+  	return {
+  		info: {}
+  	}
+  },
+  computed:{
+    startDate() {
+      if(!this.info.startTime) return ''
+      return this.info.startTime.split(' ')[0]
+    },
+    endDate() {
+      if(!this.info.endTime) return ''
+      return this.info.endTime.split(' ')[0]
     }
   }
 }
 </script>
-
-<style scoped lang="less">
-
-</style>

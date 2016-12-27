@@ -73,10 +73,14 @@ export default {
   },
   route: {
     data() {
-      this.newsList = server.news.getList(()=>{
-        this.news.loading = !this.newsList.isAjax
-        this.news.list = this.newsList.data  
-      }, 2)
+      const self = this
+      server.news.getList(2).then( listEntity => {
+        listEntity.callback = function(){
+          self.news.loading = !listEntity.isAjax
+          self.news.list = listEntity.alldata
+        }
+        listEntity.init()
+      })
     }
   },
   data() {

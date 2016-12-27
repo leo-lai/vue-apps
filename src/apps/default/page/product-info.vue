@@ -57,29 +57,24 @@ export default {
     data({ to }) {
       const self = this
       let id = to.query.id 
-      let promise = server.product.getInfo(id).then(({body})=>{
-        if(body.success && body.data){
-          if(body.data.pictureShows){
-            let realShow = []
-            body.data.pictureShows.split('<;>').forEach((item)=>{
-              if(item){
-                realShow.push({
-                  w: 640,
-                  h: 400,
-                  src: self.$image.thumb(item, 640, 400)
-                })
-              }
-            })
-            self.realShow = realShow
-          }
-          self.info = body.data
+      server.product.getInfo(id).then( info => {
+        if(info.pictureShows){
+          let realShow = []
+          info.pictureShows.split('<;>').forEach((item)=>{
+            if(item){
+              realShow.push({
+                w: 640,
+                h: 400,
+                src: self.$image.thumb(item, 640, 400)
+              })
+            }
+          })
+          self.realShow = realShow
         }
-      })
-
-      self.$vux.loading.show()
-      Promise.all([promise]).finally(()=>{
+        self.info = info
         self.$vux.loading.hide()
       })
+      self.$vux.loading.show()
     }
   },
   data() {

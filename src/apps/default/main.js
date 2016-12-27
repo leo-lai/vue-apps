@@ -122,7 +122,7 @@ router.beforeEach(({ to, from, next }) => {
   }
 
   storage.session.set('_history', _history)
-  setTimeout(next, 50)
+  setTimeout(next, 100)
 })
 
 // 此钩子函数一个类型为切换对象的参数，但是你只能访问此参数的 to 和 from 属性, 这两个属性都是路由对象。在这个后置钩子函数里不能调用任何切换函数。

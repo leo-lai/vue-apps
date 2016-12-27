@@ -173,23 +173,17 @@ export default {
       const promises = []
 
       // 获取奖品列表
-      let promise1 = server.welfare.getGiftList(wxinfo.wxOpenId).then(({ body })=>{
-        if(body.success && body.data){
-          self.giftList = body.data
-        }
+      let promise1 = server.welfare.getGiftList(wxinfo.wxOpenId).then( list => {
+        self.giftList = list
       })
       // 获取分享人数
-      let promise2 = server.welfare.getShareList(wxinfo.wxOpenId).then(({ body })=>{
-        if(body.success && body.data){
-          self.shareList = body.data.shareList.rowsObject
-          self.sharer = body.data.sharer
-        }
+      let promise2 = server.welfare.getShareList(wxinfo.wxOpenId).then( data =>{
+        self.shareList = data.shareList.rowsObject
+        self.sharer = data.sharer
       })
       // 获取中奖名单
-      let promise3 = server.welfare.getWinner().then(({ body })=>{
-        if(body.success && body.data){
-          self.winnerList = body.data.rowsObject
-        }
+      let promise3 = server.welfare.getWinner().then( list => {
+        self.winnerList = list
       })
       // jssdk授权
       let promise4 = server.getWxConfig().then((wx)=>{
@@ -207,9 +201,9 @@ export default {
           dataUrl: '',                                                      // 如果type是music或video，则要提供数据链接，默认为空
           success: function() {
             server.welfare.addShare(wxinfo.wxOpenId, wxinfo.wxUnionId, wxinfo.wxHeadPhoto, wxinfo.wxNickName)
-            .then(({ body })=>{
+            .then( success => {
               self.dialog.share = false
-              if(body.success){
+              if(success){
                 console.log('分享成功')
                 // self.$vux.toast.show('分享成功')
               }else{
@@ -231,12 +225,8 @@ export default {
 
       // 好友助力二维码
       if(self.route.query.isFriend){
-        let promise5 = server.getWxTempQrCode(wxinfo.wxOpenId, wxinfo.wxUnionId).then(({ body })=>{
-          if(body.success){
-            self.tempQrCode = body.data
-          }else{
-            console.log('获取好友二维码失败')
-          }
+        let promise5 = server.getWxTempQrCode(wxinfo.wxOpenId, wxinfo.wxUnionId).then( qrcode => {
+          self.tempQrCode = qrcode
         })
         promises.push(promise5)
       }
@@ -247,36 +237,39 @@ export default {
       })
     },
     canActivate({ to, next, abort }) {
-      let promise = null
-      let { code, wxOpenId, wxUnionId }  = to.query
-      const userinfo = storage.local.get('userinfo')
-
-      if(wxOpenId && wxUnionId){
-        storage.session.set('wxinfo', {
-          wxOpenId, wxUnionId
-        })
-      }else if(userinfo && userinfo.wxOpenId && userinfo.wxUnionId){
-        storage.session.set('wxinfo', userinfo)
-      }else{
-        if(!code){ // 跳转授权
-          let absUrl = utils.url.join(config.getHost(), config.getPath(), '/welfare')
-          absUrl = server.getGrantUrl(absUrl)
-          if(!/\d+.\d+.\d.\d+/.test(window.location.hostname) && utils.device.isWechat){
-            utils.url.replace(absUrl)
-            setTimeout(abort, 50)
-            // return false
-          }
-        }else{ // 通过code获取微信信息
-          promise = server.getWxByCode(code).then(({ body })=>{
-            if(body.success && body.data && body.data.wxOpenId && body.data.wxUnionId){
-              // 保存微信信息
-              storage.session.set('wxinfo', body.data)
+      let promise = new Promise((resolve, reject)=>{
+        let { code, wxOpenId, wxUnionId }  = to.query
+        const userinfo = storage.local.get('userinfo')  
+        if(wxOpenId && wxUnionId){
+          resolve({wxOpenId, wxUnionId})
+        }else if(userinfo && userinfo.wxOpenId && userinfo.wxUnionId){
+          resolve(userinfo)
+        }else{
+          if(!code){ // 跳转授权
+            let absUrl = utils.url.join(config.getHost(), config.getPath(), '/welfare')
+            absUrl = server.getGrantUrl(absUrl)
+            if(!/\d+.\d+.\d.\d+/.test(window.location.hostname) && utils.device.isWechat){
+              utils.url.replace(absUrl)
+              reject('跳转授权中')
+            }else{
+              resolve({})
             }
-          })
-          // return promise
+          }else{ // 通过code获取微信信息
+            server.getWxByCode(code).then( info =>{
+              if(info.wxOpenId && info.wxUnionId){
+                resolve(info)
+              }else{
+                reject('授权失败，没有获取到微信信息')
+              }
+            })
+          }
         }
-      }
-      setTimeout(next, 50)
+      }).then(wxinfo => {
+        storage.session.set('wxinfo', wxinfo)
+        setTimeout(next, 50)
+      }).catch( error => {
+        setTimeout(abort, 50)
+      })
     }
   },
   store,
@@ -305,8 +298,6 @@ export default {
     showGift(index) {
       this.giftList[index].show = !this.giftList[index].show
       this.giftList.$set(index, this.giftList[index])
-      // this.dialog.show = true
-      // this.dialog.itemInfo = this.giftList[index]
     },
     receiveGift() {
       const wxinfo = storage.session.get('wxinfo')
@@ -351,7 +342,6 @@ export default {
   background: #ebebeb url('~assets/imgs/avatar.png') no-repeat 50% 50%;
   background-size: contain;
 }
-
 .l-welfare{
   min-height: 100%;
   background-color: #fdd400;
@@ -361,7 +351,6 @@ export default {
     margin: auto;
   }
 }
-
 .l-box-1, .l-name-list{
   margin: auto 0.533333rem;
   text-align: left;
@@ -376,7 +365,6 @@ export default {
   text-align: center;
   z-index: 0;
 }
-
 .l-welfare-2{
   margin: 0.4rem 0;
   padding: 2rem 0.8rem;
@@ -403,7 +391,6 @@ export default {
       filter: grayscale(100%)
     }
   }
-
   .l-tip{
     position: absolute;
     top: 0;
@@ -418,7 +405,6 @@ export default {
     font-size: 14px;
   }
 }
-
 .l-name-list{
   max-height: 4.0rem;
   overflow: auto;
@@ -428,15 +414,12 @@ export default {
     border:none;
   }
 }
-
 .l-welfare-4{
   background-color: #4083c7;
 }
-
 .l-can-get .l-prize{
   filter: none !important;
 }
-
 .l-got{
   filter: grayscale(100%) !important;
 }
