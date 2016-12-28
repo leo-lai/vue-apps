@@ -1,18 +1,18 @@
 <template>
   <div>
     <group title="常见问题">
-      <cell v-for="item in faqList" :title="item.question" :link="{path: '/user/faq/info?id='+item.id }">
+      <cell v-for="item in faqScroller.list" :title="item.question" :link="{path: '/user/faq/info?id='+item.id }">
         <span slot="icon">{{$index+1}}、</span>
       </cell>
     </group>
-    <div v-if="loading1" class="l-loading"><br><br><br></div>
+    <div v-if="faqScroller.loading" class="l-loading"><br></div>
     <group title="我的反馈">
-      <cell v-for="item in feedbackList" :title="item.title" :link="{path: '/user/faq/feedback?id='+item.id }">
+      <cell v-for="item in feedbackScroller.list" :title="item.title" :link="{path: '/user/faq/feedback?id='+item.id }">
         <span slot="icon">{{$index+1}}、</span>
         <span v-if="item.state === 2" class="vux-reddot" slot="after-title">&nbsp;</span>
       </cell>
     </group>
-    <div v-if="loading2" class="l-loading"><br><br><br></div>
+    <div v-if="feedbackScroller.loading" class="l-loading"><br></div>
     <div class="l-btn-area">
       <x-button type="primary" v-link="{path:'/user/faq/add'}">我要反馈</x-button>  
     </div>
@@ -31,14 +31,30 @@ export default {
   route: {
     data() {
       const self = this
-      let promise1 = server.faq.getHelpList().then( list => {
-        self.faqList = list
-        self.loading1 = false
+      server.faq.getHelpList().then( listEntity => {
+        listEntity.callback = function(){
+          self.faqScroller.pullupStatus = 'default'
+          self.faqScroller.list = listEntity.alldata
+          self.faqScroller.loading = listEntity.isLoading
+          self.faqScroller.isNull = listEntity.isNull
+          // self.$nextTick(() => {
+          //   self.$refs.faqScroller.reset()
+          // })
+        }
+        listEntity.init()
       })
 
-      let promise2 = server.faq.getFeedBackList(self.userinfo.id).then( list => {
-        self.feedbackList = list
-        self.loading2 = false
+      server.faq.getFeedBackList(self.userinfo.id).then( listEntity => {
+        listEntity.callback = function(){
+          self.feedbackScroller.pullupStatus = 'default'
+          self.feedbackScroller.list = listEntity.alldata
+          self.feedbackScroller.loading = listEntity.isLoading
+          self.feedbackScroller.isNull = listEntity.isNull
+          // self.$nextTick(() => {
+          //   self.$refs.feedbackScroller.reset()
+          // })
+        }
+        listEntity.init()
       })
     }
   },
@@ -48,10 +64,18 @@ export default {
   },
   data () {
     return {
-      loading1: true,
-      loading2: true,
-      faqList: [],
-      feedbackList: []
+      faqScroller: {
+        loading: true,
+        isNull: false,
+        list: [],
+        pullupStatus: 'loading'
+      },
+      feedbackScroller: {
+        loading: true,
+        isNull: false,
+        list: [],
+        pullupStatus: 'loading'
+      }
     }
   }
 }

@@ -8,13 +8,13 @@
           <h3 v-text="info.storeName"></h3>
         </div>
       </div>
-      <cell :title="'营业时间 ' + info.openTime">
+      <cell :title="info.openTime">
         <i class="iconfont" slot="icon">&#xe61f;</i>
       </cell>
-      <cell :title="'订货电话 ' + info.workPhone">
+      <cell :title="info.workPhone">
         <i class="iconfont" slot="icon">&#xe612;</i>
       </cell>
-      <cell :title="'门店地址 ' + info.address" :is-link='true' @click="openMap(info)">
+      <cell :title="info.address" :is-link='true' @click="openMap(info)">
         <i class="iconfont" slot="icon">&#xe600;</i>
       </cell>
     </group>
@@ -42,28 +42,20 @@ export default {
   route: {
     data({ to }) {
       const self = this
-      self.$http.get('owner/visitor/getStoreDetail', {
-        params: {
-          storeId: to.query.id
+      server.store.getInfo(to.query.id).then( info => {
+        if(info.storeImgList){
+          self.storeImgList = info.storeImgList.map((item) => {
+            return {
+              w: 640,
+              h: 400,
+              src: self.$image.thumb(item, 640, 400)
+            }
+          })
         }
-      }).then(({ body })=>{
-        if(body.success && body.data){
-          self.info = body.data
-          if(self.info.storeImgList){
-            self.storeImgList = self.info.storeImgList.map((item) => {
-              return {
-                w: 640,
-                h: 400,
-                src: self.$image.thumb(item, 640, 400)
-              }
-            })
-          }
-          return self.info
-        }
-        return {}
-      }).then((info)=>{
-        server.getPosition().then((position)=>{
-          self.$vux.loading.hide()
+        self.info = info
+        self.$vux.loading.hide()
+        
+        server.getPosition().then( position =>{
           let distance = server.getDistance({
             lng1: position.longitude, 
             lat1: position.latitude

@@ -56,7 +56,7 @@ export default {
         self.giftList = giftList
       })
       // jssdk授权
-      let promise2 = server.getWxConfig().then((wx)=>{
+      let promise2 = server.getWxConfig().then( wx =>{
         let url = utils.url.setArgs(window.location.href, {
           isFriend: new Date().getTime(),
           wxOpenId,

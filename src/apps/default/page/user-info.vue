@@ -23,6 +23,8 @@
 <script>
 import { utils, storage } from 'assets/utils'
 import { Group, XInput, Cell, XButton, Address, AddressChinaData } from 'vux-components'
+import name2value from 'vux/src/filters/name2value'
+import value2name from 'vux/src/filters/value2name'
 import { store, getters, actions } from '../vuex'
 import config from '../config'
 
@@ -54,7 +56,8 @@ export default {
       },
       address: {
         data: AddressChinaData,
-        value: []
+        value: [],
+        name: []
       }
     }
   },
@@ -66,6 +69,11 @@ export default {
         self.formData.provinceId = self.address.value[0] || ''
         self.formData.cityId = self.address.value[1] || ''
         self.formData.areaId = self.address.value[2] || ''
+
+        self.address.name = value2name(self.address.value, AddressChinaData).split(' ')
+        self.formData.province = self.address.name[0] || ''
+        self.formData.city = self.address.name[1] || ''
+        self.formData.area = self.address.name[2] || ''
       }
 
       self.$vux.loading.show('保存中')

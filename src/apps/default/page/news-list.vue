@@ -50,6 +50,16 @@ export default {
       })
     }
   },
+  data() {
+    return {
+      scroller: {
+        isNull: false,
+        list: [],
+        pulldownStatus: 'default',
+        pullupStatus: 'loading'
+      }
+    }
+  },
   methods: {
     loadMore (uuid) {
       this.listEntity.next()
@@ -62,16 +72,6 @@ export default {
       this.$nextTick(() => {
         this.$broadcast('pulldown:reset', uuid)
       })
-    }
-  },
-  data() {
-    return {
-      scroller: {
-        isNull: false,
-        list: [],
-        pulldownStatus: 'default',
-        pullupStatus: 'loading'
-      }
     }
   }
 }

@@ -1,31 +1,55 @@
 <template>
-  <div>
-    <div class="l-flex-hc l-store-item" v-for="item in list | orderBy 'distance' 1" v-link="{path: '/store/list/info?id=' + item.id}">
-      <div class="l-thumb"><img :src="$image.thumb(item.thumbnail, 80, 80)"></div>
-      <div class="l-rest">
-        <h3 v-text="item.storeName"></h3>
-        <p v-text="item.address"></p>
-        <div class="l-bottom">
-          <a class="l-fr" @click.stop href="tel:{{item.workPhone}}"><i class="iconfont">&#xe612;</i> 电话</a>
-          <a class="l-fr" @click.stop="openMap(item)"><i class="iconfont">&#xe600;</i> 导航</a>
-          <a class="l-fgray"><i class="iconfont">&#xe634;</i>{{item.distance}}km</a>
+  <div style="height:100%;">
+    <scroller height="100%" v-ref:scroller lock-x scrollbar-y use-pullup use-pulldown
+      @pullup:loading="loadMore" @pulldown:loading="refresh" 
+      :pulldown-config="{height: 100}" :pulldown-status.sync="scroller.pulldownStatus"
+      :pullup-config="{pullUpHeight: 100}" :pullup-status.sync="scroller.pullupStatus">
+      <div store-list>
+        <div class="l-flex-hc l-store-item" v-for="item in scroller.list | orderBy 'distance' 1" @click="view(item.id)">
+          <div class="l-thumb"><img :src="$image.thumb(item.thumbnail, 80, 80)"></div>
+          <div class="l-rest">
+            <h3 v-text="item.storeName"></h3>
+            <p v-text="item.address"></p>
+            <div class="l-bottom">
+              <a class="l-fr" @click.stop href="tel:{{item.workPhone}}"><i class="iconfont">&#xe612;</i> 电话</a>
+              <a class="l-fr" @click.stop="openMap(item)"><i class="iconfont">&#xe600;</i> 导航</a>
+              <a class="l-fgray"><i class="iconfont">&#xe634;</i>{{item.distance}}km</a>
+            </div>
+          </div>
+          <div>
+            <i class="iconfont icon-arrow">&#xe601;</i>
+          </div>
         </div>
       </div>
-      <div>
-        <i class="iconfont icon-arrow">&#xe601;</i>
+      <div class="l-center l-margin l-padding" v-if="scroller.isNull && scroller.list.length === 0">
+        <img class="l-center" style="width:3.75rem;" src="~assets/imgs/none.jpg">
+        <p class="l-fgray l-fsize-s l-margin-t">暂无内容</p>
       </div>
-    </div>
-    <div v-if="loading" class="l-loading"><br><br><br><br><br></div>
+      <!--pulldown slot-->
+      <div slot="pulldown" class="l-pulldown">
+        <span v-show="scroller.pulldownStatus === 'down'">下拉刷新</span>
+        <span v-show="scroller.pulldownStatus === 'up'">释放刷新</span>
+        <span v-show="scroller.pulldownStatus === 'loading'"><spinner type="ios-small"></spinner></span>
+      </div>
+      <!--pullup slot-->
+      <div slot="pullup" class="l-pullup">
+        <span v-show="scroller.pullupStatus === 'down'">释放加载更多</span>
+        <span v-show="scroller.pullupStatus === 'up' && scroller.list.length > 0">{{scroller.isNull ? '没有更多了' : '上拉加载更多'}}</span>
+        <span v-show="scroller.pullupStatus === 'loading'"><spinner type="ios-small"></spinner>正在加载</span>
+      </div>
+    </scroller>
   </div>
 </template>
 <script>
-import { utils, storage } from 'assets/lib'
+import { Scroller, Spinner } from 'vux-components'
 import { store, getters, actions } from '../vuex'
 import config from '../config'
 import server from '../server'
-// import wx from 'weixin-js-sdk'
 
 export default {
+  components: {
+    Scroller, Spinner
+  },
   store,
   vuex: {
     getters, actions
@@ -33,38 +57,54 @@ export default {
   route: {
     data() {
       const self = this
-      
-      self.$http.get('owner/visitor/getStoreList')
-      .then(({ body })=>{
-        if(body.success && body.data){
-          return body.data.rowsObject
-        }
-        return []
-      }).then((list)=>{
-        server.getPosition().then((position)=>{
-          self.loading = false
-          self.list = list.map((item) => {
-            item.distance = server.getDistance({
-              lng1: position.longitude, 
-              lat1: position.latitude
-            }, {
-              lng2: item.longitude,
-              lat2: item.latitude
+      server.getPosition().then( position => {
+        server.store.getList().then( listEntity => {
+          self.listEntity = listEntity
+          listEntity.callback = function(){
+            self.scroller.pullupStatus = 'up'
+            self.scroller.list = listEntity.alldata.map( item => {
+              item.distance = server.getDistance({
+                lng1: position.longitude, 
+                lat1: position.latitude
+              }, {
+                lng2: item.longitude,
+                lat2: item.latitude
+              })
+              return item
             })
-            return item
-          })
+            self.scroller.isNull = listEntity.isNull
+            self.$nextTick(() => {
+              self.$refs.scroller.reset()
+            })
+          }
+          listEntity.init()
         })
-      })
-      self.loading = true
+      })  
     }
   },
   data() {
     return {
-      loading: true,
-      list: []
+      scroller: {
+        isNull: false,
+        list: [],
+        pulldownStatus: 'default',
+        pullupStatus: 'loading'
+      }
     }
   },
   methods: {
+    loadMore (uuid) {
+      this.listEntity.next()
+      this.$nextTick(() => {
+        this.$broadcast('pullup:reset', uuid)
+      })
+    },
+    refresh (uuid) {
+      this.listEntity.init()
+      this.$nextTick(() => {
+        this.$broadcast('pulldown:reset', uuid)
+      })
+    },
     openMap(storeEntity) {
       server.getWxConfig().then((wx)=>{
         wx.openLocation({
@@ -76,6 +116,9 @@ export default {
           infoUrl: '' // 在查看位置界面底部显示的超链接,可点击跳转
         })
       })
+    },
+    view(id) {
+      this.$router.go(`/store/list/info?id=${id}`)
     }
   }
 }

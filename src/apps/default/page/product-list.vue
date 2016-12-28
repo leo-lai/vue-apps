@@ -76,14 +76,12 @@ export default {
 
       if(self.tab.list[index].length === 0){
         self.loading = true
-        server.product.getList(self.tab.data[index].id).then(({ body })=>{
+        server.product.getList(self.tab.data[index].id).then( list => {
           self.loading = false
-          if(body.success){
-            self.tab.list.$set(index, body.data.rowsObject)
-            self.$nextTick(() => {
-              // setTimeout(self.$refs.scroller.reset, 500)
-            })
-          }
+          self.tab.list.$set(index, list)
+          self.$nextTick(() => {
+            // setTimeout(self.$refs.scroller.reset, 500)
+          })
         })
       }
     },

@@ -105,7 +105,7 @@ export default {
 </script>
 <style scoped lang="less">
 .l-card-item {
-  margin:0.4rem;
+  margin:0.4rem 0.4rem 0;
   padding: 0.266667rem;
   background-color: #fff;
   border-radius: 5px;

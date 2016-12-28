@@ -20,10 +20,30 @@
 </template>
 <script>
 import { XButton, Group, XInput, Cell, Address, AddressChinaData } from 'vux-components'
+import name2value from 'vux/src/filters/name2value'
 import value2name from 'vux/src/filters/value2name'
+import { store, getters } from '../vuex'
+import server from '../server'
+
 export default {
   components: {
     XButton, Group, XInput, Cell, Address, AddressChinaData
+  },
+  store,
+  vuex: { getters },
+  route: {
+    data() {
+      server.getAddress().then( address => {
+        if(address.address_component){
+          let province = address.address_component.province
+          let city = address.address_component.city
+          let area = address.address_component.district
+          this.address.value = name2value([province, city, area], AddressChinaData).split(' ')  
+        }
+      })
+      this.formData.name = this.userinfo.realName || this.userinfo.wxNickName || ''
+      this.formData.mobilePhone = this.userinfo.mobilePhone || ''
+    }
   },
   data() {
     return {

@@ -41,12 +41,16 @@ export default {
       timeout = setTimeout(()=>{
         self.loading = true
         self.loaded = false
-        server.order.getList(val)
-        .then( list => {
-          self.orderList = list
-          self.loaded = true
-          self.loading = false
-          console.log(self.loaded)
+
+        server.order.getList(val).then( listEntity => {
+          self.listEntity = listEntity
+          listEntity.rows = 50
+          listEntity.callback = function(){
+            self.orderList = listEntity.alldata
+            self.loaded = true
+            self.loading = false
+          }
+          listEntity.init()
         })
       }, 1000)
     }

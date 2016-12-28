@@ -10,7 +10,6 @@
 import LArticle from 'components/l-article'
 import server from '../server'
 
-
 export default {
   components: {
     LArticle

@@ -2,12 +2,6 @@ import { Vue, utils, storage } from 'assets/lib'
 import config from './config'
 
 Vue.http.options.root = config.getServerPath()
-
-const PROMISE = function(response = '接口参数不正确') {
-  return new Promise((resolve) => {
-    resolve(response)
-  })
-}
 const ERROR_MSG = {
   api: '服务器繁忙，请稍后重试！'
 }
@@ -68,17 +62,29 @@ class List {
     if(this.isLoading){ return this }
     let url = ''
     switch (this._type) {
-      case 'news':        // 新闻列表
+      case 'news':              // 新闻列表
         url = 'owner/visitor/getPublishList'
         break
-      case 'activity':    // 活动列表
+      case 'activity':          // 活动列表
         url = 'owner/visitor/getCouponActivity'
         break
-      case 'appointment': // 预约列表
+      case 'appointment':       // 预约列表
         url = 'owner/visitor/getAppointList'
         break
-      case 'order':       // 订单列表
+      case 'order':             // 订单列表
         url = 'owner/visitor/getOrderList'
+        break
+      case 'faq':               // 常见问题列表
+        url = 'owner/visitor/getHelpList'
+        break
+      case 'feedback':          // 反馈问题列表
+        url = 'owner/getMyFeedBackList'
+        break
+      case 'feedbackReply':     // 反馈详情回复列表
+        url = 'owner/getMyFeedBackReply'
+        break
+      case 'store':             // 门店列表
+        url = 'owner/visitor/getStoreList'
         break
     }
     this.params.page = this.page
@@ -260,47 +266,51 @@ export default {
   },
   // 发送手机验证码
   sendMobiCode(phone, btn) {
-    if(!utils.regexp.mobile.test(phone)){
-      utils.alert('请输入正确手机号码')
-      return PROMISE()
-    }
-      
-    btn.setAttribute('disabled', true)
-    let time = 30
-    let oldtext = btn.textContent
-    let timeid = setInterval(()=>{
-      if(--time >= 0){
-        btn.textContent = `${time}s`
+    let promise = new Promise((resolve) => {
+      if(!utils.regexp.mobile.test(phone)){
+        utils.alert.call(Vue, '请输入正确手机号码')
+        resolve()
       }else{
-        clearInterval(timeid)
-        btn.removeAttribute('disabled')
-        btn.textContent = oldtext
+        btn.setAttribute('disabled', true)
+        let time = 30
+        let oldtext = btn.textContent
+        let timeid = setInterval(()=>{
+          if(--time >= 0){
+            btn.textContent = `${time}s`
+          }else{
+            clearInterval(timeid)
+            btn.removeAttribute('disabled')
+            btn.textContent = oldtext
+          }
+        }, 1000)
+
+        Vue.http.get('common/getPhoneVerifyCode', {
+          params: {
+            phone: phone 
+          }
+        }).then(({ body }) => {
+          if(!body.success){
+            clearInterval(timeid)
+            btn.removeAttribute('disabled')
+            btn.textContent = oldtext
+            utils.alert.call(Vue, body.message)
+          }else{
+            utils.alert.call(Vue, '手机验证码已发送成功')
+          }
+          resolve()
+        }, (error) => {
+          clearInterval(timeid)
+          btn.removeAttribute('disabled')
+          btn.textContent = oldtext
+          utils.alert.call(Vue, ERROR_MSG.api)
+          resolve()
+        })
       }
-    }, 1000)
-    let promise = Vue.http.get('common/getPhoneVerifyCode', {
-      params: {
-        phone: phone 
-      }
-    }).then((response) => {
-      if(!response.body.success){
-        clearInterval(timeid)
-        btn.removeAttribute('disabled')
-        btn.textContent = oldtext
-        utils.alert(response.body.message)
-      }else{
-        utils.alert('手机验证码已发送成功')
-      }
-      return response
-    }, (error) => {
-      clearInterval(timeid)
-      btn.removeAttribute('disabled')
-      btn.textContent = oldtext
-      utils.alert(ERROR_MSG.api)
-      return error
     })
+
     return promise
   },
-  // 获取当前地理位置(经纬度)
+  // 获取当前经纬度
   getPosition() {
     // let position = storage.local.get('position') || {}
     let position = {}
@@ -363,51 +373,57 @@ export default {
 
     return promise
   },
-  // 获取当前地理位置(地址)
-  getAddress(callback) {
-    callback = utils.isFunction(callback) ? callback : utils.noop
-    let address = storage.local.get('address')
-    if(address){
-      callback(address)
-      return PROMISE(address)
-    }
-    // 使用腾讯地图WebService API
-    return this.getPosition().then( (position) => {
-      let promise = Vue.http.jsonp('http://apis.map.qq.com/ws/geocoder/v1/', {
-        params: {
-          location: position.latitude + ',' + position.longitude,
-          key: 'GPIBZ-V7YH3-CD735-3HDQM-CNM3F-4PFQP',
-          output: 'jsonp'
-        }
-      }).then(({ body })=>{
-        if(body.status == 0){
-          storage.local.set('address', body.result, 1000 * 1800);
-          callback(body.result)
-        }
-      })
-      return promise
+  // 获取当前地址 使用腾讯地图WebService API
+  getAddress() {
+    const self = this
+    let ret = {}
+    let promise = new Promise((resolve) => {
+      let address = storage.local.get('address')
+      if(address){
+        resolve(address)
+      }else{
+        self.getPosition().then( position => {
+          Vue.http.jsonp('http://apis.map.qq.com/ws/geocoder/v1/', {
+            params: {
+              location: position.latitude + ',' + position.longitude,
+              key: 'GPIBZ-V7YH3-CD735-3HDQM-CNM3F-4PFQP',
+              output: 'jsonp'
+            }
+          }).then(({ body })=>{
+            if(body.status == 0){
+              storage.local.set('address', body.result, 1000 * 1800);
+              resolve(body.result)
+            }else{
+              resolve(ret)
+            }
+          }, (error) => {
+            console.log('获取当前地址失败', error)
+            resolve(ret)
+          })
+        })
+      }
     })
+    return promise
   },
   // 获取两个经纬度的距离
   getDistance({ lng1 = 0, lat1 = 0 }, { lng2 = 0, lat2 = 0 }) {
-
-    var EARTH_RADIUS = 6378137.0    //单位M
-    var PI = Math.PI
-    var getRad = function(d){
+    let EARTH_RADIUS = 6378137.0    //单位M
+    let PI = Math.PI
+    let getRad = function(d){
       return d*PI/180.0
     }
 
-    var f = getRad((lat1 + lat2)/2)
-    var g = getRad((lat1 - lat2)/2)
-    var l = getRad((lng1 - lng2)/2)
+    let f = getRad((lat1 + lat2)/2)
+    let g = getRad((lat1 - lat2)/2)
+    let l = getRad((lng1 - lng2)/2)
     
-    var sg = Math.sin(g)
-    var sl = Math.sin(l)
-    var sf = Math.sin(f)
+    let sg = Math.sin(g)
+    let sl = Math.sin(l)
+    let sf = Math.sin(f)
     
-    var s,c,w,r,d,h1,h2
-    var a = EARTH_RADIUS
-    var fl = 1/298.257
+    let s,c,w,r,d,h1,h2
+    let a = EARTH_RADIUS
+    let fl = 1/298.257
     
     sg = sg*sg
     sl = sl*sl
@@ -422,7 +438,7 @@ export default {
     h1 = (3*r -1)/2/c
     h2 = (3*r +1)/2/s
     
-    var m = d*(1 + fl*(h1*sf*(1-sg) - h2*(1-sf)*sg))
+    let m = d*(1 + fl*(h1*sf*(1-sg) - h2*(1-sf)*sg))
 
     if(Number.isNaN(m)){
       return 0
@@ -767,12 +783,33 @@ export default {
     getCategory() {
       let ret = []
       let promise = new Promise((resolve) => {
-        if(!phoneNum){
+        Vue.http.get('owner/visitor/getProductCategory').then(({ body })=>{
+          if(body.success && body.data){
+            resolve(body.data)
+          }else{
+            resolve(ret)
+            utils.alert.call(Vue, body.message)
+          }
+        }, (error)=>{
+          resolve(ret)
+          utils.alert.call(Vue, ERROR_MSG.api)
+        })
+      })
+      return promise
+    },
+    getList(type) {
+      let ret = []
+      let promise = new Promise((resolve) => {
+        if(!type){
           resolve(ret)
         }else{
-          Vue.http.get('owner/visitor/getProductCategory').then(({ body })=>{
+          Vue.http.get('owner/visitor/getProductList', {
+            params: {
+              category: type
+            }
+          }).then(({ body })=>{
             if(body.success && body.data){
-              resolve(body.data)
+              resolve(body.data.rowsObject)
             }else{
               resolve(ret)
               utils.alert.call(Vue, body.message)
@@ -783,25 +820,6 @@ export default {
           })
         }
       })
-      return promise
-    },
-    getList(type) {
-      if(!type) return PROMISE()
-
-      let promise = Vue.http.get('owner/visitor/getProductList', {
-        params: {
-          category: type
-        }
-      }).then((response)=>{
-        if(!response.body.success){
-          utils.alert(response.body.message)
-        }
-        return response
-      }, (error)=>{
-        utils.alert(ERROR_MSG.api)
-        return error
-      })
-
       return promise
     },
     getInfo(id) {
@@ -832,24 +850,15 @@ export default {
   },
   // 我的反馈
   faq: {
+    // 常见问题列表
     getHelpList() {
-      let ret = []
-      let promise = new Promise((resolve, reject)=>{
-        Vue.http.get('owner/visitor/getHelpList')
-        .then(({ body })=>{
-          if(body.success && body.data){
-            resolve(body.data.rowsObject)
-          }else{
-            resolve(ret)
-            utils.alert.call(Vue, body.message)
-          }
-        }, (error)=>{
-          resolve(ret)
-          utils.alert.call(Vue, ERROR_MSG.api)
-        })
+      let promise = new Promise((resolve) => {
+        let list = new List('faq')
+        resolve(list)
       })
       return promise
     },
+    // 常见问题详情
     getHelpDetail(id){
       let ret = {}
       let promise = new Promise((resolve, reject)=>{
@@ -875,40 +884,25 @@ export default {
       })
       return promise
     },
+    // 反馈列表
     getFeedBackList(userId) {
-      let ret = []
-      let promise = new Promise((resolve, reject)=>{
-        if(!userId){
-          resolve(ret)
-        }else{
-          Vue.http.get('owner/getMyFeedBackList', {
-            params: {
-              clientId: userId
-            }
-          }).then(({ body })=>{
-            if(body.success && body.data){
-              resolve(body.data.rowsObject)
-            }else{
-              resolve(ret)
-              utils.alert.call(Vue, body.message)
-            }
-          }, (error)=>{
-            resolve(ret)
-            utils.alert.call(Vue, ERROR_MSG.api)
-          })
-        }
+      let promise = new Promise((resolve) => {
+        let list = new List('feedback')
+        list.params.clientId = userId
+        resolve(list)
       })
       return promise
     },
-    getFeedBackDetail(id){
+    // 反馈详情
+    getFeedBackDetail(feedBackId){
       let ret = {}
-      let promise = new Promise((resolve, reject)=>{
-        if(!id){
+      let promise = new Promise((resolve)=>{
+        if(!feedBackId){
           resolve(ret)
         }else{
           Vue.http.get('owner/getMyFeedBackDetail', {
             params: {
-              feedBackId: id
+              feedBackId
             }
           }).then(({ body })=>{
             if(body.success && body.data){
@@ -925,6 +919,16 @@ export default {
       })
       return promise
     },
+    // 反馈详情回复列表
+    getFeedBackReply(feedBackId){
+      let promise = new Promise((resolve) => {
+        let list = new List('feedbackReply')
+        list.params.feedBackId = feedBackId
+        resolve(list)
+      })
+      return promise
+    },
+    // 反馈设置已读
     getEditFeedBack(id){
       let ret = {}
       let promise = new Promise((resolve, reject)=>{
@@ -941,6 +945,41 @@ export default {
             }
           }, (error)=>{
             resolve(ret)
+          })
+        }
+      })
+      return promise
+    }
+  },
+  // 门店列表
+  store: {
+    getList() {
+      let promise = new Promise((resolve) => {
+        let list = new List('store')
+        resolve(list)
+      })
+      return promise
+    },
+    getInfo(storeId) {
+      let ret = {}
+      let promise = new Promise((resolve)=>{
+        if(!storeId){
+          resolve(ret)
+        }else{
+          Vue.http.get('owner/visitor/getStoreDetail', {
+            params: {
+              storeId
+            }
+          }).then(({ body })=>{
+            if(body.success && body.data){
+              resolve(body.data)
+            }else{
+              resolve(ret)
+              utils.alert.call(Vue, body.message)
+            }
+          }, (error)=>{
+            resolve(ret)
+            utils.alert.call(Vue, ERROR_MSG.api)
           })
         }
       })

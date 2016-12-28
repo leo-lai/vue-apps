@@ -30,22 +30,15 @@ export default {
   route: {
     data() {
       const self = this
-      let promise = server.coupon.getList(self.userinfo.mobilePhone)
-      .then(({ body })=>{
-        if(body.success && body.data ){
-          self.list = body.data.map((item) => {
-            if(self.coupon.id === item.id){
-              item.slted = true  
-            }else{
-              item.slted = false
-            }
-            return item
-          })
-        }
-      })
-
-      self.loading = true
-      Promise.all([promise]).finally(()=>{
+      server.coupon.getList(self.userinfo.mobilePhone).then( list => {
+        self.list = list.map( item => {
+          if(self.coupon.id === item.id){
+            item.slted = true  
+          }else{
+            item.slted = false
+          }
+          return item
+        })
         self.loading = false
       })
     }
