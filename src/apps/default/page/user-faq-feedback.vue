@@ -1,6 +1,6 @@
 <template>
   <div class="l-flex-v" style="height:100%;">
-    <scroller class="l-rest" v-ref:scroller lock-x scrollbar-y :use-pullup="false" use-pulldown
+    <scroller class="l-rest" v-ref:scroller lock-x scrollbar-y use-pulldown
       @pulldown:loading="loadMore" 
       :pulldown-config="{height: 100}" :pulldown-status.sync="scroller.pulldownStatus">
       <div class="l-chat-list">
@@ -75,7 +75,7 @@ export default {
     loadMore (uuid) {
       this.listEntity.next()
       this.$nextTick(() => {
-        this.$broadcast('pullup:reset', uuid)
+        this.$broadcast('pulldown:reset', uuid)
       })
     },
     send() {

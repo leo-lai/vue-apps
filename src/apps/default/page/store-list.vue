@@ -4,8 +4,8 @@
       @pullup:loading="loadMore" @pulldown:loading="refresh" 
       :pulldown-config="{height: 100}" :pulldown-status.sync="scroller.pulldownStatus"
       :pullup-config="{pullUpHeight: 100}" :pullup-status.sync="scroller.pullupStatus">
-      <div store-list>
-        <div class="l-flex-hc l-store-item" v-for="item in scroller.list | orderBy 'distance' 1" @click="view(item.id)">
+      <div>
+        <div class="l-flex-hc l-store-item l-border-t" v-for="item in scroller.list | orderBy 'distance' 1" @click="view(item.id)">
           <div class="l-thumb"><img :src="$image.thumb(item.thumbnail, 80, 80)"></div>
           <div class="l-rest">
             <h3 v-text="item.storeName"></h3>
@@ -126,15 +126,13 @@ export default {
 <style scoped lang="less">
 .l-store-item{
   background-color: #fff;
-  padding: 0.266667rem;
+  padding: 0.5rem;
   font-size: 14px;
-  margin-bottom: 0.4rem;
-  h3{margin-bottom: 0.133333rem}
   p{color: #999; font-size: 12px;}
   .l-thumb {
-    margin-right: 0.266667rem;
-    width: 2.133333rem;
-    height: 2.133333rem;
+    margin-right: 0.5rem;
+    width: 3.0rem;
+    height: 3.0rem;
     img {
       width: 100%;
       height: 100%;
@@ -144,12 +142,11 @@ export default {
     font-size: 16px;
   }
   .l-bottom{
-    margin-top: 0.266667rem;
     a{
-      margin: 0 0.266667rem 0 0;
+      margin: 0 0.5rem 0 0;
     }
     a.l-fr{
-      margin: 0 0 0 0.266667rem;
+      margin: 0 0 0 0.5rem;
     }
   }
 }

@@ -56,7 +56,7 @@ export default {
 <style scoped lang="less">
 .l-order-item{
   color: #999;
-  padding: 0.4rem;
+  padding: 0.75rem;
   background-color: #fff;
   font-size: 14px;
   strong {
@@ -69,6 +69,6 @@ export default {
   }
 }
 .l-order-item .icon-arrow{
-  margin-right: -0.266667rem
+  margin-right: -0.5rem
 }
 </style>

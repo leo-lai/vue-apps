@@ -101,7 +101,7 @@ export default {
 
 <style scoped lang="less">
 .l-order-item{
-  padding: 0.4rem;
+  padding: 0.75rem;
   background-color: #fff;
   margin: 0 0 0.533333rem 0;
   font-size: 14px;

@@ -37,7 +37,7 @@
       </div>
     </div>
     <div class="l-product-video" v-show="tab.index === 2">
-      <p class="l-fsize-sm" v-text="info.videoDesc"></p>
+      <p class="l-fsize-s" v-text="info.videoDesc"></p>
       <div class="l-video-player">
         <video id="video-player" x-webkit-airplay="true" webkit-playsinline="true" controls="controls"
         :poster="$image.thumb(info.videoThum, 640, 400)" :src="info.videoUrl"></video>
@@ -118,10 +118,10 @@ export default {
 <style scoped lang="less">
 .l-product-realshow{
   >div{
-    margin: 0.4rem;
+    margin: 0.75rem;
     border: 1px solid #ebebeb;
     border-radius: 3px;
-    padding: 0.266667rem;
+    padding: 0.75rem;
     background-color: #fff;
   }
   img{
@@ -132,40 +132,40 @@ export default {
 .l-product-props{
   background-color: #fff;
   .iconfont{
-    width: 0.933333rem;
+    width: 2.0rem;
     text-align: center;
     color: #4083c7;
   }
   .l-props-item{
-    margin: 0.4rem 0 0 0;
-    padding: 0.133333rem 0.266667rem 0.133333rem 0 ;
+    margin: 0.75rem 0 0 0;
+    padding: 0.375rem 0.75rem 0.375rem 0 ;
     border-radius: 3px;
   }
   .l-title{
     h4{
       color: #4083c7;
       font-weight: 400;
-      padding: 0.133333rem 0;
+      padding: 0.375rem 0;
     }
   }
   .l-content{
     font-size: 14px;
-    padding: 0.266667rem 0 0.266667rem 0.933333rem
+    padding: 0.5rem 0 0.5rem 2rem;
   }
 }
 
 .l-product-video{
-  padding: 0.46875rem;
+  padding: 0.75rem;
   background-color: #fff;
   p {
     color: #999;
   }
   .l-video-player{
-    margin: 0.46875rem 0 0 0;
+    margin: 0.75rem 0 0 0;
     background-color: #000;
     video{
       width: 100%;
-      height: 5.46875rem;
+      height: 12.0rem;
       display: block;
     }
   }

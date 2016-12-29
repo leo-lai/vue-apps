@@ -1,7 +1,7 @@
 <template>
   <div>
     <l-article :title="info.title" time="">
-      <div class="l-border-b" style="padding-bottom:0.4rem;margin-bottom:0.4rem;color:#666;">
+      <div class="l-border-b" style="padding-bottom:0.75rem;margin-bottom:0.75rem;color:#666;">
         <p>活动时间：{{startDate}} - {{endDate}}</p>
         <p>活动地点：{{info.location}}</p>
       </div>

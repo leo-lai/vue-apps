@@ -30,17 +30,17 @@ export default {
 <style scoped lang="less">
 .l-article {
   background-color: #fff;
-  padding: 0.4rem;
-  font-size: 15px;
+  padding: 0.75rem;
+  font-size: 14px;
   .l-article-hd {
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.75rem;
     overflow: hidden;
     h1 {
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 400;
     }
     p {
-      font-size: 12px;
+      font-size: 14px;
       color: #999;
     }
   }
@@ -56,13 +56,13 @@ export default {
     max-width: 100%; 
   }
   h2 {
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 400;
     margin-bottom: .34em;
   }
   h3 {
     font-weight: 400;
-    font-size: 15px;
+    font-size: 14px;
     margin-bottom: .34em;
   }
   p {

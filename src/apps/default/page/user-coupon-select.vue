@@ -76,7 +76,7 @@ export default {
 <style scoped lang="less">
 .l-coupon-list{
   box-sizing: border-box;
-  padding: 0 0.4rem;
+  padding: 0 0.75rem;
 }
 
 [class*=l-coupon-item] button{
@@ -90,7 +90,7 @@ export default {
 
 [class*=l-coupon-item] {
   background: #F39B00;
-  margin: 0.4rem 0;
+  margin: 0.75rem 0;
   box-sizing: border-box;
   width: 100%;
   min-height: 3.413333rem;

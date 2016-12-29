@@ -121,24 +121,24 @@ export default {
     margin-top: -2px;
   }
   .l-thumb{
-    padding: 0.4rem;
+    padding: 0.75rem;
     h3{
       font-weight: 400;
     }
     img{
-      width: 2.133333rem;
-      height: 2.133333rem;
-      margin-right: 0.266667rem;
+      width: 3.0rem;
+      height: 3.0rem;
+      margin-right: 0.5rem;
     }
   }
 }
 
 .l-store-details{
   background-color: #fff;
-  padding: 0.4rem;
+  padding: 0.75rem;
   img{
     display: block;
-    margin: 0.266667rem auto;
+    margin: 0.5rem auto;
   }
 }
 </style>

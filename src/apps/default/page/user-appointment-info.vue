@@ -17,7 +17,7 @@
           <img class="previewer-img" width="100%" :src="item.src">
         </swiper-item>
       </swiper>
-      <div v-else class="vux-center" style="height:4.266667rem;color:#999; font-size:14px;">
+      <div v-else class="vux-center" style="height: 8rem;color:#999; font-size:14px;">
         大样图正在设计中
       </div>
     </div>
@@ -311,9 +311,9 @@ export default {
 </script>
 <style scoped lang="less">
 .l-appointment-item{
-  padding: 0.4rem;
+  padding: 0.75rem;
   background-color: #fff;
-  margin: 0 0 0.533333rem 0;
+  margin: 0 0 0.75rem 0;
   font-size: 14px;
   p{
     margin:5px 0;

@@ -41,7 +41,7 @@ export default {
 </script>
 <style scoped>
 .m-item{
-  margin:0.4rem;
+  margin:0.75rem;
   overflow: hidden;
 }
 .m-img {
@@ -79,9 +79,9 @@ export default {
 }
 
 .m-circle{
-  width: 2.133333rem;
-  height: 2.133333rem;
-  line-height: 2.133333rem;
+  width: 4rem;
+  height: 4rem;
+  line-height: 4rem;
   background-color: rgba(255,255,255, 0.8);
   margin: auto;
   border-radius: 50%;

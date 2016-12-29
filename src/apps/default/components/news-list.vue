@@ -37,11 +37,11 @@ export default {
 <style scoped lang="less">
 .l-news-item{
   background-color: #fff;
-  padding: 0.266667rem;
+  padding: 0.75rem;
   .l-thumb{
-    width: 1.6rem;
-    height: 1.6rem;
-    margin-right: 0.266667rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-right: 0.5rem;
     img{
       width: 100%;
       height: 100%;

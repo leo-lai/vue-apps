@@ -137,7 +137,7 @@ export default {
 <style scoped lang="less">
 .l-appointment-item{
   color: #999;
-  padding: 0.266667rem 0.4rem;
+  padding: 0.5rem 0.75rem;
   background-color: #fff;
   font-size: 14px;
   .iconfont{
@@ -156,6 +156,6 @@ export default {
   }
 }
 .l-appointment-item .icon-arrow{
-  margin-right: -0.266667rem
+  margin-right: -0.5rem
 }
 </style>

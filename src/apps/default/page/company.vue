@@ -189,7 +189,7 @@ export default {
 
 .swiper-slide:nth-child(1){
   p{
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.75rem;
     line-height: 1.4;
   }
   .l-fsize-s p{
@@ -198,7 +198,7 @@ export default {
 }
 
 .l-swiper-content{
-  padding: 0 0.506667rem;
+  padding: 0 0.75rem;
 }
 
 </style>

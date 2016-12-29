@@ -92,9 +92,9 @@ export default {
 }
 
 .l-user-avatar .avatar {
-  width: 1.6rem;
-  height: 1.6rem;
-  margin:0 0.4rem;
+  width: 3.0rem;
+  height: 3.0rem;
+  margin:0 0.75rem;
   border-radius: 50%;
   border: 2px solid #ececec;
   background: no-repeat 50% 50%;

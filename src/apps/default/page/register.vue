@@ -1,10 +1,10 @@
 <template>
   <div>
-    <div v-if="!avatar" class="vux-center l-fsize-l" style="height: 1.6rem;">
+    <div v-if="!avatar" class="vux-center l-fsize-l" style="height: 3.2rem;">
       填写注册信息
     </div>
-    <div v-else class="vux-center" style="padding:0.4rem 0;">
-      <img style="width:2.133333rem;height:2.133333rem;border-radius:50%;border:1px solid #ccc" :src="avatar">
+    <div v-else class="vux-center" style="padding:0.75rem 0;">
+      <img style="width:3.0rem;height:3.0rem;border-radius:50%;border:1px solid #ccc" :src="avatar">
     </div>
     <group class="weui_cells_form">
       <x-input placeholder="请输入手机号码" :value.sync="formData.mobilePhone" class="weui_vcode" keyboard="number" is-type="china-mobile">

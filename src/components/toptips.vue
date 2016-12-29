@@ -43,7 +43,7 @@ export default {
   color: #fff;
   z-index: 1000;
   background-color: #e64340;
-  padding: 10px;
+  padding: 0.5rem;
   right: 0;
   left:0;
 }

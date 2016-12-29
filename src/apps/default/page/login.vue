@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="vux-center l-fsize-l" style="height: 1.6rem;">
+    <div class="vux-center l-fsize-l" style="height: 3.2rem;">
       使用账号和密码登录
     </div>
     <group class="weui_cells_form">

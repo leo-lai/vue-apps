@@ -68,7 +68,7 @@
         </div>
       </div>
       <div class="l-step-1" :class="{'l-can-get': giftList[1].whetherExchange, 'l-got': giftList[1].isExchanged}">
-        <img style="left:-0.266667rem;" class="l-prize" :src="giftList[1].imgUrl" @click="showGift(1)">
+        <img style="left:-0.5rem;" class="l-prize" :src="giftList[1].imgUrl" @click="showGift(1)">
         <img src="~assets/imgs/temp-047.jpg">
         <div class="l-tip l-flex-vc" v-if="giftList[1].show" @click="showGift(1)">
           <p>礼品名称：{{giftList[1].giftName}}</p>
@@ -134,15 +134,15 @@
     <!-- 好友助力二维码 -->
     <dialog :show.sync="dialog.qrcode" :scroll="dialog.scroll" @click="dialog.qrcode=false">
       <div v-if="route.query.isFriend">
-        <img style="width:5.333333rem; height:5.333333rem; display:block;margin: 0.266667rem auto;" :src="tempQrCode || defaultVal.qrcode">
+        <img style="width:5.333333rem; height:5.333333rem; display:block;margin: 0.5rem auto;" :src="tempQrCode || defaultVal.qrcode">
         <p style="color:#d29504; font-size:14px; font-weight: 500; padding:10px;">这是一个友好的二维码，请长按或扫描关注我们，完成为好友助力壮举！同时我们也会将最新优惠资讯发送给您。</p>
       </div>
     </dialog>
     <!-- 奖品详情 -->
     <!-- <dialog :show.sync="dialog.show" :scroll="dialog.scroll" @click="dialog.show=false">
-      <div style="padding:0.266667rem; background-color:#fff;">
+      <div style="padding:0.5rem; background-color:#fff;">
         <img height="200" :src="$image.thumb(dialog.itemInfo.imgUrl, 640, 400)">
-        <div style="text-align:left;margin-top:0.266667rem;">
+        <div style="text-align:left;margin-top:0.5rem;">
           <p>礼品名称：{{dialog.itemInfo.giftName}}</p>
           <p>领取条件：需要{{dialog.itemInfo.integral}}好友助力完成</p>    
         </div>
@@ -366,13 +366,13 @@ export default {
   z-index: 0;
 }
 .l-welfare-2{
-  margin: 0.4rem 0;
+  margin: 0.75rem 0;
   padding: 2rem 0.8rem;
   background: #fdd400 url('~assets/imgs/temp-044.jpg') no-repeat center top;
   background-size: 100% 100%;
   >[class^=l-step-]{
     position: relative;
-    margin: 0.266667rem 0;
+    margin: 0.5rem 0;
   }
   .l-prize{
     position: absolute;
@@ -387,7 +387,7 @@ export default {
   }
   .l-step-2{
     .l-prize {
-      right: 0.266667rem;
+      right: 0.5rem;
       filter: grayscale(100%)
     }
   }

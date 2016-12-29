@@ -105,8 +105,8 @@ export default {
 </script>
 <style scoped lang="less">
 .l-card-item {
-  margin:0.4rem 0.4rem 0;
-  padding: 0.266667rem;
+  margin:0.75rem 0.75rem 0;
+  padding: 0.75rem;
   background-color: #fff;
   border-radius: 5px;
   border:1px solid #ccc;
@@ -116,26 +116,26 @@ export default {
     font-size: 16px;  
   }
   p {
-    font-size: 12px;
+    font-size: 14px;
     color: #999;
   }
 }
 .l-card-item-bd{
-  padding: 0.266667rem 0;
+  padding: 0.5rem 0;
   img{
     width: 100%;
-    height: 4.266667rem;
+    height: 8.0rem;
     background-color: #ebebeb;
   }
   p {
-    font-size: 12px;
+    font-size: 14px;
     color: #999;
     line-height: 1.4;
-    margin-top: 0.266667rem;
+    margin-top: 0.5rem;
   }
 }
 .l-card-item-ft{
-  padding-top: 0.266667rem;
+  padding-top: 0.5rem;
   font-size: 14px;
   .icon-arrow{
     font-size: inherit;

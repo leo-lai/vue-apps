@@ -11,8 +11,8 @@
       <div class="l-flex-h l-coupon-item-0" v-for="item in tabData[tabIndex]">
         <div class="l-rest par">
           <p v-text="item.couponName"></p>
-          <sub class="sign">￥</sub><span v-text="item.couponValue"></span>
-          <p class="l-fsize-sm" v-text="item.ruleDesc"></p>
+          <p style="margin:0.375rem 0;"><sub class="sign">￥</sub><span v-text="item.couponValue"></span></p>
+          <p class="l-fsize-s" v-text="item.ruleDesc"></p>
         </div>
         <div class="copy l-flex-vhc">
           <p>有效日期</p>
@@ -28,8 +28,8 @@
       <div class="l-flex-h l-coupon-item-used" v-for="item in tabData[tabIndex]">
         <div class="l-rest par">
           <p v-text="item.couponName"></p>
-          <sub class="sign">￥</sub><span v-text="item.couponValue"></span>
-          <p class="l-fsize-sm" v-text="item.ruleDesc"></p>
+          <p style="margin:0.375rem 0;"><sub class="sign">￥</sub><span v-text="item.couponValue"></span></p>
+          <p class="l-fsize-s" v-text="item.ruleDesc"></p>
         </div>
         <div class="copy l-flex-vhc">
           <p>有效日期</p>
@@ -44,8 +44,8 @@
       <div class="l-flex-h l-coupon-item-used" v-for="item in tabData[tabIndex]">
         <div class="l-rest par">
           <p v-text="item.couponName"></p>
-          <sub class="sign">￥</sub><span v-text="item.couponValue"></span>
-          <p class="l-fsize-sm" v-text="item.ruleDesc"></p>
+          <p style="margin:0.375rem 0;"><sub class="sign">￥</sub><span v-text="item.couponValue"></span></p>
+          <p class="l-fsize-s" v-text="item.ruleDesc"></p>
         </div>
         <div class="copy l-flex-vhc">
           <p>有效日期</p>
@@ -108,7 +108,7 @@ export default {
 <style scoped lang="less">
 .l-coupon-list{
   box-sizing: border-box;
-  padding: 0 0.4rem;
+  padding: 0 0.75rem;
 }
 
 [class*=l-coupon-item] button{
@@ -122,7 +122,7 @@ export default {
 
 [class*=l-coupon-item] {
   background: #F39B00;
-  margin: 0.4rem 0;
+  margin: 0.75rem 0;
   box-sizing: border-box;
   width: 100%;
   min-height: 3.413333rem;
@@ -146,7 +146,7 @@ export default {
     p {
       color: #fff;
       font-size: 16px;
-      line-height: 21px;
+      line-height: 1.4;
     }
     span {
       font-size: 30px;
@@ -155,16 +155,18 @@ export default {
       line-height: 1.6rem;
     }
     .sign {
+      font-size: 18px;
+      margin-right: 0.25rem;
     }
     sub {
       position: relative;
-      top: -5px;
-      color: rgba(255, 255, 255, .8);
+      top: -7px;
+      // color: rgba(255, 255, 255, .8);
     }
   }
   .copy {
     width: 35%;
-    max-width: 4.0rem;
+    max-width: 8.0rem;
     color: rgb(255, 255, 255);
     .time{
       line-height: 1.6;

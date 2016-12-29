@@ -1,14 +1,14 @@
 <template>
   <div>
     <swiper :list="banner" loop auto></swiper>
-    <div class="l-margin-tb l-flex-hc" style="background-color:#fff;padding:0.4rem;">
+    <div class="l-margin-tb l-flex-hc" style="background-color:#fff;padding:0.75rem;">
       <div class="l-rest">
         <masker class="l-masker-item" :opacity="0.5" v-link="{path:'/booking'}">
           <div class="l-img" :style="{backgroundImage: 'url(' + images.img1 + ')'}"></div>
           <div class="l-title" slot="content">在线预约</div>
         </masker>  
       </div>
-      <div class="l-rest" style="margin-left:0.4rem;">
+      <div class="l-rest" style="margin-left:0.75rem;">
         <masker class="l-masker-item" :opacity="0.5" v-link="{path:'/welfare'}">
           <div class="l-img" :style="{backgroundImage: 'url(' + images.img2 + ')'}"></div>
           <div class="l-title" slot="content">新人领福利</div>
@@ -104,14 +104,15 @@ export default {
 </script>
 <style scoped lang="less">
 .l-grid{
-  margin:0.4rem 0;
+  margin: 0.75rem 0;
   background-color: #fff;
   font-size: 12px;
+  padding: 0.375rem 0;
 }
 .l-grid-item{
   box-sizing: border-box;
   width: 25%;
-  padding: 0.266667rem;
+  padding: 0.375rem;
   img{
     width: 80%;
   }

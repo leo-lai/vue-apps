@@ -3,7 +3,7 @@
     <div class="swiper-container">
       <div class="swiper-wrapper">
         <div class="swiper-slide l-flex-vhc">
-          <img class="ani" ani-effect="flip fadeIn" ani-duration="0.8s" ani-delay="1s" style="width: 4.266667rem" src="~assets/imgs/temp-028.jpg">
+          <img class="ani" ani-effect="flip fadeIn" ani-duration="0.8s" ani-delay="1s" style="width: 8rem" src="~assets/imgs/temp-028.jpg">
           <br><br>
           <div class="l-center ani" ani-effect="fadeInDown" ani-duration="1s">
             <p>曾梦想仗剑走天涯</p>

@@ -164,7 +164,7 @@ export default {
 </script>
 <style lang="less">
 .l-booking-form{
-  margin-left: -0.266667rem;
+  margin-left: -0.5rem;
   .weui_cells:after, .weui_cells:before{
     display: none;
   }
@@ -188,7 +188,7 @@ export default {
 }
 
 .l-box-1{
-  margin: 0.533333rem;padding:0.4rem;
+  margin: 0.533333rem;padding:0.75rem;
   background:#fff url('~assets/imgs/temp-063.jpg') no-repeat center bottom;
   background-size: contain;
 }
@@ -197,7 +197,7 @@ export default {
 }
 
 .l-gift-list{
-  margin-top: 0.4rem;
+  margin-top: 0.75rem;
   .l-item{
     width: 1.6rem;
     height: 1.6rem;

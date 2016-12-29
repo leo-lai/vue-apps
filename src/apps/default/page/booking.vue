@@ -34,11 +34,15 @@ export default {
   route: {
     data() {
       server.getAddress().then( address => {
+
         if(address.address_component){
           let province = address.address_component.province
           let city = address.address_component.city
           let area = address.address_component.district
-          this.address.value = name2value([province, city, area], AddressChinaData).split(' ')  
+          let tempValue = name2value([province, city, area], AddressChinaData).split(' ')
+          if(tempValue && tempValue[0] !== '__'){
+            this.address.value = tempValue
+          }
         }
       })
       this.formData.name = this.userinfo.realName || this.userinfo.wxNickName || ''
