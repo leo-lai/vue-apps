@@ -1,6 +1,6 @@
 <template>
   <div>
-    <swiper :list="banner" loop auto></swiper>
+    <swiper :list="banner" loop auto height="9.0rem"></swiper>
     <div class="l-margin-tb l-flex-hc" style="background-color:#fff;padding:0.75rem;">
       <div class="l-rest">
         <masker class="l-masker-item" :opacity="0.5" v-link="{path:'/booking'}">

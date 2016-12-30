@@ -11,8 +11,8 @@
       <p>楼盘地址：<span v-text="info.province+info.city+info.area+(info.address||'')"></span></p>
     </div>
     <divider>大样图</divider>
-    <div style="background-color:#fff;margin: 0.133333rem 0 0.533333rem;">
-      <swiper :aspect-ratio="300/800" v-if="designImgs.length > 0">
+    <div style="background-color:#fff;margin: 0.375rem 0 0.75rem;">
+      <swiper :aspect-ratio="400/800" v-if="designImgs.length > 0">
         <swiper-item v-for="(index, item) in designImgs"  @click="$refs.previewer.show(index)">
           <img class="previewer-img" width="100%" :src="item.src">
         </swiper-item>
@@ -30,26 +30,33 @@
             <th>产品名称</th>
             <th>数量(套)</th>
             <th>面积(m²)</th>
-            <th>单价(元)</th>
+            <th>单价</th>
+            <th>配件</th>
             <th>小计(元)</th>
           </tr>
         </thead>
-        <tr class="l-table-line"><td colspan="5"></td></tr>
+        <tr class="l-table-line"><td colspan="6"></td></tr>
         <tbody v-for="item in products">
           <tr class="l-table-th">
-            <td colspan="4" v-text="item.typeName"></td>
-            <td v-text="item.orderAmount | currency '' 2"></td>
+            <td colspan="6">
+              <strong class="l-fr" v-text="item.orderAmount | currency '' 2"></strong>
+              <strong v-text="item.typeName"></strong>
+            </td>
           </tr>
           <tr v-for="product in item.list">
-            <td v-text="product.productName"></td>
+            <td style="text-align:left;" v-text="product.productName"></td>
             <td v-text="product.pruductNum"></td>
             <td v-text="product.areas"></td>
             <td v-text="product.showUnitPrice"></td>
+            <td>
+              <a style="text-decoration:underline;" v-if="product.goodsAmount" v-text="product.goodsAmount" @click="showParts(product.id)"></a>
+              <span v-else>0</span>
+            </td>
             <td v-text="product.showAmount | currency '' 2"></td>
           </tr>
         </tbody>
         <tfoot>
-          <td colspan="5" class="l-tr">
+          <td colspan="6" class="l-tr">
             <div style="color:#333;">合计：{{amount | currency '' 2}}</div>
             <div v-if="info._state === 8" style="color:#4083c7;text-decoration: underline;" v-link="'/user/coupon/select'">
               优惠券：-{{ ( couponValue || 0) | currency '' 2 }}
@@ -71,6 +78,19 @@
         <x-textarea :max="500" placeholder="请详细描述您不满意的原因" :value.sync="formData.remark"></x-textarea>
         <x-button class="l-btn-square" @click="submit(false)">提交</x-button>
       </div>
+    </dialog>
+    <dialog :show.sync="dialog2.show" :scroll="true" @click="dialog2.show = false">
+      <h3 style="padding:0.25rem;">配件明细</h3>
+      <table>
+        <tr>
+          <th>配件名称</th>
+          <th>配件金额</th>
+        </tr>
+        <tr v-for="item in dialog2.list.names">
+          <td v-text="item"></td>
+          <td v-text="dialog2.list.amounts[$index]"></td>
+        </tr>
+      </table>
     </dialog>
     <previewer :list="designImgs" v-ref:previewer :options="options"></previewer>
   </div>
@@ -109,6 +129,13 @@ export default {
       dialog: {
         show: false,
         scroll: false
+      },
+      dialog2: {
+        show: false,
+        list: {
+          names: [],
+          amounts: []
+        }
       },
       amountCoupon: 0,
       amount: 0,
@@ -151,11 +178,10 @@ export default {
     },
     products() {
       let ret = []
-      let cateObj = {}
-      let product = {}
-      let amount = 0
-      let amountCoupon = 0
-
+      let cateObj = {}        // 产品分类  阳光房,门，窗
+      let amount = 0          // 总计
+      let amountCoupon = 0    // 优惠金额
+      let parts = {}          // 配件数据
       let typeName = ['安全门', '安全窗', '贵族阳光房']
       let categoryName = ['钢结构', '主立柱', '靠墙立柱', '次立柱', '三角面积', '屋顶', '水槽', '水槽堵塞网', '清风双悬推拉门', '95手摇开窗-固定部分', '95手摇开窗-扇部分']
       if(this.info && this.info.designVoList){
@@ -178,12 +204,20 @@ export default {
               item.quotationVo.detailDWVoList && (cateObj.list = item.quotationVo.detailDWVoList)
             }
             
-            cateObj.list.forEach((item)=>{
+            cateObj.list.forEach((item2)=>{
               if(cateObj.designType === 3){
-                item.productName = categoryName[item.structure - 1]
+                item2.productName = categoryName[item2.structure - 1]
+              }else{
+                // 整理配件数据
+                if(item2.goodNames && item2.goodAmounts){
+                  parts[item2.id] = {
+                    names: item2.goodNames.split('|'),
+                    amounts: item2.goodAmounts.split('|')
+                  }
+                }
               }
-              item.showAmount = this.info.byAgentUserId ? item.salesUnitAmount : item.amount
-              item.showUnitPrice = this.info.byAgentUserId ? item.salesUnitPrice : item.unitPrice
+              item2.showAmount = this.info.byAgentUserId ? item2.salesUnitAmount : item2.amount
+              item2.showUnitPrice = this.info.byAgentUserId ? item2.salesUnitPrice : item2.unitPrice
             })
 
             ret.push(cateObj)
@@ -191,6 +225,7 @@ export default {
         }
       }
 
+      this.parts = parts
       this.amount = amount
       this.amountCoupon = amountCoupon
       return ret
@@ -255,6 +290,13 @@ export default {
         }
       })
     },
+    showParts(id) {
+      if(this.parts[id]){
+        this.dialog2.list.names = this.parts[id].names
+        this.dialog2.list.amounts = this.parts[id].amounts  
+      }
+      this.dialog2.show = true
+    },
     submit(sure) {
       const self = this
       self.formData.appointId = self.info.id
@@ -311,7 +353,7 @@ export default {
 </script>
 <style scoped lang="less">
 .l-appointment-item{
-  padding: 0.75rem;
+  padding: 0.375rem;
   background-color: #fff;
   margin: 0 0 0.75rem 0;
   font-size: 14px;
