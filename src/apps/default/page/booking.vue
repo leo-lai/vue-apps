@@ -33,8 +33,8 @@ export default {
   vuex: { getters },
   route: {
     data() {
+      // 自动定位地址
       server.getAddress().then( address => {
-
         if(address.address_component){
           let province = address.address_component.province
           let city = address.address_component.city

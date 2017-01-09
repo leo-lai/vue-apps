@@ -178,7 +178,7 @@ export default {
 
     let promise = new Promise((resolve) => {
       if(!window.wx){
-        utils.alert('找不到jweixin.js文件')
+        utils.alert.call(Vue, '没有引入jweixin')
         resolve({})
       }else{
         window.wx._ready = false
@@ -245,10 +245,12 @@ export default {
       if(!inviterWxOpenId || !inviterWxUnionId){
         resolve(ret)
       }else{
-        Vue.http.post('owner/visitor/addShare', {
-          channel,
-          inviterWxOpenId,
-          inviterWxUnionId
+        Vue.http.get('wx/frame/getActivityQrCodeUrl', { 
+          params: {
+            channel,
+            inviterWxOpenId,
+            inviterWxUnionId  
+          }
         }).then(({ body })=>{
           if(body.success && body.data){
             resolve(body.data)

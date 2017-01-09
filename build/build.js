@@ -19,7 +19,7 @@ spinner.start()
 
 // assetsPath ->  d:\leo-work\vue-pages\dist\static
 var assetsPath = path.join(config.build.assetsRoot, config.build.assetsSubDirectory)
-rm('-rf', assetsPath)
+// rm('-rf', assetsPath)
 mkdir('-p', assetsPath)
 // cp('-R', 'static/', config.build.assetsRoot)
 
@@ -29,6 +29,7 @@ webpack(webpackConfig, function (err, stats) {
   process.stdout.write(stats.toString({
     progress: true,
     colors: true,
+    profile: true,
     modules: false,
     children: false,
     chunks: false,

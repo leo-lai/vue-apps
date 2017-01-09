@@ -2,7 +2,7 @@
   <div class="l-welfare-gift">
     <div class="l-box-1">
       <div class="l-box-2">
-        <p class="l-fsize-s">请放心大胆填写用户信息，工作人员审核后，会安排快递小哥愉快的将礼品送到您的手上哦~</p>
+        <p class="l-fsize-sm">请放心大胆填写用户信息，工作人员审核后，会安排快递小哥愉快的将礼品送到您的手上哦~</p>
         <div class="l-flex-hc l-gift-list">
           <div class="l-item" v-for="item in giftList">
             <img :src="item.imgUrl">
@@ -23,6 +23,7 @@
 </template>
 <script>
 import { Dialog, XButton, Group, XInput, Cell, Address, AddressChinaData } from 'vux-components'
+import name2value from 'vux/src/filters/name2value'
 import value2name from 'vux/src/filters/value2name'
 import { utils, storage } from 'assets/lib'
 import { store, actions, getters } from '../vuex'
@@ -71,6 +72,19 @@ export default {
         // 分享到朋友圈/好友
         wx.onMenuShareTimeline(shareConfig)
         wx.onMenuShareAppMessage(shareConfig)
+      })
+
+      // 自动定位地址
+      server.getAddress().then( address => {
+        if(address.address_component){
+          let province = address.address_component.province
+          let city = address.address_component.city
+          let area = address.address_component.district
+          let tempValue = name2value([province, city, area], AddressChinaData).split(' ')
+          if(tempValue && tempValue[0] !== '__'){
+            this.address.value = tempValue
+          }
+        }
       })
 
       self.$vux.loading.show()
@@ -184,27 +198,27 @@ export default {
   min-height: 100%;
   background: #4083c7 url('~assets/imgs/temp-062.jpg') no-repeat 50% top;
   background-size: 100% 100%;
-  padding-bottom: 1.333333rem;
+  padding-bottom: 1.0rem;
 }
 
 .l-box-1{
-  margin: 0.533333rem;padding:0.75rem;
+  margin: 0.75rem; padding:0.75rem;
   background:#fff url('~assets/imgs/temp-063.jpg') no-repeat center bottom;
   background-size: contain;
 }
 .l-box-2{
-  border-radius:5px;background:#cfe7fd;padding:15px;
+  border-radius: 3px; background:#cfe7fd; padding: 0.75rem;
 }
 
 .l-gift-list{
   margin-top: 0.75rem;
   .l-item{
-    width: 1.6rem;
-    height: 1.6rem;
+    width: 2.5rem;
+    height: 2.5rem;
     border-radius: 50%;
     overflow:hidden;
     background-color: #fff;
-    margin:0.106667rem;
+    margin: 0.375rem;
     img{
       width: 100%;
       height: 100%;

@@ -4,17 +4,16 @@
     <img class="l-block" style="margin-top:-20px; max-width:90%;" src="~assets/imgs/temp-039.png">
 
     <div class="l-welfare-1">
-      <img style="width: 3.866667rem; position: absolute; top: -1.6rem; left: 0; z-index: -1;" src="~assets/imgs/temp-040.png">
-      <img style=" width: 1.333333rem;" class="l-block" src="~assets/imgs/temp-042.png">
+      <img style="width: 6.8rem; position: absolute; top: -3.0rem; left: 0; z-index: -1;" src="~assets/imgs/temp-040.png">
+      <img style=" width: 2.0rem;" class="l-block" src="~assets/imgs/temp-042.png">
       <!-- 好友助力显示 -->
       <div class="l-box-1" v-if="route.query.isFriend">
         <div class="vux-center" v-if="sharer.wxNickName">
           <!-- <img style="width:1.066667rem;height:1.066667rem;border: 1px solid #ebebeb;margin:0 15px 0 0;" 
             :src="sharer.wxHeadPhoto || defaultVal.avatar"> -->
           您的好友 {{sharer.wxNickName}} 邀请您帮他拼人脉
-          <br><br>
+          <br>
         </div>
-        
         <div class="l-flex-h l-chat-item">
           <div class="l-thumb">
             <img :src="sharer.wxHeadPhoto || defaultVal.avatar">  
@@ -35,8 +34,7 @@
             </div>
           </div>
         </div>
-        <br>
-        <img v-if="route.query.isFriend" @click="dialog.qrcode=true" class="l-block" style="width:5.333333rem;" src="~assets/imgs/temp-065.png">
+        <img v-if="route.query.isFriend" @click="dialog.qrcode=true" class="l-block" style="width: 7.5rem;" src="~assets/imgs/temp-065.png">
       </div>
       <!-- 自己分享显示 活动规则 -->
       <div v-else>
@@ -56,7 +54,7 @@
     <!-- 自己分享显示 奖品列表 -->
     <div class="l-welfare-2" v-if="!route.query.isFriend">
       <div class="l-step-first">
-        <img style="width: 3.466667rem; top: -1.866667rem; left: 0.533333rem;" class="l-prize" src="~assets/imgs/temp-051.png">
+        <img style="top: -2.75rem; left: 1.2rem;" class="l-prize" src="~assets/imgs/temp-051.png">
         <img src="~assets/imgs/temp-045.jpg">
       </div>
       <div class="l-step-2" :class="{'l-can-get': giftList[0].whetherExchange, 'l-got': giftList[0].isExchanged}">
@@ -68,7 +66,7 @@
         </div>
       </div>
       <div class="l-step-1" :class="{'l-can-get': giftList[1].whetherExchange, 'l-got': giftList[1].isExchanged}">
-        <img style="left:-0.5rem;" class="l-prize" :src="giftList[1].imgUrl" @click="showGift(1)">
+        <img class="l-prize" :src="giftList[1].imgUrl" @click="showGift(1)">
         <img src="~assets/imgs/temp-047.jpg">
         <div class="l-tip l-flex-vc" v-if="giftList[1].show" @click="showGift(1)">
           <p>礼品名称：{{giftList[1].giftName}}</p>
@@ -76,7 +74,7 @@
         </div>
       </div>
       <div class="l-step-2" :class="{'l-can-get': giftList[2].whetherExchange, 'l-got': giftList[2].isExchanged}">
-        <img style="right:-0.666667rem;top:-1.6rem;" class="l-prize" :src="giftList[2].imgUrl" @click="showGift(2)">
+        <img class="l-prize" :src="giftList[2].imgUrl" @click="showGift(2)">
         <img src="~assets/imgs/temp-048.jpg">
         <div class="l-tip l-flex-vc" v-if="giftList[2].show" @click="showGift(2)">
           <p>礼品名称：{{giftList[2].giftName}}</p>
@@ -84,7 +82,7 @@
         </div>
       </div>
       <div class="l-step-1" :class="{'l-can-get': giftList[3].whetherExchange, 'l-got': giftList[3].isExchanged}">
-        <img style="left:-0.933333rem;" class="l-prize" :src="giftList[3].imgUrl" @click="showGift(3)">
+        <img class="l-prize" :src="giftList[3].imgUrl" @click="showGift(3)">
         <img src="~assets/imgs/temp-049.jpg">
         <div class="l-tip l-flex-vc" v-if="giftList[3].show" @click="showGift(3)">
           <p>礼品名称：{{giftList[3].giftName}}</p>
@@ -117,25 +115,25 @@
       <br>
       <img class="l-block" style="max-width:85%;" src="~assets/imgs/temp-058.jpg">
       <p class="l-box-1">邀请小伙伴助力，小伙伴越多得到的礼品也越多。最终全部通关的用户，可领取全部礼品！就是这么壕！</p>
-      <img style=" width: 1.333333rem;" class="l-block" src="~assets/imgs/temp-042.png">
+      <img style=" width: 2.5rem;" class="l-block" src="~assets/imgs/temp-042.png">
       <img class="l-block" style="max-width:90%;" src="~assets/imgs/temp-059.jpg">
-      <img style=" width: 1.333333rem;" class="l-block" src="~assets/imgs/temp-042.png">
+      <img style=" width: 2.5rem;" class="l-block" src="~assets/imgs/temp-042.png">
       <div class="l-box-1">
-        <ol style="margin-left:0.533333rem;">
+        <ol style="margin-left: 1.0rem;">
           <li>活动时间：2016-12-01 00:00:00至2016-12-12 23:59:59；</li>
           <li>同一用户可领取多个礼品，同一用户指：同一手机号、身份证号、收货地址等；</li>
           <li>领取奖品的用户点击“领取礼品”填写个人信息，即可等待回访电话获得奖品。</li>
         </ol>
       </div>
       <br>
-      <img v-if="!route.query.isFriend" @click="receiveGift" class="l-block" style="width:5.333333rem" src="~assets/imgs/temp-060.jpg">
+      <img v-if="!route.query.isFriend" @click="receiveGift" class="l-block" style="width:7.5rem" src="~assets/imgs/temp-060.jpg">
       <br>
     </div>
     <!-- 好友助力二维码 -->
     <dialog :show.sync="dialog.qrcode" :scroll="dialog.scroll" @click="dialog.qrcode=false">
-      <div v-if="route.query.isFriend">
-        <img style="width:5.333333rem; height:5.333333rem; display:block;margin: 0.5rem auto;" :src="tempQrCode || defaultVal.qrcode">
-        <p style="color:#d29504; font-size:14px; font-weight: 500; padding:10px;">这是一个友好的二维码，请长按或扫描关注我们，完成为好友助力壮举！同时我们也会将最新优惠资讯发送给您。</p>
+      <div v-if="route.query.isFriend" style="padding: 0.75rem; text-align:center;">
+        <img style="width:7.5rem; height:7.5rem; " :src="tempQrCode || defaultVal.qrcode">
+        <p style="color:#d29504; font-size:14px; ">这是一个友好的二维码，请长按或扫描关注我们，完成为好友助力壮举！同时我们也会将最新优惠资讯发送给您。</p>
       </div>
     </dialog>
     <!-- 奖品详情 -->
@@ -331,14 +329,14 @@ export default {
 <style scoped lang="less">
 .l-winner-list{
   overflow:hidden;
-  margin-left: -0.133333rem;
+  margin-left: -0.375rem;
 }
 .l-winner-list li{
   list-style: none;
   float: left;
-  width: 1.04rem;
-  height: 1.04rem;
-  margin: 0.133333rem;
+  width: 2.0rem;
+  height: 2.0rem;
+  margin: 0.375rem;
   background: #ebebeb url('~assets/imgs/avatar.png') no-repeat 50% 50%;
   background-size: contain;
 }
@@ -352,10 +350,10 @@ export default {
   }
 }
 .l-box-1, .l-name-list{
-  margin: auto 0.533333rem;
+  margin: auto 0.75rem;
   text-align: left;
   color: #5a4c05;
-  padding: 0.533333rem;
+  padding: 0.75rem;
   border:2px solid #000;
   border-radius: 3px;
   background-color: #fff;
@@ -376,18 +374,19 @@ export default {
   }
   .l-prize{
     position: absolute;
-    top: -0.8rem;
-    width: 2.4rem;
+    top: -1.2rem;
+    width: 6.0rem;
+    height: 6.0rem;
   }
   .l-step-1{
     .l-prize {
-      left: -0.533333rem;
+      left: 0;
       filter: grayscale(100%)
     }
   }
   .l-step-2{
     .l-prize {
-      right: 0.5rem;
+      right: 0;
       filter: grayscale(100%)
     }
   }
@@ -399,18 +398,18 @@ export default {
     width: 100%;
     background: rgba(0, 0, 0, 0.7);
     color: #fff;
-    border-radius: 5px;
-    padding: 0 10px;
+    border-radius: 3px;
+    padding: 0 0.5rem;
     box-sizing: border-box;
     font-size: 14px;
   }
 }
 .l-name-list{
-  max-height: 4.0rem;
+  max-height: 7.5rem;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
   table, td{
-    padding: 0 0.133333rem;
+    padding: 0 0.375rem;
     border:none;
   }
 }

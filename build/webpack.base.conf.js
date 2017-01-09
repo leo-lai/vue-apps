@@ -131,7 +131,7 @@ for (var pathname in entries) {
   module.exports.plugins.push(new HtmlWebpackPlugin(conf))
 }
 
-// e.g. getEntry('./src/apps/*/*.js')
+// e.g. getEntry('./src/apps/*/main.js')
 /*
   return {
     'index': './src/page/index/main.js',
@@ -139,8 +139,7 @@ for (var pathname in entries) {
   }
 */
 function getEntry(globPath) {
-  var entries = {},
-    basename, tmp, pathname
+  var entries = {}, basename, tmp, pathname
   
   glob.sync(globPath).forEach(function (entry) {
     // basename = path.basename(entry, path.extname(entry))
