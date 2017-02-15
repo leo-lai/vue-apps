@@ -9,7 +9,7 @@ let _serverPath = 'http://ktz.aylsonclub.com/service'
 if(_HOST.indexOf('http://ktz.aylsonclub.com') === -1){
   _qrcode = require('assets/imgs/yz-qrcode-test.jpg')
   _appid = 'wxc8123454324da8b0'
-  _serverPath = 'http://test.aylsonclub.com/dc-web'
+  _serverPath = 'https://test.aylsonclub.com/dc-web'
 }
 
 export default {
