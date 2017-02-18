@@ -1,0 +1,6 @@
+<urlrewrite>
+  <rule>
+    <from>^/(.(?!\.))*$</from>
+    <to type="forward">/index.html</to>
+  </rule>
+</urlrewrite>
